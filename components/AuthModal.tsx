@@ -58,9 +58,9 @@ export default function AuthModal() {
           </div>
           <h2 className="text-xl md:text-2xl font-black text-white">
             {isRegister ? (
-              <span>Créer un compte <span className="text-white">PROS</span><span className="text-cyan">PECTIZI</span></span>
+              <span>Créer un compte <span className="text-white">Pros</span><span className="text-cyan">pectizi</span></span>
             ) : (
-              <span>Connexion à votre Espace <span className="text-white">PROS</span><span className="text-cyan">PECTIZI</span></span>
+              <span>Connexion à votre Espace <span className="text-white">Pros</span><span className="text-cyan">pectizi</span></span>
             )}
           </h2>
           <p className="text-xs text-slate-400 mt-1">

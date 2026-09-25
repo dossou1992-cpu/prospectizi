@@ -28,6 +28,14 @@ export default function AvatarPage() {
   // Presets pour tous les métiers du digital
   const presets = [
     {
+      title: "🤖 IA Engineer / Auto",
+      profession: "IA Engineer & Spécialiste Automatisation / Chatbots",
+      offer: "Intégration d'agents d'IA intelligents, qualification automatique des leads 24/7 et automatisation des processus internes.",
+      target_audience: "PME, cabinets de conseil, startups, plateformes e-commerce et agences.",
+      major_benefit: "Économiser 15h de travail manuel par semaine et traiter 100% des prospects en moins de 60 secondes.",
+      tone: "direct" as const,
+    },
+    {
       title: "💻 Développeur Web",
       profession: "Développeur Web & Créateur de Sites / SaaS",
       offer: "Refonte de sites web ultra-rapides, responsives et intégration de tunnels de devis automatisés.",
@@ -143,6 +151,14 @@ export default function AvatarPage() {
         
         {/* FORMULAIRE GAUCHE */}
         <div className="lg:col-span-7 bg-dark-900 border border-dark-600/90 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          {/* Reassurance note */}
+          <div className="p-3 bg-cyan/10 border border-cyan/30 rounded-xl text-xs text-slate-300 flex items-start gap-2.5">
+            <Sparkles className="w-4 h-4 text-cyan shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
+              <strong className="text-white">Liberté totale de saisie :</strong> Les boutons de sélection rapide ci-dessus ne sont que des exemples pour vous faire gagner du temps. Vous pouvez taper n&apos;importe quel métier (ex: <em>IA Engineering, Prompt Engineering, Consultant Cybersécurité, Data Analyst, Monteur Vidéo, Growth Hacker...</em>) : l&apos;IA calibrera automatiquement les failles et rédigera les messages adaptés aux besoins réels de vos prospects.
+            </p>
+          </div>
+
           <form onSubmit={handleSave} className="space-y-5">
             {/* Métier / Activité */}
             <div>

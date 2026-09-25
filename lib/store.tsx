@@ -469,6 +469,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
 
     // Trade profiling
     const profLower = (avatar.profession || "").toLowerCase();
+    const isAI = profLower.includes('ia') || profLower.includes('ai') || profLower.includes('artificielle') || profLower.includes('data') || profLower.includes('machine learning') || profLower.includes('prompt') || profLower.includes('automat') || profLower.includes('engineer');
     const isWebDev = profLower.includes('web') || profLower.includes('site') || profLower.includes('développeur') || profLower.includes('saas');
     const isCM = profLower.includes('community') || profLower.includes('social') || profLower.includes('réseaux') || profLower.includes('instagram');
     const isAds = profLower.includes('ads') || profLower.includes('pub') || profLower.includes('media') || profLower.includes('acquisition');
@@ -490,6 +491,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       const score = Math.floor(Math.random() * (98 - 70 + 1)) + 70;
       const id = "search-" + Date.now() + "-" + i;
       const targetLoc = params.location || comp.city;
+      const targetAct = params.keyword ? `${params.keyword} (${comp.act})` : comp.act;
 
       // Dynamic Flaw & Offer based on user's digital profession
       let flaws = "";
@@ -498,7 +500,13 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       let firstContactB = "";
       let valueOffer = "";
 
-      if (isWebDev) {
+      if (isAI) {
+        flaws = "Processus clients et qualification 100% manuels, aucune automatisation IA pour traiter les demandes entrantes 24/7 et données internes non exploitées.";
+        offer = avatar.offer || "Mise en place d'agents d'IA intelligents, de chatbots de qualification automatique et de pipelines d'automatisation de tâches répétitives.";
+        firstContactA = `Bonjour ! En analysant le fonctionnement de ${comp.name} sur ${targetLoc}, vos équipes perdent probablement plusieurs heures par jour sur des tâches manuelles répétitives. Nous intégrons des agents IA qui automatisent le tri et la qualification 24h/24. Seriez-vous ouvert à une démo de 2 min ?`;
+        firstContactB = `Bonjour ! Les structures de votre secteur sur ${targetLoc} qui intègrent l'IA qualifient 3x plus de prospects sans recruter. J'ai modélisé un cas d'usage IA sur-mesure pour ${comp.name}. Disponible pour un rapide aperçu de 2 min ?`;
+        valueOffer = `💡 Message de Valeur (IA Engineering & Automatisation) :\n\n« Déployer un agent d'IA conversationnelle permet de qualifier 100% des leads entrants en moins de 60 secondes, même le week-end. Une entreprise équivalente a réduit ses coûts de traitement de 45% tout en signant 4 nouveaux contrats dès le premier mois. »`;
+      } else if (isWebDev) {
         flaws = "Site web obsolète, non adapté au mobile (temps de chargement > 4.2s) et absence de module de réservation/devis instantané.";
         offer = avatar.offer || "Création d'un site web ultra-rapide, responsive et optimisé SEO pour doubler les prises de contact directes.";
         firstContactA = `Bonjour ! J'ai regardé le site de ${comp.name} sur ${targetLoc}. Sur smartphone, la page met plus de 4s à s'afficher, ce qui fait perdre 1 visiteur sur 2. J'ai une solution légère pour corriger ça. Seriez-vous ouvert à une démo de 2 min ?`;
@@ -529,18 +537,18 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         firstContactB = `Bonjour ! En lisant les supports de ${comp.name}, quelques ajustements de copywriting pourraient doubler vos prises de contact. Nous aidons les professionnels à faire passer leurs lecteurs à l'action sans survendre. Disponible pour un mot de 2 min ?`;
         valueOffer = `💡 Message de Valeur (Copywriter) :\n\n« Un appel à l'action clair et des arguments orientés bénéfices client augmentent le taux de conversion de 40%. Voici 3 phrases types adaptées à vos offres pour déclencher plus de demandes. »`;
       } else {
-        // Fallback custom profession
-        flaws = "Absence de relance structurée après remise de devis et délais de première réponse supérieurs à 48 heures.";
-        offer = avatar.offer || "Mise en place d'un système de prospection et de relance réactive pour doubler le closing des devis.";
-        firstContactA = `Bonjour ! J'ai remarqué le développement de ${comp.name} sur ${targetLoc}. Beaucoup de structures de votre secteur perdent des devis faute d'un suivi rapide des demandes. J'ai un système léger qui fait ça sans effort. Seriez-vous ouvert à un rapide échange de 2 min ?`;
-        firstContactB = `Bonjour ! En observant ${comp.name} sur ${targetLoc}, vos offres méritent une réactivité maximale. Nous aidons les entreprises de votre secteur à récupérer 1 devis sur 3 sans forcer. Disponible pour une démo de 2 min ?`;
-        valueOffer = `💡 Comment utiliser ce message : À envoyer si le prospect réagit favorablement à votre première accroche :\n\n« Nous permettons aux entreprises comme la vôtre de réactiver jusqu'à 35% de prospects silencieux grâce à des messages courts et ciblés. Par exemple, une structure équivalente sur ${targetLoc} a généré 3 nouveaux contrats dès le premier mois. »`;
+        // Fallback dynamically personalized to ANY custom profession entered by user (e.g. IA Engineering, etc.)
+        flaws = `Absence de modernisation stratégique en ${avatar.profession || "services spécialisés"} et pertes d'opportunités de croissance face aux concurrents de ${targetLoc}.`;
+        offer = avatar.offer || `Prestations expertes en ${avatar.profession} pour ${avatar.major_benefit || "booster votre acquisition et vos performances"}.`;
+        firstContactA = `Bonjour ! En suivant les activités de ${comp.name} sur ${targetLoc}, j'ai remarqué un potentiel direct sur votre activité. En tant que spécialiste en ${avatar.profession || "digital"}, j'aide les entreprises à ${avatar.major_benefit || "accélérer leurs résultats"}. Seriez-vous ouvert à un rapide échange de 2 min ?`;
+        firstContactB = `Bonjour ! Nous accompagnons les structures comme ${comp.name} à ${targetLoc} pour ${avatar.major_benefit || "résoudre leurs blocages et atteindre leurs objectifs"}. Seriez-vous curieux de découvrir notre méthode ?`;
+        valueOffer = `💡 Message de Valeur (${avatar.profession || "Expert Métier"}) :\n\n« Notre approche personnalisée en ${avatar.profession} garantit : ${avatar.major_benefit || "une progression rapide et mesurable"}. C'est précisément ce que nous mettons en place pour les acteurs de votre secteur. »`;
       }
 
       newItems.push({
         id,
         company_name: `${comp.name} ${i > 5 ? i : ''}`,
-        activity: comp.act,
+        activity: targetAct,
         city: targetLoc,
         country: "Afrique / Europe",
         qualification_score: score,

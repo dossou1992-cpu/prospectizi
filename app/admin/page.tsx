@@ -353,6 +353,8 @@ export default function AdminPage() {
             <a
               href="/prospectizi_demo_video.mp4"
               download="PROSPECTIZI_Demo_Video_HD.mp4"
+              target="_blank"
+              rel="noopener noreferrer"
               className="py-2 px-3 rounded-lg text-xs font-bold bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-1.5 shadow-cyan-glow transition-all"
             >
               <Download className="w-3.5 h-3.5" />
@@ -374,6 +376,8 @@ export default function AdminPage() {
             <a
               href="/PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
               download="PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
+              target="_blank"
+              rel="noopener noreferrer"
               className="py-2 px-3 rounded-lg text-xs font-bold bg-blue-500 hover:bg-blue-400 text-white flex items-center justify-center gap-1.5 shadow-md transition-all"
             >
               <Download className="w-3.5 h-3.5" />
@@ -395,6 +399,8 @@ export default function AdminPage() {
             <a
               href="/PROSPECTIZI_Presentation_MVP.pptx"
               download="PROSPECTIZI_Presentation_MVP.pptx"
+              target="_blank"
+              rel="noopener noreferrer"
               className="py-2 px-3 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-dark-950 flex items-center justify-center gap-1.5 shadow-md transition-all"
             >
               <Download className="w-3.5 h-3.5" />
@@ -416,6 +422,8 @@ export default function AdminPage() {
             <a
               href="/PROSPECTIZI_Dossier_Cahier_des_Charges.docx"
               download="PROSPECTIZI_Dossier_Cahier_des_Charges.docx"
+              target="_blank"
+              rel="noopener noreferrer"
               className="py-2 px-3 rounded-lg text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-dark-950 flex items-center justify-center gap-1.5 shadow-md transition-all"
             >
               <Download className="w-3.5 h-3.5" />

@@ -519,6 +519,8 @@ export default function SettingsPage() {
               <a
                 href="/prospectizi_demo_video.mp4"
                 download="PROSPECTIZI_Demo_Video_HD.mp4"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-2 shadow-cyan-glow transition-all"
               >
                 <Download className="w-4 h-4" />
@@ -542,6 +544,8 @@ export default function SettingsPage() {
               <a
                 href="/PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
                 download="PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold bg-blue-500 hover:bg-blue-400 text-white flex items-center justify-center gap-2 shadow-lg transition-all"
               >
                 <Download className="w-4 h-4" />
@@ -565,6 +569,8 @@ export default function SettingsPage() {
               <a
                 href="/PROSPECTIZI_Presentation_MVP.pptx"
                 download="PROSPECTIZI_Presentation_MVP.pptx"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold bg-amber-500 hover:bg-amber-400 text-dark-950 flex items-center justify-center gap-2 shadow-lg transition-all"
               >
                 <Download className="w-4 h-4" />
@@ -588,6 +594,8 @@ export default function SettingsPage() {
               <a
                 href="/PROSPECTIZI_Dossier_Cahier_des_Charges.docx"
                 download="PROSPECTIZI_Dossier_Cahier_des_Charges.docx"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold bg-emerald-500 hover:bg-emerald-400 text-dark-950 flex items-center justify-center gap-2 shadow-lg transition-all"
               >
                 <Download className="w-4 h-4" />

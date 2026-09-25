@@ -50,7 +50,7 @@ export default function Sidebar({ onOpenTutorial, onOpenLegal, collapsed, onTogg
       <div>
         {/* Brand Header */}
         <div className={`p-3.5 border-b border-dark-600/60 flex items-center ${collapsed ? "justify-center" : "justify-between"}`}>
-          <Link href="/dashboard" className="flex items-center gap-2.5 group">
+          <Link href="/" className="flex items-center gap-2.5 group" title="Retour à la page d'accueil">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan to-cyan-intense flex items-center justify-center text-dark-950 font-black shadow-cyan-glow shrink-0">
               <Zap className="w-5 h-5 fill-dark-950" />
             </div>
@@ -58,8 +58,8 @@ export default function Sidebar({ onOpenTutorial, onOpenLegal, collapsed, onTogg
               <div className="overflow-hidden">
                 <div className="flex items-center gap-1.5">
                   <span className="text-lg font-black tracking-tight">
-                    <span className="text-white">PROS</span>
-                    <span className="text-cyan">PECTIZI</span>
+                    <span className="text-white">Pros</span>
+                    <span className="text-cyan">pectizi</span>
                   </span>
                 </div>
                 <p className="text-[10px] text-cyan font-semibold truncate">Trouvez &amp; contactez mieux !</p>

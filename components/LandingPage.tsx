@@ -47,8 +47,8 @@ export default function LandingPage() {
           </div>
           <div>
             <span className="text-xl font-black tracking-tight">
-              <span className="text-white">PROS</span>
-              <span className="text-cyan">PECTIZI</span>
+              <span className="text-white">Pros</span>
+              <span className="text-cyan">pectizi</span>
             </span>
             <span className="text-[10px] text-cyan font-semibold block leading-none">Trouvez &amp; contactez mieux !</span>
           </div>
@@ -417,8 +417,8 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-black tracking-tight text-sm">
-              <span className="text-white">PROS</span>
-              <span className="text-cyan">PECTIZI</span>
+              <span className="text-white">Pros</span>
+              <span className="text-cyan">pectizi</span>
             </span>
             <span className="text-slate-400">- Trouvez &amp; contactez mieux !</span>
           </div>
