@@ -131,7 +131,7 @@ export default function ProspectsPage() {
             </div>
             {!isBypass && (
               <span className="text-[10px] text-slate-400 text-right mt-0.5">
-                {remaining > 0 ? `${remaining} disponible(s) ce mois-ci` : "Plafond atteint — Passez en PRO"}
+                {remaining > 0 ? `${remaining} disponible(s) ce mois-ci` : "Plafond atteint - Passez en PRO"}
               </span>
             )}
           </div>

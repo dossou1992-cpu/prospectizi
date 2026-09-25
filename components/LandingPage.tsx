@@ -46,8 +46,11 @@ export default function LandingPage() {
             <Zap className="w-5 h-5 fill-dark-950" />
           </div>
           <div>
-            <span className="text-xl font-black text-white tracking-tight">Prospectizi</span>
-            <span className="text-[10px] text-cyan font-semibold block leading-none">Trouver &amp; contactez mieux</span>
+            <span className="text-xl font-black tracking-tight">
+              <span className="text-white">PROS</span>
+              <span className="text-cyan">PECTIZI</span>
+            </span>
+            <span className="text-[10px] text-cyan font-semibold block leading-none">Trouvez &amp; contactez mieux !</span>
           </div>
         </Link>
 
@@ -159,6 +162,7 @@ export default function LandingPage() {
                 src="/prospectizi_demo_video.mp4"
                 poster="/scene1_landing.png"
                 controls
+                controlsList="nodownload"
                 playsInline
                 className="w-full h-full object-contain"
                 onPlay={() => setIsPlaying(true)}
@@ -185,26 +189,10 @@ export default function LandingPage() {
                 <span className="font-bold text-white">Vidéo Démo Produit (Test Réel de la Plateforme)</span>
               </div>
 
-              <div className="flex items-center gap-3">
-                <a
-                  href="/prospectizi_demo_video.mp4"
-                  download="PROSPECTIZI_Demo_Video.mp4"
-                  className="text-cyan hover:underline flex items-center gap-1 font-semibold"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Télécharger la Vidéo (.MP4)</span>
-                </a>
-
-                <span className="text-slate-600">•</span>
-
-                <a
-                  href="/PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
-                  download="PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
-                  className="text-cyan hover:underline flex items-center gap-1 font-semibold"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Télécharger le Script (.DOCX)</span>
-                </a>
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1 rounded-full bg-cyan/10 border border-cyan/30 text-cyan text-xs font-semibold">
+                  30 secondes • Qualité HD 1080p
+                </span>
               </div>
             </div>
           </div>
@@ -428,8 +416,11 @@ export default function LandingPage() {
       <footer className="mt-auto border-t border-dark-800 bg-dark-950 py-8 px-4 text-xs text-slate-400">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-white">Prospectizi</span>
-            <span>— Trouver &amp; contactez mieux</span>
+            <span className="font-black tracking-tight text-sm">
+              <span className="text-white">PROS</span>
+              <span className="text-cyan">PECTIZI</span>
+            </span>
+            <span className="text-slate-400">- Trouvez &amp; contactez mieux !</span>
           </div>
 
           <div className="flex items-center gap-4">

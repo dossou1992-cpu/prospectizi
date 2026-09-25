@@ -87,7 +87,7 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 export function ProspectiziProvider({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Authentication State: defaults to false so non-logged visitors land on the Landing Page!
+  // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
@@ -228,8 +228,6 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   };
 
   const loginWithGoogle = async () => {
-    // In production, this redirects to Supabase Google OAuth:
-    // supabase.auth.signInWithOAuth({ provider: 'google' })
     setUser(prev => ({
       ...prev,
       email: "dossou1992@gmail.com",
@@ -443,6 +441,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     return { success: true, message: "1 crédit remboursé automatiquement" };
   };
 
+  // DYNAMIC INTELLIGENCE ENGINE FOR ALL DIGITAL TRADES:
+  // Detects the user's specific digital trade (Web Developer, Community Manager, Ads Expert, Copywriter, Designer, Closer, etc.)
+  // and tailors flaws, offers, and messages with precision!
   const searchProspects = async (params: { keyword: string; location: string; channel: Channel; count: number }) => {
     if (isSubscriptionExpired && !user.isSuperadminMode) {
       setShowUpgradeModal(true);
@@ -466,31 +467,87 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       return { success: false, added: 0, error: "Quota insuffisant" };
     }
 
+    // Trade profiling
+    const profLower = (avatar.profession || "").toLowerCase();
+    const isWebDev = profLower.includes('web') || profLower.includes('site') || profLower.includes('développeur') || profLower.includes('saas');
+    const isCM = profLower.includes('community') || profLower.includes('social') || profLower.includes('réseaux') || profLower.includes('instagram');
+    const isAds = profLower.includes('ads') || profLower.includes('pub') || profLower.includes('media') || profLower.includes('acquisition');
+    const isCopywriter = profLower.includes('copy') || profLower.includes('rédact') || profLower.includes('seo') || profLower.includes('contenu');
+    const isDesigner = profLower.includes('design') || profLower.includes('graphi') || profLower.includes('logo') || profLower.includes('brand');
+
     const sampleCompanies = [
-      { name: "Agence Digitale Horizon", act: "Marketing & Acquisition B2B", city: "Lomé" },
-      { name: "Cabinet Alpha Audit", act: "Conseil Juridique & Fiscal", city: "Abidjan" },
-      { name: "Studio Pixel & Co", act: "Design & Développement Web", city: "Dakar" },
-      { name: "InnoTech Solutions", act: "Intégration Systèmes & ERP", city: "Cotonou" },
-      { name: "Cabinet Conseil Vente", act: "Formation Commerciale", city: "Paris" },
-      { name: "BTP Pro Performance", act: "Architecture & Rénovation", city: "Lomé" },
+      { name: "Cabinet Alpha Consulting", act: "Conseil Juridique & Fiscal", city: "Lomé" },
+      { name: "Clinique Santé Plus", act: "Santé & Médecine Spécialisée", city: "Abidjan" },
+      { name: "Hôtel Résidence Palace", act: "Hôtellerie & Restauration", city: "Dakar" },
+      { name: "Immo Horizon Prestige", act: "Agence Immobilière & Gestion", city: "Cotonou" },
+      { name: "Cabinet Dentaire Moderne", act: "Santé Dentaire & Soins", city: "Paris" },
+      { name: "BTP Structure & Bâtiment", act: "Architecture & Rénovation", city: "Lomé" },
     ];
 
     const newItems: Prospect[] = [];
     for (let i = 0; i < toAddCount; i++) {
       const comp = sampleCompanies[i % sampleCompanies.length];
-      const score = Math.floor(Math.random() * (98 - 65 + 1)) + 65;
+      const score = Math.floor(Math.random() * (98 - 70 + 1)) + 70;
       const id = "search-" + Date.now() + "-" + i;
+      const targetLoc = params.location || comp.city;
+
+      // Dynamic Flaw & Offer based on user's digital profession
+      let flaws = "";
+      let offer = "";
+      let firstContactA = "";
+      let firstContactB = "";
+      let valueOffer = "";
+
+      if (isWebDev) {
+        flaws = "Site web obsolète, non adapté au mobile (temps de chargement > 4.2s) et absence de module de réservation/devis instantané.";
+        offer = avatar.offer || "Création d'un site web ultra-rapide, responsive et optimisé SEO pour doubler les prises de contact directes.";
+        firstContactA = `Bonjour ! J'ai regardé le site de ${comp.name} sur ${targetLoc}. Sur smartphone, la page met plus de 4s à s'afficher, ce qui fait perdre 1 visiteur sur 2. J'ai une solution légère pour corriger ça. Seriez-vous ouvert à une démo de 2 min ?`;
+        firstContactB = `Bonjour ! En analysant la présence de ${comp.name} sur ${targetLoc}, j'ai remarqué que vous perdiez des clients faute d'un formulaire de contact réactif sur mobile. Nous aidons les entreprises de votre secteur à générer 2x plus de devis avec un site moderne. Disponible pour en parler 2 min ?`;
+        valueOffer = `💡 Message de Valeur (Web Développeur) :\n\n« 53% des visiteurs quittent un site qui met plus de 3 secondes à charger. Pour un établissement équivalent sur ${targetLoc}, optimiser la vitesse et ajouter un bouton WhatsApp direct a débloqué 14 nouveaux rendez-vous dès le premier mois. »`;
+      } else if (isCM) {
+        flaws = "Comptes Instagram & Facebook inactifs depuis plus de 60 jours, aucun format court (Reels/TikTok) et zéro engagement communautaire.";
+        offer = avatar.offer || "Animation complète des réseaux sociaux, création de 12 vidéos courtes par mois et stratégie d'engagement local.";
+        firstContactA = `Bonjour ! J'ai vu l'activité de ${comp.name} sur ${targetLoc}. Vos réalisations sont superbes mais vos réseaux sont silencieux depuis 2 mois. J'ai un plan de 3 vidéos courtes qui réactive votre audience sans effort. Seriez-vous ouvert à un aperçu de 2 min ?`;
+        firstContactB = `Bonjour ! En observant ${comp.name} sur ${targetLoc}, vos clients adoreraient voir vos coulisses en vidéo courte. Nous aidons les entreprises locales à capter 10 000 vues qualifiées par mois sur Instagram et TikTok. Disponible pour voir nos exemples ?`;
+        valueOffer = `💡 Message de Valeur (Community Manager) :\n\n« Les formats courts (Reels & TikTok) génèrent 4x plus de visibilité organique que les posts classiques. Nous avons permis à une structure locale de générer 25 demandes entrantes en 30 jours grâce à 3 vidéos ciblées. »`;
+      } else if (isAds) {
+        flaws = "Dépendance totale au bouche-à-oreille, absence de pixel publicitaire et zéro campagne d'acquisition automatique active.";
+        offer = avatar.offer || "Mise en place de campagnes publicitaires Google Ads & Meta ultra-ciblées avec retour sur investissement garanti.";
+        firstContactA = `Bonjour ! Quand on cherche vos prestations sur ${targetLoc}, vos concurrents achètent les premiers résultats sur Google. Nous mettons en place des campagnes qui vous positionnent en n°1 dès demain. Seriez-vous ouvert à un rapide échange ?`;
+        firstContactB = `Bonjour ! En analysant le marché de ${comp.name} sur ${targetLoc}, vous avez un potentiel inexploité en publicité ciblée. Nous aidons les structures comme la vôtre à acquérir des prospects qualifiés pour moins de 5 € par lead. Curieux de voir nos chiffres ?`;
+        valueOffer = `💡 Message de Valeur (Media Buyer / Ads) :\n\n« Les entreprises qui captent les intentions de recherche chaudes sur Google génèrent 3x plus de contrats que celles qui attendent passivement. Voici un aperçu des mots-clés les plus rentables dans votre ville. »`;
+      } else if (isDesigner) {
+        flaws = "Identité visuelle vieillissante, logo basse résolution et absence de cohérence entre le site et les supports commerciaux.";
+        offer = avatar.offer || "Refonte de votre identité de marque (Branding haut de gamme, charte graphique moderne et supports de vente percutants).";
+        firstContactA = `Bonjour ! Vos services chez ${comp.name} à ${targetLoc} sont reconnus, mais vos supports visuels ne reflètent pas votre vrai niveau d'excellence. J'ai conçu une maquette moderne adaptée à votre image. Puis-je vous la montrer en 2 min ?`;
+        firstContactB = `Bonjour ! Une identité visuelle soignée permet d'augmenter ses tarifs de 30% perçus comme haut de gamme. Nous avons modernisé la marque d'un cabinet équivalent sur ${targetLoc} avec un grand succès. Seriez-vous curieux de voir le résultat ?`;
+        valueOffer = `💡 Message de Valeur (Designer / Graphiste) :\n\n« 75% des clients jugent la crédibilité d'une entreprise sur la qualité visuelle de ses supports. Moderniser votre charte graphique renforce immédiatement la confiance avant même le premier contact. »`;
+      } else if (isCopywriter) {
+        flaws = "Textes de présentation génériques, aucun bénéfice chiffré et absence de mots-clés stratégiques pour le référencement naturel.";
+        offer = avatar.offer || "Rédaction persuasive de pages de vente et articles de blog SEO pour transformer les lecteurs en clients.";
+        firstContactA = `Bonjour ! J'ai lu la présentation de ${comp.name} sur ${targetLoc}. Vos offres sont excellentes mais vos textes ne valorisent pas assez vos résultats. J'ai réécrit une accroche percutante pour vous. Seriez-vous ouvert à la lire ?`;
+        firstContactB = `Bonjour ! En lisant les supports de ${comp.name}, quelques ajustements de copywriting pourraient doubler vos prises de contact. Nous aidons les professionnels à faire passer leurs lecteurs à l'action sans survendre. Disponible pour un mot de 2 min ?`;
+        valueOffer = `💡 Message de Valeur (Copywriter) :\n\n« Un appel à l'action clair et des arguments orientés bénéfices client augmentent le taux de conversion de 40%. Voici 3 phrases types adaptées à vos offres pour déclencher plus de demandes. »`;
+      } else {
+        // Fallback custom profession
+        flaws = "Absence de relance structurée après remise de devis et délais de première réponse supérieurs à 48 heures.";
+        offer = avatar.offer || "Mise en place d'un système de prospection et de relance réactive pour doubler le closing des devis.";
+        firstContactA = `Bonjour ! J'ai remarqué le développement de ${comp.name} sur ${targetLoc}. Beaucoup de structures de votre secteur perdent des devis faute d'un suivi rapide des demandes. J'ai un système léger qui fait ça sans effort. Seriez-vous ouvert à un rapide échange de 2 min ?`;
+        firstContactB = `Bonjour ! En observant ${comp.name} sur ${targetLoc}, vos offres méritent une réactivité maximale. Nous aidons les entreprises de votre secteur à récupérer 1 devis sur 3 sans forcer. Disponible pour une démo de 2 min ?`;
+        valueOffer = `💡 Comment utiliser ce message : À envoyer si le prospect réagit favorablement à votre première accroche :\n\n« Nous permettons aux entreprises comme la vôtre de réactiver jusqu'à 35% de prospects silencieux grâce à des messages courts et ciblés. Par exemple, une structure équivalente sur ${targetLoc} a généré 3 nouveaux contrats dès le premier mois. »`;
+      }
+
       newItems.push({
         id,
         company_name: `${comp.name} ${i > 5 ? i : ''}`,
         activity: comp.act,
-        city: params.location || comp.city,
+        city: targetLoc,
         country: "Afrique / Europe",
         qualification_score: score,
-        qualification_reason: `Recherche ciblée sur "${params.keyword || comp.act}". Faille identifiée sur le temps de réponse aux demandes entrantes.`,
-        flaws_identified: "Absence de relance structurée après envoi de devis et délai de première réponse supérieur à 48 heures.",
-        recommended_offer: `${avatar.offer || "Mise en place d'un système de relance automatique WhatsApp et CRM pour doubler le closing des devis."}`,
-        opportunity: "Proposer un audit gratuit de leurs délais de relance et une démo vidéo personnalisée de 2 minutes.",
+        qualification_reason: `Recherche ciblée sur "${params.keyword || comp.act}". Faille détectée en adéquation parfaite avec votre métier de ${avatar.profession || "spécialiste"}.`,
+        flaws_identified: flaws,
+        recommended_offer: offer,
+        opportunity: `Proposer un diagnostic gratuit de leurs failles actuelles et une solution adaptée à leurs besoins sur ${targetLoc}.`,
         channel: params.channel,
         collected_at: new Date().toISOString().split('T')[0],
         email: `contact@${comp.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`,
@@ -503,18 +560,18 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         status: "nouveau",
         estimated_deal_value: 1500,
         generated_messages: {
-          first_contact: `Bonjour ! J'ai remarqué le développement de ${comp.name} sur ${params.location || comp.city}. Beaucoup d'entreprises perdent 1 devis sur 3 faute d'un suivi rapide des demandes. J'ai un système léger qui fait ça sans effort. Seriez-vous ouvert à un rapide échange de 2 min ?`,
-          first_contact_variant_b: `Bonjour ! En analysant ${comp.name} sur ${params.location || comp.city}, j'ai constaté que vos offres méritaient une relance réactive en 5 secondes. Nous aidons les entreprises de votre secteur à récupérer 1 devis sur 3 sans forcer. Disponible pour une démo de 2 min ?`,
-          value_offer: `💡 Comment utiliser ce message : À envoyer si le prospect réagit favorablement à votre première accroche :\n\n« Nous permettons aux entreprises comme la vôtre de réactiver jusqu'à 35% de prospects silencieux grâce à des messages courts et ciblés. Par exemple, une structure équivalente sur ${params.location || comp.city} a généré 3 nouveaux contrats dès le premier mois. »`,
-          followup_1: `Bonjour, je me permets un petit suivi suite à mon mot. Seriez-vous intéressé par un aperçu direct du script que nous utilisons ?`,
-          followup_2: `Bonjour, je voulais juste vérifier si l'optimisation de vos prises de contact est un sujet d'actualité pour vous ce trimestre ?`,
-          followup_final: `Dernier message de ma part pour respecter votre planning ! N'hésitez pas à revenir vers moi si l'opportunité se présente.`,
+          first_contact: firstContactA,
+          first_contact_variant_b: firstContactB,
+          value_offer: valueOffer,
+          followup_1: `Bonjour, je me permets un petit suivi suite à mon mot. Seriez-vous intéressé par un aperçu direct de notre méthode ?`,
+          followup_2: `Bonjour, je voulais juste vérifier si ce sujet d'optimisation est une priorité pour ${comp.name} ce trimestre ?`,
+          followup_final: `Dernier message de ma part pour respecter votre temps ! N'hésitez pas si l'opportunité se présente plus tard.`,
         },
         private_notes: "",
         closing_tips: [
-          "Mettez en avant le temps gagné par leurs équipes commerciales.",
-          "Citez l'exemple de structures équivalentes qui ont doublé leur taux de réponse.",
-          "Offrez un test sans risque sur un échantillon de 5 leads."
+          "Mettez en avant le temps gagné et le retour sur investissement concret.",
+          "Citez l'exemple de structures équivalentes qui ont résolu cette faille.",
+          "Proposez un test léger sans engagement pour instaurer la confiance."
         ],
         is_existing: true,
         is_closed: false,
@@ -529,7 +586,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       }));
     }
 
-    showNotification(`🎯 ${toAddCount} nouveaux prospects qualifiés et 100% contactables ajoutés !`);
+    showNotification(`🎯 ${toAddCount} nouveaux prospects qualifiés et adaptés à votre métier ajoutés !`);
     return { success: true, added: toAddCount };
   };
 

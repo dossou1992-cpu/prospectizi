@@ -14,7 +14,9 @@ import {
   UserCheck, 
   Download,
   AlertTriangle,
-  Play
+  Play,
+  FileText,
+  FileSpreadsheet
 } from 'lucide-react';
 import { PlanType } from '@/lib/types';
 
@@ -311,6 +313,115 @@ export default function AdminPage() {
               )}
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* SECTION 3 : TÉLÉCHARGEMENT DES LIVRABLES & VIDÉO DÉMO (ACCÈS CRÉATEUR) */}
+      <div className="bg-dark-900 border-2 border-cyan/40 rounded-2xl p-6 space-y-5 shadow-cyan-glow">
+        <div className="border-b border-dark-700 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan/15 text-cyan text-[11px] font-bold uppercase tracking-wider mb-1 border border-cyan/30">
+              <Crown className="w-3 h-3" />
+              Téléchargements Privés Superadmin
+            </div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Download className="w-4 h-4 text-cyan" />
+              <span>Livrables Officiels du MVP &amp; Vidéo Démo HD</span>
+            </h2>
+          </div>
+          <span className="text-xs text-slate-400">
+            Ces téléchargements sont masqués sur la landing page publique
+          </span>
+        </div>
+
+        <p className="text-xs text-slate-300 leading-relaxed">
+          Téléchargez directement vos fichiers de production et vos supports officiels (la vidéo et les documents ne sont téléchargeables que depuis cet espace authentifié) :
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Vidéo Démo */}
+          <div className="p-4 bg-dark-800 rounded-xl border border-cyan/30 flex flex-col justify-between space-y-3">
+            <div className="space-y-1.5">
+              <div className="w-8 h-8 rounded-lg bg-cyan/20 border border-cyan/40 flex items-center justify-center text-cyan">
+                <Video className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-bold text-white">Vidéo Démo HD (.MP4)</h3>
+              <p className="text-[11px] text-slate-400">
+                Vidéo produit 30s 1080p avec musique tech ambiante.
+              </p>
+            </div>
+            <a
+              href="/prospectizi_demo_video.mp4"
+              download="PROSPECTIZI_Demo_Video_HD.mp4"
+              className="py-2 px-3 rounded-lg text-xs font-bold bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-1.5 shadow-cyan-glow transition-all"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Télécharger (.MP4)</span>
+            </a>
+          </div>
+
+          {/* Script Word */}
+          <div className="p-4 bg-dark-800 rounded-xl border border-blue-500/30 flex flex-col justify-between space-y-3">
+            <div className="space-y-1.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
+                <FileText className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-bold text-white">Script &amp; Storyboard (.DOCX)</h3>
+              <p className="text-[11px] text-slate-400">
+                Découpage scène par scène, pitch et voix off.
+              </p>
+            </div>
+            <a
+              href="/PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
+              download="PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
+              className="py-2 px-3 rounded-lg text-xs font-bold bg-blue-500 hover:bg-blue-400 text-white flex items-center justify-center gap-1.5 shadow-md transition-all"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Télécharger (.DOCX)</span>
+            </a>
+          </div>
+
+          {/* Présentation PPTX */}
+          <div className="p-4 bg-dark-800 rounded-xl border border-amber-500/30 flex flex-col justify-between space-y-3">
+            <div className="space-y-1.5">
+              <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                <FileSpreadsheet className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-bold text-white">Présentation MVP (.PPTX)</h3>
+              <p className="text-[11px] text-slate-400">
+                11 slides détaillées de présentation SaaS.
+              </p>
+            </div>
+            <a
+              href="/PROSPECTIZI_Presentation_MVP.pptx"
+              download="PROSPECTIZI_Presentation_MVP.pptx"
+              className="py-2 px-3 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-dark-950 flex items-center justify-center gap-1.5 shadow-md transition-all"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Télécharger (.PPTX)</span>
+            </a>
+          </div>
+
+          {/* Cahier des Charges Word */}
+          <div className="p-4 bg-dark-800 rounded-xl border border-emerald-500/30 flex flex-col justify-between space-y-3">
+            <div className="space-y-1.5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                <FileText className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-bold text-white">Cahier des Charges (.DOCX)</h3>
+              <p className="text-[11px] text-slate-400">
+                Spécifications fonctionnelles et scoring IA.
+              </p>
+            </div>
+            <a
+              href="/PROSPECTIZI_Dossier_Cahier_des_Charges.docx"
+              download="PROSPECTIZI_Dossier_Cahier_des_Charges.docx"
+              className="py-2 px-3 rounded-lg text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-dark-950 flex items-center justify-center gap-1.5 shadow-md transition-all"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Télécharger (.DOCX)</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>

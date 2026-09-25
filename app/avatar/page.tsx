@@ -21,34 +21,58 @@ export default function AvatarPage() {
   const [formData, setFormData] = useState<AvatarProfile>(avatar);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Sync with store on load
   useEffect(() => {
     setFormData(avatar);
   }, [avatar]);
 
+  // Presets pour tous les métiers du digital
   const presets = [
     {
-      title: "Agence Web & Digitale",
-      profession: "Agence de Création Web & Automatisation",
-      offer: "Refonte de sites web à fort taux de conversion et automatisation du suivi commercial WhatsApp.",
-      target_audience: "PME locales, cliniques privées, architectes et commerces à Lomé et Abidjan.",
-      major_benefit: "Générer 2x plus de rendez-vous qualifiés et moderniser leur image sous 21 jours.",
+      title: "💻 Développeur Web",
+      profession: "Développeur Web & Créateur de Sites / SaaS",
+      offer: "Refonte de sites web ultra-rapides, responsives et intégration de tunnels de devis automatisés.",
+      target_audience: "PME locales, cliniques privées, architectes, agences immobilières et commerces.",
+      major_benefit: "Doubler les prises de contact directes et éliminer les pertes de clients sur mobile.",
       tone: "direct" as const,
     },
     {
-      title: "Consultant / Coach Business",
-      profession: "Consultant en Stratégie Commerciale B2B",
-      offer: "Optimisation du processus de vente et formation des équipes au closing sans forcer.",
-      target_audience: "Dirigeants de PME (10 à 50 salariés) et cabinets de conseil.",
-      major_benefit: "Augmenter le taux de transformation des propositions de 18% à 35% en 60 jours.",
+      title: "📱 Community Manager",
+      profession: "Community Manager & Social Media Manager",
+      offer: "Gestion complète des réseaux sociaux, création de 12 Reels/TikToks par mois et acquisition d'abonnés engagés.",
+      target_audience: "Marques e-commerce, restaurants, instituts de beauté et prestataires de services locaux.",
+      major_benefit: "Générer +10 000 vues qualifiées par mois et transformer l'audience en clients fidèles.",
+      tone: "chaleureux" as const,
+    },
+    {
+      title: "🎯 Expert Ads / Média Buyer",
+      profession: "Expert Publicité Meta & Google Ads",
+      offer: "Lancement et optimisation de campagnes publicitaires à fort retour sur investissement (ROAS).",
+      target_audience: "Entreprises de services, écoles privées, promoteurs et boutiques en ligne.",
+      major_benefit: "Acquérir des leads qualifiés à moins de 5 € et garantir un retour sur investissement mesurable.",
+      tone: "persuasif" as const,
+    },
+    {
+      title: "✍️ Copywriter / Rédacteur",
+      profession: "Copywriter & Rédacteur Web SEO",
+      offer: "Réécriture persuasive de pages de vente, séquences email de closing et articles de blog positionnés sur Google.",
+      target_audience: "Créateurs de formations, cabinets d'avocats, éditeurs de logiciels et coachs.",
+      major_benefit: "Augmenter le taux de conversion des visiteurs de +35% sans dépenser 1 centime en publicité.",
+      tone: "persuasif" as const,
+    },
+    {
+      title: "🎨 Graphiste / Designer UI/UX",
+      profession: "Graphiste & Designer UI/UX / Identité de Marque",
+      offer: "Création d'identités visuelles mémorables (Logo, charte graphique, maquettes UI et plaquettes haut de gamme).",
+      target_audience: "Startups, cabinets médicaux, marques de cosmétiques et entreprises en repositionnement.",
+      major_benefit: "Augmenter la valeur perçue de vos services pour justifier des tarifs 30% plus élevés.",
       tone: "professionnel" as const,
     },
     {
-      title: "Architecte & Design d'Intérieur",
-      profession: "Architecte & Maître d'œuvre d'Intérieur",
-      offer: "Conception 3D haut de gamme et suivi clé en main de projets résidentiels et tertiaires.",
-      target_audience: "Propriétaires de villas, promoteurs immobiliers et sièges d'entreprises.",
-      major_benefit: "Livrer des espaces d'exception dans le respect strict des budgets et des délais.",
+      title: "🤝 Closer High-Ticket",
+      profession: "Closer & Stratège Commercial Indépendant",
+      offer: "Prise en charge des appels de vente et relance des devis endormis pour maximiser le taux de closing.",
+      target_audience: "Agences de marketing, consultants et organismes de formation professionnelle.",
+      major_benefit: "Signer 1 contrat sur 3 supplémentaires sur les leads qui ne répondaient plus.",
       tone: "chaleureux" as const,
     }
   ];
@@ -56,7 +80,6 @@ export default function AvatarPage() {
   const handleFieldChange = (field: keyof AvatarProfile, value: any) => {
     const updated = { ...formData, [field]: value };
     setFormData(updated);
-    // Instant background sync so navigating away never loses progress
     updateAvatar(updated);
   };
 
@@ -92,22 +115,22 @@ export default function AvatarPage() {
             Paramétrage IA Avatar Client
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white">
-            Définissez votre Profil Commercial &amp; Client Idéal
+            Définissez votre Métier Digital &amp; Client Idéal
           </h1>
           <p className="text-slate-400 text-xs md:text-sm mt-1">
-            Vos données sont sauvegardées en temps réel. Elles calibrent le ciblage et la personnalisation de chaque message.
+            Que vous soyez développeur, community manager, graphiste ou copywriter, l&apos;IA calibre automatiquement vos fiches prospects et vos messages.
           </p>
         </div>
 
         {/* Quick Presets Buttons */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-slate-400 font-medium">Modèles rapides :</span>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-[11px] text-slate-400 font-medium mr-1">Sélection rapide par métier :</span>
           {presets.map((p, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => handleApplyPreset(p)}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 text-cyan border border-dark-600 hover:border-cyan/40 transition-colors"
+              className="text-xs font-medium px-2.5 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 text-cyan border border-dark-600 hover:border-cyan/40 transition-colors"
             >
               {p.title}
             </button>
@@ -125,12 +148,12 @@ export default function AvatarPage() {
             <div>
               <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-2">
                 <Briefcase className="w-3.5 h-3.5 text-cyan" />
-                Votre Métier / Activité principale
+                Votre Métier Digital / Activité principale
               </label>
               <input
                 type="text"
                 required
-                placeholder="Ex: Consultant en Acquisition B2B, Développeur SaaS, Agence Web..."
+                placeholder="Ex: Développeur Web, Community Manager, Expert Ads, Graphiste, Copywriter..."
                 value={formData.profession}
                 onChange={(e) => handleFieldChange('profession', e.target.value)}
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none transition-colors"
@@ -141,12 +164,12 @@ export default function AvatarPage() {
             <div>
               <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-2">
                 <Award className="w-3.5 h-3.5 text-cyan" />
-                Votre Offre Principale (Ce que vous proposez)
+                Votre Offre Principale (Ce que vous apportez à vos clients)
               </label>
               <textarea
                 required
                 rows={3}
-                placeholder="Ex: Mise en place d'un système de relance automatique WhatsApp et CRM pour doubler le closing..."
+                placeholder="Ex: Refonte de sites web modernes, création de vidéos courtes TikTok/Reels, gestion de campagnes publicitaires..."
                 value={formData.offer}
                 onChange={(e) => handleFieldChange('offer', e.target.value)}
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none transition-colors"
@@ -162,7 +185,7 @@ export default function AvatarPage() {
               <input
                 type="text"
                 required
-                placeholder="Ex: Cabinets de conseil, agences de services et PME en Afrique et en Europe..."
+                placeholder="Ex: Cabinets d'avocats, cliniques, agences immobilières, restaurants, commerces..."
                 value={formData.target_audience}
                 onChange={(e) => handleFieldChange('target_audience', e.target.value)}
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none transition-colors"
@@ -178,7 +201,7 @@ export default function AvatarPage() {
               <input
                 type="text"
                 required
-                placeholder="Ex: Générer +35% de rendez-vous qualifiés et transformer 2x plus de devis..."
+                placeholder="Ex: Générer 2x plus de rendez-vous, capter 10 000 vues qualifiées par mois..."
                 value={formData.major_benefit}
                 onChange={(e) => handleFieldChange('major_benefit', e.target.value)}
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none transition-colors"
@@ -187,7 +210,6 @@ export default function AvatarPage() {
 
             {/* Sélecteur de Ton & Fréquence */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              {/* Ton rédactionnel */}
               <div>
                 <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-2">
                   <MessageCircle className="w-3.5 h-3.5 text-cyan" />
@@ -205,7 +227,6 @@ export default function AvatarPage() {
                 </select>
               </div>
 
-              {/* Fréquence des relances */}
               <div>
                 <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 text-cyan" />
@@ -260,9 +281,9 @@ export default function AvatarPage() {
             {/* Dynamic IA Card */}
             <div className="space-y-4 text-xs">
               <div className="p-3 bg-dark-800/80 rounded-xl border border-dark-700 space-y-1">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Positionnement commercial :</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Métier &amp; Expertise :</span>
                 <p className="text-white font-medium">
-                  Expertise en tant que <strong className="text-cyan">{formData.profession || "[Votre Métier]"}</strong>.
+                  Spécialiste en tant que <strong className="text-cyan">{formData.profession || "[Votre Métier Digital]"}</strong>.
                 </p>
               </div>
 
@@ -299,7 +320,7 @@ export default function AvatarPage() {
                 <span>Expérience Magic Setup</span>
               </div>
               <p className="text-slate-300 leading-relaxed text-[11px]">
-                Dès que votre Avatar est enregistré, Prospectizi calibre l&apos;IA pour générer vos premiers prospects ultra-qualifiés sans configuration compliquée.
+                Dès que votre Avatar est enregistré, Prospectizi calibre l&apos;IA pour détecter les failles spécifiques à votre métier (vitesse de site, réseaux inactifs, absence de publicité) et rédiger les messages sur-mesure.
               </p>
             </div>
           </div>

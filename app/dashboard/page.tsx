@@ -66,7 +66,7 @@ export default function DashboardPage() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan/15 text-cyan text-xs font-bold uppercase tracking-wider mb-2 border border-cyan/30">
               <Sparkles className="w-3.5 h-3.5" />
-              Trouver &amp; contactez mieux
+              Trouvez &amp; contactez mieux !
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-white">
               Prêt(e) à signer vos prochains contrats ?

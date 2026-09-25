@@ -1,4 +1,4 @@
-# ⚡ Prospectizi — SaaS B2B de Prospection Intelligente
+# ⚡ Prospectizi - SaaS B2B de Prospection Intelligente
 
 > **"Trouver & contactez mieux"**
 

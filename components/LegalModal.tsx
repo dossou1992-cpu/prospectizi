@@ -28,7 +28,7 @@ export default function LegalModal() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-white">Centre Légal &amp; Conformité Réglementaire</h2>
-            <p className="text-xs text-slate-400">Prospectizi — Solution B2B d&apos;aide à la prospection commerciale</p>
+            <p className="text-xs text-slate-400">Prospectizi - Solution B2B d&apos;aide à la prospection commerciale</p>
           </div>
         </div>
 
@@ -128,14 +128,14 @@ export default function LegalModal() {
               </div>
 
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-2">
-                <h3 className="font-bold text-white text-sm">Article 1 — Objet &amp; Champ d&apos;Application</h3>
+                <h3 className="font-bold text-white text-sm">Article 1 - Objet &amp; Champ d&apos;Application</h3>
                 <p>
                   Les présentes Conditions Générales régissent l&apos;ensemble des relations contractuelles entre Prospectizi SAS et tout professionnel abonné au service. Le service est strictement réservé à une utilisation professionnelle (B2B).
                 </p>
               </div>
 
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-2">
-                <h3 className="font-bold text-white text-sm">Article 2 — Modalités d&apos;Abonnement &amp; Facturation</h3>
+                <h3 className="font-bold text-white text-sm">Article 2 - Modalités d&apos;Abonnement &amp; Facturation</h3>
                 <ul className="list-disc list-inside space-y-1.5 text-slate-300">
                   <li><strong>Formule Découverte (1 €) :</strong> Achat ponctuel donnant accès à 3 prospects qualifiés et aux fonctionnalités de base, sans renouvellement automatique.</li>
                   <li><strong>Formule PRO (29 € HT/mois) :</strong> Abonnement mensuel à tacite reconduction, fournissant un quota de 90 prospects qualifiés mensuels (3 par jour ouvré).</li>
@@ -145,14 +145,14 @@ export default function LegalModal() {
               </div>
 
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-2">
-                <h3 className="font-bold text-white text-sm">Article 3 — Garantie &quot;Contact Inexploitable&quot; (Anti-Gaspillage)</h3>
+                <h3 className="font-bold text-white text-sm">Article 3 - Garantie &quot;Contact Inexploitable&quot; (Anti-Gaspillage)</h3>
                 <p>
                   Prospectizi intègre un mécanisme automatique de remboursement de quota : si un prospect qualifié comporte un numéro de téléphone invalide ou un e-mail professionnel provoquant un rejet technique (Hard Bounce vérifié par nos sondes SMTP/HLR), l&apos;Utilisateur peut le signaler via l&apos;interface sous 72 heures. Après vérification technique instantanée, un nouveau crédit de prospect est recrédité immédiatement sur le compte de l&apos;Utilisateur.
                 </p>
               </div>
 
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-2">
-                <h3 className="font-bold text-white text-sm">Article 4 — Responsabilité de l&apos;Utilisateur</h3>
+                <h3 className="font-bold text-white text-sm">Article 4 - Responsabilité de l&apos;Utilisateur</h3>
                 <p>
                   L&apos;Utilisateur est seul responsable des messages qu&apos;il expédie à ses prospects, de la conformité de ses démarches commerciales avec les règles de prospection B2B de son pays d&apos;établissement, et de l&apos;intégration obligatoire d&apos;un moyen simple de désinscription (opt-out) dans chaque courriel ou message adressé.
                 </p>

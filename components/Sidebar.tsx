@@ -57,9 +57,12 @@ export default function Sidebar({ onOpenTutorial, onOpenLegal, collapsed, onTogg
             {!collapsed && (
               <div className="overflow-hidden">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-lg font-black tracking-tight text-white">Prospectizi</span>
+                  <span className="text-lg font-black tracking-tight">
+                    <span className="text-white">PROS</span>
+                    <span className="text-cyan">PECTIZI</span>
+                  </span>
                 </div>
-                <p className="text-[10px] text-cyan font-semibold truncate">Trouver &amp; contactez mieux</p>
+                <p className="text-[10px] text-cyan font-semibold truncate">Trouvez &amp; contactez mieux !</p>
               </div>
             )}
           </Link>

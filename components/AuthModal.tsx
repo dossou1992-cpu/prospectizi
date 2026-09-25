@@ -57,7 +57,11 @@ export default function AuthModal() {
             <Zap className="w-6 h-6 fill-cyan" />
           </div>
           <h2 className="text-xl md:text-2xl font-black text-white">
-            {isRegister ? "Créer un compte Prospectizi" : "Connexion à votre Espace"}
+            {isRegister ? (
+              <span>Créer un compte <span className="text-white">PROS</span><span className="text-cyan">PECTIZI</span></span>
+            ) : (
+              <span>Connexion à votre Espace <span className="text-white">PROS</span><span className="text-cyan">PECTIZI</span></span>
+            )}
           </h2>
           <p className="text-xs text-slate-400 mt-1">
             {isRegister 
