@@ -13,11 +13,22 @@ import {
   Calendar,
   FlaskConical,
   Award,
-  ArrowRight
+  ArrowRight,
+  Clock,
+  Play
 } from 'lucide-react';
 
 export default function AuditPage() {
-  const { auditReport, generateAuditReport, user, updateAvatar, toggleABTest, applyWinningScript } = useStore();
+  const { 
+    auditReport, 
+    generateAuditReport, 
+    user, 
+    updateAvatar, 
+    toggleABTest, 
+    applyWinningScript,
+    simulateABTestThreshold 
+  } = useStore();
+  
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -49,12 +60,16 @@ export default function AuditPage() {
     }
   };
 
-  const abStats = auditReport.ab_test_stats || { variant_a_sent: 18, variant_b_sent: 14, variant_a_replies: 6, variant_b_replies: 7 };
+  const abStats = auditReport.ab_test_stats || { variant_a_sent: 4, variant_b_sent: 3, variant_a_replies: 1, variant_b_replies: 2 };
+  const totalSent = abStats.variant_a_sent + abStats.variant_b_sent;
+  const requiredThreshold = 20;
+  const isThresholdMet = totalSent >= requiredThreshold || isSuperadmin;
+
   const rateA = abStats.variant_a_sent > 0 ? Math.round((abStats.variant_a_replies / abStats.variant_a_sent) * 100) : 0;
   const rateB = abStats.variant_b_sent > 0 ? Math.round((abStats.variant_b_replies / abStats.variant_b_sent) * 100) : 0;
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-8 animate-fadeIn max-w-6xl mx-auto">
       {/* Header */}
       <div className="bg-gradient-to-r from-dark-900 via-dark-850 to-dark-900 border border-cyan/40 rounded-2xl p-6 md:p-8 relative shadow-xl overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-80 bg-cyan/10 rounded-full blur-3xl pointer-events-none" />
@@ -186,20 +201,24 @@ export default function AuditPage() {
             <FlaskConical className="w-5 h-5 text-purple-400" />
             <div>
               <h2 className="text-lg font-bold text-white">C. Plan d&apos;Action &amp; Test A/B des Scripts</h2>
-              <p className="text-xs text-slate-400">Validez ce test pour que l&apos;outil propose les deux variantes sur chaque prospect.</p>
+              <p className="text-xs text-slate-400">
+                Activez ce test pour faire apparaître le choix entre Variante A et Variante B sur vos fiches prospects.
+              </p>
             </div>
           </div>
 
-          <button
-            onClick={() => toggleABTest(!auditReport.ab_test_active)}
-            className={`py-2 px-4 rounded-xl text-xs font-bold border transition-all ${
-              auditReport.ab_test_active
-                ? "bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30"
-                : "bg-dark-800 text-slate-300 border-dark-600 hover:text-white"
-            }`}
-          >
-            {auditReport.ab_test_active ? "✔ Test A/B Actif sur votre compte" : "Activer le Test A/B"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => toggleABTest(!auditReport.ab_test_active)}
+              className={`py-2 px-4 rounded-xl text-xs font-bold border transition-all ${
+                auditReport.ab_test_active
+                  ? "bg-purple-600 text-white border-purple-400 shadow-lg shadow-purple-600/30"
+                  : "bg-dark-800 text-slate-300 border-dark-600 hover:text-white"
+              }`}
+            >
+              {auditReport.ab_test_active ? "✔ Test A/B Actif sur vos Fiches" : "Activer le Test A/B"}
+            </button>
+          </div>
         </div>
 
         {/* Real-time A/B stats comparison */}
@@ -208,7 +227,7 @@ export default function AuditPage() {
           <div className="bg-dark-800 border border-dark-600 rounded-xl p-5 space-y-3">
             <div className="flex justify-between items-center">
               <div>
-                <span className="text-xs font-bold text-cyan uppercase tracking-wider block">Variante A (Accroche Initiale)</span>
+                <span className="text-xs font-bold text-cyan uppercase tracking-wider block">Variante A (Accroche Directe)</span>
                 <span className="text-[11px] text-slate-400">{abStats.variant_a_sent} envoyés • {abStats.variant_a_replies} réponses ({rateA}%)</span>
               </div>
               <button
@@ -224,16 +243,16 @@ export default function AuditPage() {
             </div>
           </div>
 
-          {/* Variante B (Gagnante) */}
+          {/* Variante B */}
           <div className="bg-dark-800 border-2 border-purple-500/50 rounded-xl p-5 space-y-3 relative shadow-purple-500/10 shadow-lg">
             <div className="flex justify-between items-center">
               <div>
                 <span className="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
                   <Award className="w-4 h-4 text-purple-400" />
-                  Variante B (Optimisée par l&apos;IA) — MEILLEUR RENDEMENT
+                  Variante B (Optimisée IA)
                 </span>
                 <span className="text-[11px] text-emerald-400 font-semibold">
-                  {abStats.variant_b_sent} envoyés • {abStats.variant_b_replies} réponses ({rateB}%) — +{rateB - rateA}% de réponses !
+                  {abStats.variant_b_sent} envoyés • {abStats.variant_b_replies} réponses ({rateB}%)
                 </span>
               </div>
               <button
@@ -250,19 +269,62 @@ export default function AuditPage() {
           </div>
         </div>
 
-        {/* Bouton d'application définitive */}
-        <div className="p-4 bg-purple-950/30 border border-purple-500/30 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="text-slate-300">
-            L&apos;IA a analysé les résultats : la <strong>Variante B génère 50% de conversion</strong> contre 33% pour la variante A.
+        {/* PROGRESSION & CONDITION D'ARBITRAGE DU TEST A/B */}
+        {!isThresholdMet ? (
+          <div className="p-4 bg-dark-800/90 border border-purple-500/30 rounded-xl space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <span className="font-bold text-purple-300 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-purple-400" />
+                Test A/B en cours de collecte : {totalSent} / {requiredThreshold} envois requis
+              </span>
+              <span className="text-slate-400 text-[11px]">
+                Encore {Math.max(0, requiredThreshold - totalSent)} messages à tester pour désigner le vainqueur
+              </span>
+            </div>
+
+            {/* Progress bar */}
+            <div className="w-full h-2 bg-dark-700 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-cyan to-purple-500 transition-all duration-300" 
+                style={{ width: `${Math.min(100, Math.round((totalSent / requiredThreshold) * 100))}%` }}
+              />
+            </div>
+
+            <p className="text-[11px] text-slate-400 leading-relaxed">
+              Pour que l&apos;IA puisse statuer sur la variante gagnante de manière fiable, continuez à prospecter pendant quelques jours en alternant Variante A et Variante B. Le bouton d&apos;application définitive se débloquera dès que vous aurez enregistré 20 prises de contact.
+            </p>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={simulateABTestThreshold}
+                className="text-[11px] text-purple-400 hover:text-purple-300 underline font-semibold flex items-center gap-1"
+                title="Simule instantanément 34 envois pour débloquer l'arbitrage immédiatement à des fins de test"
+              >
+                <span>⚡ Simuler 20+ envois pour tester l&apos;arbitrage tout de suite</span>
+              </button>
+            </div>
           </div>
-          <button
-            onClick={applyWinningScript}
-            className="py-2.5 px-5 rounded-xl font-bold bg-purple-600 hover:bg-purple-500 text-white shrink-0 shadow-lg shadow-purple-600/30 transition-all flex items-center gap-2"
-          >
-            <Award className="w-4 h-4" />
-            <span>Appliquer définitivement la Variante B à tout mon compte</span>
-          </button>
-        </div>
+        ) : (
+          /* Arbitrage débloqué lorsque le seuil est atteint */
+          <div className="p-4 bg-purple-950/40 border border-purple-500/40 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs animate-fadeIn">
+            <div className="text-slate-200 space-y-0.5">
+              <div className="font-bold text-emerald-400 flex items-center gap-1.5">
+                <Award className="w-4 h-4" />
+                Arbitrage IA Définitif : La Variante B gagne avec {rateB}% de conversion !
+              </div>
+              <p className="text-[11px] text-slate-300">
+                Sur {totalSent} prospects testés, la Variante B génère +{rateB - rateA}% de réponses supplémentaires par rapport à la Variante A.
+              </p>
+            </div>
+            <button
+              onClick={applyWinningScript}
+              className="py-2.5 px-5 rounded-xl font-bold bg-purple-600 hover:bg-purple-500 text-white shrink-0 shadow-lg shadow-purple-600/30 transition-all flex items-center gap-2 hover:scale-105"
+            >
+              <Award className="w-4 h-4" />
+              <span>Appliquer définitivement la Variante B à tout mon compte</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* BLOC D : RECOMMANDATION STRATÉGIQUE AVATAR */}

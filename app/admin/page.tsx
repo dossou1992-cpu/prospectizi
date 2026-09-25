@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useStore } from '@/lib/store';
 import { 
-  ShieldCheck, 
   Crown, 
   Gift, 
   RotateCcw, 
@@ -12,11 +11,10 @@ import {
   XCircle, 
   Video, 
   ExternalLink, 
+  UserCheck, 
+  Download,
   AlertTriangle,
-  UserCheck,
-  Zap,
-  TrendingUp,
-  Download
+  Play
 } from 'lucide-react';
 import { PlanType } from '@/lib/types';
 
@@ -29,11 +27,13 @@ export default function AdminPage() {
     resetQuota, 
     upgradePlan,
     subscription,
+    isSubscriptionExpired,
+    simulateMonthEndExpired,
+    reactivateSubscription,
     exportProspectsCSV 
   } = useStore();
 
   const [searchUser, setSearchUser] = useState('');
-  const [selectedUserPlan, setSelectedUserPlan] = useState<PlanType>('PRO');
 
   // Simulated platform users list for Superadmin view
   const [platformUsers, setPlatformUsers] = useState([
@@ -124,13 +124,33 @@ export default function AdminPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Simulation Expiration fin de mois */}
+            {isSubscriptionExpired ? (
+              <button
+                onClick={reactivateSubscription}
+                className="py-2.5 px-3.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition-all shadow-sm"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Réactiver l&apos;abonnement</span>
+              </button>
+            ) : (
+              <button
+                onClick={simulateMonthEndExpired}
+                className="py-2.5 px-3.5 rounded-xl text-xs font-bold bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/40 flex items-center gap-1.5 transition-all"
+                title="Simule la fin du mois pour tester le blocage et la modale de renouvellement"
+              >
+                <AlertTriangle className="w-4 h-4" />
+                <span>Simuler fin de mois (Échéance échue)</span>
+              </button>
+            )}
+
             <button
               onClick={exportProspectsCSV}
               className="py-2.5 px-4 rounded-xl text-xs font-bold bg-dark-800 hover:bg-dark-700 text-slate-200 border border-dark-600 flex items-center gap-2 transition-colors"
             >
               <Download className="w-4 h-4 text-cyan" />
-              <span>Export Données Globales</span>
+              <span>Export CSV</span>
             </button>
           </div>
         </div>
@@ -142,7 +162,7 @@ export default function AdminPage() {
           <div>
             <h2 className="text-base font-bold text-white flex items-center gap-2">
               <UserCheck className="w-4 h-4 text-cyan" />
-              Gestion des Comptes Utilisateurs
+              Gestion des Comptes Utilisateurs (Plateforme Globale)
             </h2>
             <p className="text-xs text-slate-400">Surclassez des partenaires, réinitialisez des quotas ou ajoutez des bonus</p>
           </div>
@@ -278,7 +298,7 @@ export default function AdminPage() {
                     className="py-1.5 px-3 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 shadow-sm"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Valider & Créditer (+3)</span>
+                    <span>Valider &amp; Créditer (+3)</span>
                   </button>
                   <button
                     onClick={() => updateTestimonialStatus(testi.id, 'rejected')}

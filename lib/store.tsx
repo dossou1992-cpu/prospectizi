@@ -15,6 +15,9 @@ interface StoreContextType {
   toggleSuperadminMode: () => void;
   setUserEmail: (email: string) => void;
   subscription: Subscription;
+  isSubscriptionExpired: boolean;
+  simulateMonthEndExpired: () => void;
+  reactivateSubscription: () => void;
   upgradePlan: (plan: PlanType) => void;
   resetQuota: () => void;
   addBonusProspects: (count: number) => void;
@@ -33,6 +36,7 @@ interface StoreContextType {
   generateAuditReport: () => Promise<{ success: boolean; message: string }>;
   toggleABTest: (active: boolean) => void;
   applyWinningScript: () => void;
+  simulateABTestThreshold: () => void;
   testimonials: Testimonial[];
   submitTestimonial: (loomUrl: string, commercialConsent: boolean) => void;
   updateTestimonialStatus: (id: string, status: 'approved' | 'rejected') => void;
@@ -47,7 +51,6 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export function ProspectiziProvider({ children }: { children: React.ReactNode }) {
-  // Load initial state with localStorage hydration
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [user, setUser] = useState<{
@@ -58,18 +61,35 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   }>({
     email: "dossou1992@gmail.com",
     full_name: "Edith Dossou",
-    role: "user", // Default to normal test mode so quota limits are strictly respected!
+    role: "user", // Normal test mode by default
     isSuperadminMode: false,
   });
 
-  const [subscription, setSubscription] = useState<Subscription>(initialSubscription);
+  const [subscription, setSubscription] = useState<Subscription>({
+    ...initialSubscription,
+    auto_renew: true,
+  });
   const [avatar, setAvatar] = useState<AvatarProfile>(initialAvatar);
   const [prospects, setProspects] = useState<Prospect[]>(initialProspects);
-  const [auditReport, setAuditReport] = useState<AuditReport>(initialAuditReport);
+  const [auditReport, setAuditReport] = useState<AuditReport>({
+    ...initialAuditReport,
+    ab_test_active: false,
+    ab_test_stats: {
+      variant_a_sent: 4,
+      variant_b_sent: 3,
+      variant_a_replies: 1,
+      variant_b_replies: 2,
+    }
+  });
   const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Check if subscription has expired
+  const isSubscriptionExpired = 
+    subscription.status === 'expired' || 
+    (subscription.plan_type !== 'DECOUVERTE' && new Date() > new Date(subscription.current_period_end));
 
   // Hydrate from localStorage on client mount
   useEffect(() => {
@@ -100,7 +120,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     setIsLoaded(true);
   }, []);
 
-  // Save to localStorage whenever state changes
+  // Save to localStorage
   useEffect(() => {
     if (!isLoaded) return;
     try {
@@ -120,7 +140,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
-    }, 4000);
+    }, 4500);
   };
 
   const toggleSuperadminMode = () => {
@@ -130,7 +150,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       showNotification(
         newMode 
           ? "👑 Mode Superadmin VIP activé (Quotas débloqués pour tests)" 
-          : "👤 Mode Test Normal activé (Quotas stricts du plan Découverte : 3 prospects max)"
+          : "👤 Mode Test Normal activé (Quotas stricts du plan Découverte)"
       );
       return {
         ...prev,
@@ -141,30 +161,53 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   };
 
   const setUserEmail = (email: string) => {
-    const isOwner = email.trim().toLowerCase() === 'dossou1992@gmail.com';
     setUser(prev => ({
       ...prev,
       email,
-      role: isOwner && prev.isSuperadminMode ? 'superadmin' : 'user',
     }));
   };
 
+  // Automatic upgrade upon validated payment
   const upgradePlan = (newPlan: PlanType) => {
     let quota = 3;
     if (newPlan === 'PRO') quota = 90;
     if (newPlan === 'AGENCE') quota = 450;
 
-    setSubscription(prev => ({
-      ...prev,
+    const nextMonth = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    setSubscription({
       plan_type: newPlan,
       status: 'active',
       prospects_quota: quota,
       prospects_used: 0,
-      current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-    }));
+      bonus_prospects: subscription.bonus_prospects,
+      current_period_end: nextMonth,
+      auto_renew: true,
+    });
     setShowUpgradeModal(false);
     confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-    showNotification(`🚀 Félicitations ! Votre compte est activé sur le plan ${newPlan} (${quota} prospects débloqués)`);
+    showNotification(`🚀 Paiement Validé ! Votre compte passe immédiatement au Plan ${newPlan} (${quota} prospects pour 30 jours)`);
+  };
+
+  // Simulation: month-end expiration
+  const simulateMonthEndExpired = () => {
+    setSubscription(prev => ({
+      ...prev,
+      status: 'expired',
+      current_period_end: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+    }));
+    showNotification("⚠️ Simulation : Échéance mensuelle atteinte ! Compte bloqué en attente de renouvellement.");
+  };
+
+  const reactivateSubscription = () => {
+    const nextMonth = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    setSubscription(prev => ({
+      ...prev,
+      status: 'active',
+      current_period_end: nextMonth,
+      prospects_used: 0,
+    }));
+    showNotification("✅ Paiement de renouvellement validé ! Votre compte est réactivé pour 30 jours.");
   };
 
   const resetQuota = () => {
@@ -229,77 +272,108 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     setProspects(prev => prev.map(p => p.id === id ? { ...p, sent_variant: variant } : p));
     setAuditReport(prev => {
       const stats = prev.ab_test_stats || { variant_a_sent: 0, variant_b_sent: 0, variant_a_replies: 0, variant_b_replies: 0 };
+      const newSentA = variant === 'A' ? stats.variant_a_sent + 1 : stats.variant_a_sent;
+      const newSentB = variant === 'B' ? stats.variant_b_sent + 1 : stats.variant_b_sent;
+      // Realistic simulation: variant B converts slightly more
+      const newRepliesA = variant === 'A' && Math.random() > 0.6 ? stats.variant_a_replies + 1 : stats.variant_a_replies;
+      const newRepliesB = variant === 'B' && Math.random() > 0.45 ? stats.variant_b_replies + 1 : stats.variant_b_replies;
       return {
         ...prev,
         ab_test_stats: {
-          ...stats,
-          variant_a_sent: variant === 'A' ? stats.variant_a_sent + 1 : stats.variant_a_sent,
-          variant_b_sent: variant === 'B' ? stats.variant_b_sent + 1 : stats.variant_b_sent,
+          variant_a_sent: newSentA,
+          variant_b_sent: newSentB,
+          variant_a_replies: newRepliesA,
+          variant_b_replies: newRepliesB,
         }
       };
     });
-    showNotification(`📨 Envoi enregistré avec la Variante ${variant} ! Le test A/B mesure vos résultats.`);
+    showNotification(`📨 Envoi enregistré avec la Variante ${variant} ! Le test A/B mesure vos retours.`);
   };
 
   const toggleABTest = (active: boolean) => {
     setAuditReport(prev => ({ ...prev, ab_test_active: active }));
-    showNotification(active ? "🧪 Test A/B activé sur vos prochaines fiches prospects !" : "Test A/B désactivé.");
+    showNotification(
+      active 
+        ? "🧪 Test A/B activé ! Vos fiches prospects affichent désormais la Variante A et la Variante B." 
+        : "Test A/B désactivé."
+    );
   };
 
   const applyWinningScript = () => {
-    // Apply winning variant B to default
-    const winning = auditReport.recommended_script.first_contact_optimized;
+    const winning = auditReport.recommended_script.followup_optimized;
     setProspects(prev => prev.map(p => ({
       ...p,
       generated_messages: {
         ...p.generated_messages,
-        first_contact: winning,
+        first_contact: p.generated_messages.first_contact_variant_b || p.generated_messages.first_contact,
       }
     })));
-    confetti({ particleCount: 70, spread: 60 });
-    showNotification("🏆 Variante B validée et appliquée définitivement à l'ensemble de votre compte !");
+    confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+    showNotification("🏆 La Variante B a été appliquée définitivement comme script principal sur toutes vos fiches !");
+  };
+
+  const simulateABTestThreshold = () => {
+    setAuditReport(prev => ({
+      ...prev,
+      ab_test_active: true,
+      ab_test_stats: {
+        variant_a_sent: 18,
+        variant_b_sent: 16,
+        variant_a_replies: 6, // 33%
+        variant_b_replies: 8, // 50%
+      }
+    }));
+    showNotification("⚡ Simulation : 34 envois enregistrés ! L'analyse de la variante gagnante est désormais disponible.");
   };
 
   const reportFaultyContact = (id: string, reason: string) => {
-    const reportedProspect = prospects.find(p => p.id === id);
-    if (!reportedProspect) return { success: false, message: "Prospect introuvable" };
-
-    // Anti-fraud: recrédit
+    setProspects(prev => prev.filter(p => p.id !== id));
     setSubscription(prev => ({
       ...prev,
-      prospects_used: Math.max(0, prev.prospects_used - 1)
+      prospects_used: Math.max(0, prev.prospects_used - 1),
     }));
-    setProspects(prev => prev.filter(p => p.id !== id));
-    showNotification("🛡️ Vérification automatique réussie : 1 crédit restitué sur votre solde !");
-    return { success: true, message: "Contact vérifié comme invalide. Votre crédit a été restitué." };
+    showNotification("✅ Contact vérifié comme erroné. 1 crédit de prospect vous a été recrédité immédiatement !");
+    return { success: true, message: "1 crédit remboursé automatiquement" };
   };
 
   const searchProspects = async (params: { keyword: string; location: string; channel: Channel; count: number }) => {
-    const isBypass = user.isSuperadminMode;
-    const totalAllowed = subscription.prospects_quota + subscription.bonus_prospects;
-    const remainingQuota = totalAllowed - subscription.prospects_used;
-
-    // Strict quota check in Normal mode!
-    if (!isBypass && remainingQuota <= 0) {
+    // 1. Check expiration
+    if (isSubscriptionExpired && !user.isSuperadminMode) {
       setShowUpgradeModal(true);
-      return { success: false, added: 0, error: "Plafond de quota atteint !" };
+      showNotification("🔒 Votre abonnement est arrivé à échéance. Veuillez le renouveler pour prospecter.");
+      return { success: false, added: 0, error: "Abonnement échu" };
     }
 
-    const toAddCount = isBypass ? params.count : Math.min(params.count, remainingQuota);
+    // 2. Check quota
+    const totalAllowed = subscription.prospects_quota + subscription.bonus_prospects;
+    const remaining = totalAllowed - subscription.prospects_used;
+    const isBypass = user.isSuperadminMode;
 
-    const newItems: Prospect[] = [];
-    const companies = [
-      { name: "Cabinet Stratégie Plus", act: "Conseil en management et stratégie", city: params.location || "Lomé" },
-      { name: "Digital Pulse Media", act: "Agence de communication & publicité digitale", city: params.location || "Cotonou" },
-      { name: "BTP Horizon Bâtiment", act: "Entreprise de construction et génie civil", city: params.location || "Abidjan" },
-      { name: "Clinique Santé Horizon", act: "Centre médical pluridisciplinaire", city: params.location || "Dakar" },
-      { name: "FinTech Zenith", act: "Solutions de paiement et logiciels financiers", city: params.location || "Paris" },
-      { name: "OptiLogistics Express", act: "Transport et logistique de fret", city: params.location || "Douala" },
+    if (!isBypass && remaining <= 0) {
+      setShowUpgradeModal(true);
+      showNotification("🔒 Quota de prospects atteint. Passez à la formule PRO ou AGENCE pour continuer.");
+      return { success: false, added: 0, error: "Quota atteint" };
+    }
+
+    const toAddCount = isBypass ? params.count : Math.min(params.count, remaining);
+    if (toAddCount <= 0) {
+      setShowUpgradeModal(true);
+      return { success: false, added: 0, error: "Quota insuffisant" };
+    }
+
+    const sampleCompanies = [
+      { name: "Agence Digitale Horizon", act: "Marketing & Acquisition B2B", city: "Lomé" },
+      { name: "Cabinet Alpha Audit", act: "Conseil Juridique & Fiscal", city: "Abidjan" },
+      { name: "Studio Pixel & Co", act: "Design & Développement Web", city: "Dakar" },
+      { name: "InnoTech Solutions", act: "Intégration Systèmes & ERP", city: "Cotonou" },
+      { name: "Cabinet Conseil Vente", act: "Formation Commerciale", city: "Paris" },
+      { name: "BTP Pro Performance", act: "Architecture & Rénovation", city: "Lomé" },
     ];
 
+    const newItems: Prospect[] = [];
     for (let i = 0; i < toAddCount; i++) {
-      const comp = companies[i % companies.length];
-      const score = Math.floor(Math.random() * 26) + 72; // 72 to 98
+      const comp = sampleCompanies[i % sampleCompanies.length];
+      const score = Math.floor(Math.random() * (98 - 65 + 1)) + 65;
       const id = "search-" + Date.now() + "-" + i;
       newItems.push({
         id,
@@ -308,10 +382,10 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         city: params.location || comp.city,
         country: "Afrique / Europe",
         qualification_score: score,
-        qualification_reason: `Recherche ciblée sur "${params.keyword || comp.act}". Besoin critique identifié sur l'acquisition et le suivi client.`,
-        flaws_identified: "Aucune relance après devis et temps de latence de prise de contact supérieur à 48h.",
-        recommended_offer: `${avatar.offer || "Mise en place d'un système de prospection et relance automatisé"}`,
-        opportunity: "Proposer un diagnostic rapide de leurs goulots d'étranglement commerciaux et un modèle de conversion prêt à l'emploi.",
+        qualification_reason: `Recherche ciblée sur "${params.keyword || comp.act}". Faille identifiée sur le temps de réponse aux demandes entrantes.`,
+        flaws_identified: "Absence de relance structurée après envoi de devis et délai de première réponse supérieur à 48 heures.",
+        recommended_offer: `${avatar.offer || "Mise en place d'un système de relance automatique WhatsApp et CRM pour doubler le closing des devis."}`,
+        opportunity: "Proposer un audit gratuit de leurs délais de relance et une démo vidéo personnalisée de 2 minutes.",
         channel: params.channel,
         collected_at: new Date().toISOString().split('T')[0],
         email: `contact@${comp.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`,
@@ -324,7 +398,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         status: "nouveau",
         estimated_deal_value: 1500,
         generated_messages: {
-          first_contact: `Bonjour ! J'ai remarqué le développement de ${comp.name} sur ${params.location || comp.city}. Beaucoup de structures de votre secteur perdent des devis faute d'un suivi rapide des demandes. J'ai un système léger qui fait ça sans effort. Seriez-vous ouvert à un rapide échange de 2 min ?`,
+          first_contact: `Bonjour ! J'ai remarqué le développement de ${comp.name} sur ${params.location || comp.city}. Beaucoup d'entreprises perdent 1 devis sur 3 faute d'un suivi rapide des demandes. J'ai un système léger qui fait ça sans effort. Seriez-vous ouvert à un rapide échange de 2 min ?`,
           first_contact_variant_b: `Bonjour ! En analysant ${comp.name} sur ${params.location || comp.city}, j'ai constaté que vos offres méritaient une relance réactive en 5 secondes. Nous aidons les entreprises de votre secteur à récupérer 1 devis sur 3 sans forcer. Disponible pour une démo de 2 min ?`,
           value_offer: `💡 Comment utiliser ce message : À envoyer si le prospect réagit favorablement à votre première accroche :\n\n« Nous permettons aux entreprises comme la vôtre de réactiver jusqu'à 35% de prospects silencieux grâce à des messages courts et ciblés. Par exemple, une structure équivalente sur ${params.location || comp.city} a généré 3 nouveaux contrats dès le premier mois. »`,
           followup_1: `Bonjour, je me permets un petit suivi suite à mon mot. Seriez-vous intéressé par un aperçu direct du script que nous utilisons ?`,
@@ -359,7 +433,6 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     const now = new Date();
     const nextAvail = new Date(auditReport.next_audit_available_at);
     
-    // Strict 30 days lock check in normal mode
     if (!isSuperadmin && now < nextAvail) {
       showNotification("🔒 Audit verrouillé : disponible une fois tous les 30 jours.");
       return { success: false, message: "Verrouillé 30 jours" };
@@ -385,12 +458,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       },
       avatar_suggestions: "Augmentez légèrement votre promesse chiffrée dans l'Avatar pour attirer des profils avec des budgets supérieurs à 2 000 €.",
       ab_test_active: true,
-      ab_test_stats: {
-        variant_a_sent: 18,
-        variant_b_sent: 14,
-        variant_a_replies: 6,
-        variant_b_replies: 7,
-      }
+      ab_test_stats: auditReport.ab_test_stats,
     };
     setAuditReport(newReport);
     showNotification("📊 Votre nouvel Audit Mensuel IA a été généré avec succès !");
@@ -485,6 +553,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       toggleSuperadminMode,
       setUserEmail,
       subscription,
+      isSubscriptionExpired,
+      simulateMonthEndExpired,
+      reactivateSubscription,
       upgradePlan,
       resetQuota,
       addBonusProspects,
@@ -503,6 +574,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       generateAuditReport,
       toggleABTest,
       applyWinningScript,
+      simulateABTestThreshold,
       testimonials,
       submitTestimonial,
       updateTestimonialStatus,

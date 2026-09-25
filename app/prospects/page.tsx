@@ -14,11 +14,9 @@ import {
   AlertCircle,
   FileSpreadsheet,
   CheckCircle2,
-  ArrowRight,
-  Sparkles
+  RotateCcw
 } from 'lucide-react';
 import { Channel, Prospect } from '@/lib/types';
-import Link from 'next/link';
 
 export default function ProspectsPage() {
   const { 
@@ -27,7 +25,8 @@ export default function ProspectsPage() {
     user, 
     searchProspects, 
     exportProspectsCSV, 
-    setShowUpgradeModal 
+    setShowUpgradeModal,
+    isSubscriptionExpired 
   } = useStore();
 
   const [keyword, setKeyword] = useState('Architecte & Décoration');
@@ -50,6 +49,11 @@ export default function ProspectsPage() {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubscriptionExpired && !isBypass) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     if (!isBypass && remaining <= 0) {
       setShowUpgradeModal(true);
       return;
@@ -75,8 +79,28 @@ export default function ProspectsPage() {
 
   return (
     <div className="space-y-8 animate-fadeIn">
+      {/* Alerte Expiration Abonnement */}
+      {isSubscriptionExpired && !isBypass && (
+        <div className="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-lg animate-fadeIn">
+          <div className="flex items-center gap-3 text-rose-300">
+            <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+            <div>
+              <strong className="text-white block font-bold">Votre abonnement mensuel est arrivé à échéance</strong>
+              <span>Le compte est bloqué en attente de renouvellement. Renouvelez votre forfait pour débloquer de nouveaux prospects.</span>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowUpgradeModal(true)}
+            className="py-2 px-4 rounded-xl font-bold bg-rose-600 hover:bg-rose-500 text-white shrink-0 flex items-center gap-1.5 shadow-md transition-all"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>Renouveler mon abonnement</span>
+          </button>
+        </div>
+      )}
+
       {/* Top Banner & Search Bar */}
-      <div className="bg-dark-900 border border-dark-600 rounded-2xl p-6 shadow-xl space-y-6">
+      <div className="bg-dark-900 border border-dark-600 rounded-2xl p-4 sm:p-6 shadow-xl space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-dark-700/80 pb-5">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan/15 text-cyan text-xs font-bold uppercase tracking-wider mb-2 border border-cyan/30">
@@ -87,7 +111,7 @@ export default function ProspectsPage() {
               Rechercher &amp; Qualifier vos Nouveaux Prospects
             </h1>
             <p className="text-slate-400 text-xs md:text-sm mt-1">
-              Chaque prospect extrait fait l&apos;objet d&apos;une vérification stricte : failles détectées, contact direct actif et message rédigé sur-mesure.
+              Chaque prospect extrait fait l&apos;objet d&apos;une analyse stricte : failles détectées, contact direct actif et message rédigé sur-mesure.
             </p>
           </div>
 
@@ -113,75 +137,81 @@ export default function ProspectsPage() {
           </div>
         </div>
 
-        {/* Search Form */}
-        <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
-          {/* Mot-clé / Secteur */}
-          <div className="lg:col-span-4">
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <Search className="w-3.5 h-3.5 text-cyan" />
-              Secteur ou Métier ciblé
+        {/* Formulaire de Recherche Multi-Sources */}
+        <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-12 gap-3.5">
+          {/* Métier / Mot-clé */}
+          <div className="md:col-span-4 space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+              Métier ou Secteur cible
             </label>
-            <input
-              type="text"
-              required
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Ex: Agence immobilière, Clinique, Architecte..."
-              className="w-full bg-dark-950 border border-dark-600 focus:border-cyan text-xs text-white px-3.5 py-2.5 rounded-xl focus:outline-none transition-colors"
-            />
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                required
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Ex: Agence immobilière, Avocat, Designer..."
+                className="w-full bg-dark-950 border border-dark-600 focus:border-cyan text-xs text-white pl-9 pr-3 py-2.5 rounded-xl focus:outline-none"
+              />
+            </div>
           </div>
 
-          {/* Ville / Pays */}
-          <div className="lg:col-span-3">
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-cyan" />
-              Ville ou Pays
+          {/* Ville / Région */}
+          <div className="md:col-span-3 space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+              Ville ou Région
             </label>
-            <input
-              type="text"
-              required
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Ex: Lomé, Paris, Abidjan..."
-              className="w-full bg-dark-950 border border-dark-600 focus:border-cyan text-xs text-white px-3.5 py-2.5 rounded-xl focus:outline-none transition-colors"
-            />
+            <div className="relative">
+              <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                required
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Ex: Lomé, Paris, Abidjan..."
+                className="w-full bg-dark-950 border border-dark-600 focus:border-cyan text-xs text-white pl-9 pr-3 py-2.5 rounded-xl focus:outline-none"
+              />
+            </div>
           </div>
 
-          {/* Canal */}
-          <div className="lg:col-span-3">
-            <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5 text-cyan" />
+          {/* Canal de détection */}
+          <div className="md:col-span-3 space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
               Canal de Détection
             </label>
-            <select
-              value={channel}
-              onChange={(e) => setChannel(e.target.value as any)}
-              className="w-full bg-dark-950 border border-dark-600 focus:border-cyan text-xs text-white px-3.5 py-2.5 rounded-xl focus:outline-none transition-colors"
-            >
-              <option value="google_maps">Google Maps (Commerces &amp; Bureaux)</option>
-              <option value="linkedin">LinkedIn (B2B, Cadres &amp; Agences)</option>
-              <option value="facebook">Facebook (Pages &amp; Groupes professionnels)</option>
-              <option value="instagram">Instagram (Créateurs &amp; Marques)</option>
-              <option value="google">Google Recherche (Sites web &amp; Annuaires)</option>
-            </select>
+            <div className="relative">
+              <Globe className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <select
+                value={channel}
+                onChange={(e) => setChannel(e.target.value as Channel)}
+                className="w-full bg-dark-950 border border-dark-600 focus:border-cyan text-xs text-white pl-9 pr-3 py-2.5 rounded-xl focus:outline-none appearance-none"
+              >
+                <option value="google_maps">Google Maps (Local &amp; WhatsApp vérifiés)</option>
+                <option value="linkedin">LinkedIn B2B (Décideurs &amp; Dirigeants)</option>
+                <option value="google">Recherche Web Google (Sites officiels)</option>
+                <option value="facebook">Pages Entreprises Facebook</option>
+                <option value="instagram">Comptes Professionnels Instagram</option>
+              </select>
+            </div>
           </div>
 
-          {/* CTA Submit Button */}
-          <div className="lg:col-span-2">
+          {/* Bouton Lancer la Recherche */}
+          <div className="md:col-span-2 flex items-end">
             <button
               type="submit"
               disabled={isSearching}
-              className="w-full py-2.5 px-4 rounded-xl font-extrabold text-xs bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-2 shadow-cyan-glow transition-all hover:scale-105 disabled:opacity-50"
+              className="w-full py-2.5 px-4 rounded-xl text-xs font-black bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-2 shadow-cyan-glow transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
             >
               {isSearching ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Recherche...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-dark-950" />
+                  <span>Analyse...</span>
                 </>
               ) : (
                 <>
                   <Zap className="w-4 h-4 fill-dark-950" />
-                  <span>Rechercher</span>
+                  <span>Extraire (3)</span>
                 </>
               )}
             </button>
@@ -189,21 +219,35 @@ export default function ProspectsPage() {
         </form>
       </div>
 
-      {/* Filter Bar & Export Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-dark-900/60 border border-dark-700/80 p-4 rounded-2xl">
+      {/* Barre de Filtres & Export CSV */}
+      <div className="bg-dark-900 border border-dark-700 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-slate-400 font-semibold flex items-center gap-1">
+          <div className="flex items-center gap-1.5 text-slate-400 mr-2">
             <Filter className="w-3.5 h-3.5 text-cyan" />
-            Filtrer par :
-          </span>
+            <span className="font-semibold">Filtres :</span>
+          </div>
 
-          {/* Statut filter */}
+          {/* Filtre Canal */}
+          <select
+            value={filterChannel}
+            onChange={(e) => setFilterChannel(e.target.value)}
+            className="bg-dark-800 border border-dark-600 text-xs text-slate-300 px-2.5 py-1.5 rounded-lg focus:outline-none"
+          >
+            <option value="all">Tous les canaux</option>
+            <option value="google_maps">Google Maps</option>
+            <option value="linkedin">LinkedIn</option>
+            <option value="instagram">Instagram</option>
+            <option value="facebook">Facebook</option>
+            <option value="google">Google</option>
+          </select>
+
+          {/* Filtre Statut */}
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-dark-800 border border-dark-600 rounded-lg text-xs text-slate-200 px-2.5 py-1.5 focus:outline-none"
+            className="bg-dark-800 border border-dark-600 text-xs text-slate-300 px-2.5 py-1.5 rounded-lg focus:outline-none"
           >
-            <option value="all">Tous les statuts CRM</option>
+            <option value="all">Tous les statuts</option>
             <option value="nouveau">Nouveau</option>
             <option value="non_contacte">Non contacté</option>
             <option value="en_discussion">En discussion</option>
@@ -211,101 +255,62 @@ export default function ProspectsPage() {
             <option value="perdu">Perdu</option>
           </select>
 
-          {/* Canal filter */}
-          <select
-            value={filterChannel}
-            onChange={(e) => setFilterChannel(e.target.value)}
-            className="bg-dark-800 border border-dark-600 rounded-lg text-xs text-slate-200 px-2.5 py-1.5 focus:outline-none"
-          >
-            <option value="all">Tous les canaux</option>
-            <option value="google_maps">Google Maps</option>
-            <option value="linkedin">LinkedIn</option>
-            <option value="facebook">Facebook</option>
-            <option value="instagram">Instagram</option>
-            <option value="google">Google</option>
-          </select>
-
-          {/* Only Hot checkbox pill */}
+          {/* Checkbox Score >= 80 */}
           <button
             onClick={() => setOnlyHot(!onlyHot)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
               onlyHot
-                ? "bg-cyan/20 border-cyan text-cyan shadow-cyan-border"
-                : "bg-dark-800 border-dark-600 text-slate-400 hover:text-white"
+                ? "bg-amber-500/20 text-amber-400 border-amber-500/50"
+                : "bg-dark-800 text-slate-400 border-dark-600 hover:text-white"
             }`}
           >
-            🔥 Chauds (Score ≥ 80)
+            ★ Chauds (≥ 80/100)
           </button>
         </div>
 
-        {/* Export CSV / Excel Button */}
-        <button
-          onClick={exportProspectsCSV}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-dark-800 hover:bg-dark-700 text-cyan border border-cyan/30 shadow-sm transition-all"
-        >
-          <FileSpreadsheet className="w-4 h-4 text-cyan" />
-          <span>Exporter CSV / Excel (1 Clic)</span>
-        </button>
+        {/* Compteur & Export CSV */}
+        <div className="flex items-center gap-3">
+          <span className="text-slate-400">
+            <strong className="text-white">{filteredProspects.length}</strong> prospect(s) qualifié(s)
+          </span>
+
+          <button
+            onClick={exportProspectsCSV}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-dark-800 hover:bg-dark-700 text-cyan border border-cyan/30 text-xs font-semibold transition-colors"
+            title="Exporter votre base au format CSV"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>Export CSV</span>
+          </button>
+        </div>
       </div>
 
-      {/* Prospects Cards List */}
+      {/* Liste des Fiches Prospects */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between text-xs text-slate-400">
-          <span>{filteredProspects.length} prospect(s) qualifié(s) affiché(s)</span>
-          <span className="text-emerald-400 flex items-center gap-1 font-medium">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            Garantie Anti-Gaspillage : Seuls les prospects contactables sont comptabilisés
-          </span>
-        </div>
-
         {filteredProspects.length === 0 ? (
-          <div className="p-12 text-center bg-dark-900 border border-dark-700 rounded-2xl space-y-3">
-            <AlertCircle className="w-8 h-8 text-cyan mx-auto opacity-70" />
+          <div className="bg-dark-900 border border-dark-700 rounded-2xl p-12 text-center space-y-3">
+            <CheckCircle2 className="w-10 h-10 text-cyan mx-auto" />
             <h3 className="text-base font-bold text-white">Aucun prospect correspondant aux filtres</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <p className="text-xs text-slate-400">
               Modifiez vos filtres ou lancez une nouvelle recherche ci-dessus pour alimenter votre liste.
             </p>
           </div>
         ) : (
           filteredProspects.map((prospect) => (
-            <ProspectCard 
-              key={prospect.id} 
-              prospect={prospect} 
-              onReportFaulty={(p) => setFaultyProspect(p)} 
+            <ProspectCard
+              key={prospect.id}
+              prospect={prospect}
+              onReportFaulty={(p) => setFaultyProspect(p)}
             />
           ))
         )}
       </div>
 
-      {/* Zone Basse : Widget Audit Mensuel IA */}
-      <div className="bg-gradient-to-r from-dark-900 via-dark-850 to-dark-900 border border-cyan/40 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-cyan" />
-            <span className="text-xs font-bold uppercase tracking-wider text-cyan">Diagnostic Commercial IA</span>
-          </div>
-          <h3 className="text-lg font-bold text-white">Prêt pour votre Audit Mensuel de Conversion ?</h3>
-          <p className="text-xs text-slate-400 max-w-xl">
-            L&apos;IA analyse vos messages, le taux de réponse et les statuts gagnés pour reformuler vos scripts et optimiser votre taux de signature.
-          </p>
-        </div>
-
-        <Link
-          href="/audit"
-          className="px-5 py-2.5 rounded-xl text-xs font-bold bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-2 shadow-cyan-glow transition-all shrink-0"
-        >
-          <span>Accéder au Rapport d&apos;Audit</span>
-          <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
-
-      {/* Faulty Contact Anti-fraud Modal */}
-      {faultyProspect && (
-        <FaultyContactModal 
-          prospect={faultyProspect} 
-          onClose={() => setFaultyProspect(null)} 
-        />
-      )}
+      {/* Modale de Signalement de Contact Erroné */}
+      <FaultyContactModal
+        prospect={faultyProspect}
+        onClose={() => setFaultyProspect(null)}
+      />
     </div>
   );
 }

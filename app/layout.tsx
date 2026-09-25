@@ -7,41 +7,65 @@ import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
 import UpgradeModal from "@/components/UpgradeModal";
 import LoomModal from "@/components/LoomModal";
-import VideoTutorialModal from "@/components/VideoTutorialModal";
+import LoomTutorialModal from "@/components/LoomTutorialModal";
 import LegalModal from "@/components/LegalModal";
 import Toast from "@/components/Toast";
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const [isLoomOpen, setIsLoomOpen] = useState(false);
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isLoomSubmitOpen, setIsLoomSubmitOpen] = useState(false);
+  const [isLoomTutorialOpen, setIsLoomTutorialOpen] = useState(false);
   const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-dark-950 text-slate-100 flex">
-      {/* Collapsible Sidebar */}
-      <Sidebar
-        collapsed={collapsed}
-        onToggleCollapse={() => setCollapsed(!collapsed)}
-        onOpenTutorial={() => setIsTutorialOpen(true)}
-        onOpenLegal={() => setIsLegalOpen(true)}
-      />
+    <div className="min-h-screen bg-dark-950 text-slate-100 flex flex-col md:flex-row relative">
+      {/* Mobile Backdrop Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          onClick={() => setMobileMenuOpen(false)}
+          className="md:hidden fixed inset-0 z-40 bg-black/80 backdrop-blur-sm animate-fadeIn"
+        />
+      )}
+
+      {/* Sidebar: Responsive Drawer on mobile, Fixed on Desktop */}
+      <div className={`fixed inset-y-0 left-0 z-50 transition-transform duration-300 md:translate-x-0 ${
+        mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+      }`}>
+        <Sidebar
+          collapsed={collapsed}
+          onToggleCollapse={() => setCollapsed(!collapsed)}
+          onOpenTutorial={() => {
+            setMobileMenuOpen(false);
+            setIsLoomTutorialOpen(true);
+          }}
+          onOpenLegal={() => {
+            setMobileMenuOpen(false);
+            setIsLegalOpen(true);
+          }}
+        />
+      </div>
 
       {/* Main Content Area */}
-      <div className={`flex-1 ${collapsed ? "ml-16" : "ml-60"} flex flex-col min-h-screen transition-all duration-300`}>
+      <div className={`flex-1 ${collapsed ? "md:ml-16" : "md:ml-60"} flex flex-col min-h-screen transition-all duration-300 w-full`}>
         <Topbar 
-          onOpenLoomModal={() => setIsLoomOpen(true)} 
-          onOpenTutorialModal={() => setIsTutorialOpen(true)}
+          onOpenLoomModal={() => setIsLoomSubmitOpen(true)} 
+          onOpenTutorialModal={() => setIsLoomTutorialOpen(true)}
+          onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
         />
-        <main className="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-3 sm:p-4 md:p-6 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>
 
       {/* Global Modals & Notifications */}
       <UpgradeModal />
-      <LoomModal isOpen={isLoomOpen} onClose={() => setIsLoomOpen(false)} />
-      <VideoTutorialModal isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
+      <LoomTutorialModal 
+        isOpen={isLoomTutorialOpen} 
+        onClose={() => setIsLoomTutorialOpen(false)} 
+        onOpenSubmitLoom={() => setIsLoomSubmitOpen(true)}
+      />
+      <LoomModal isOpen={isLoomSubmitOpen} onClose={() => setIsLoomSubmitOpen(false)} />
       <LegalModal isOpen={isLegalOpen} onClose={() => setIsLegalOpen(false)} />
       <Toast />
     </div>

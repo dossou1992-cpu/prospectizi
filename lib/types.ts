@@ -73,6 +73,7 @@ export interface Subscription {
   prospects_used: number;
   bonus_prospects: number;
   current_period_end: string;
+  auto_renew: boolean;
 }
 
 export interface AuditReport {

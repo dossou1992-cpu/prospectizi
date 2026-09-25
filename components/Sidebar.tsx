@@ -11,7 +11,7 @@ import {
   CreditCard, 
   ShieldCheck, 
   Users2, 
-  Video, 
+  Gift, 
   MessageCircle, 
   FileText,
   Zap,
@@ -56,7 +56,6 @@ export default function Sidebar({ onOpenTutorial, onOpenLegal, collapsed, onTogg
               <div className="overflow-hidden">
                 <div className="flex items-center gap-1.5">
                   <span className="text-lg font-black tracking-tight text-white">Prospectizi</span>
-                  <span className="text-[9px] font-bold uppercase bg-cyan/15 text-cyan border border-cyan/40 px-1 py-0.2 rounded-full">MVP</span>
                 </div>
                 <p className="text-[10px] text-cyan font-semibold truncate">Trouver &amp; contactez mieux</p>
               </div>
@@ -118,11 +117,11 @@ export default function Sidebar({ onOpenTutorial, onOpenLegal, collapsed, onTogg
         {/* Loom Video Tutorial Button */}
         <button
           onClick={onOpenTutorial}
-          title="Vidéo Tuto (2m30)"
+          title="Guide Loom (+3 leads offerts)"
           className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold bg-cyan/15 hover:bg-cyan/25 text-cyan border border-cyan/30 transition-all shadow-cyan-border"
         >
-          <Video className="w-3.5 h-3.5 shrink-0 text-cyan" />
-          {!collapsed && <span className="truncate font-bold">Vidéo Tuto (2m30)</span>}
+          <Gift className="w-3.5 h-3.5 shrink-0 text-cyan" />
+          {!collapsed && <span className="truncate font-bold">Guide Loom (+3 leads)</span>}
         </button>
 
         {/* WhatsApp Support Direct Button */}

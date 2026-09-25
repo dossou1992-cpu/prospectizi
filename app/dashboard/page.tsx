@@ -18,17 +18,19 @@ import {
   CheckCircle2, 
   Award,
   Zap,
-  PlayCircle,
+  Gift,
   CalendarCheck
 } from 'lucide-react';
 import { Prospect } from '@/lib/types';
-import VideoTutorialModal from '@/components/VideoTutorialModal';
+import LoomTutorialModal from '@/components/LoomTutorialModal';
+import LoomModal from '@/components/LoomModal';
 
 export default function DashboardPage() {
   const { prospects, avatar, markFollowupDone } = useStore();
   const [selectedFocusProspect, setSelectedFocusProspect] = useState<Prospect | null>(null);
   const [copied, setCopied] = useState(false);
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isLoomTutorialOpen, setIsLoomTutorialOpen] = useState(false);
+  const [isLoomSubmitOpen, setIsLoomSubmitOpen] = useState(false);
 
   // KPIs Calculations
   const gagneProspects = prospects.filter(p => p.status === 'gagne');
@@ -42,7 +44,6 @@ export default function DashboardPage() {
 
   // Focus du Jour : prospects à relancer ou contacter aujourd'hui qui n'ont pas encore été relancés aujourd'hui
   const focusList = prospects.filter(p => {
-    // Si déjà relancé aujourd'hui, on ne l'affiche plus dans les relances urgentes d'aujourd'hui
     if (p.last_followup_done_date === todayStr) return false;
     return p.status === 'en_discussion' || (p.status === 'non_contacte' && p.qualification_score >= 80);
   }).slice(0, 5);
@@ -76,13 +77,14 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
-            {/* Direct Video Tutorial trigger */}
+            {/* Guide Loom CTA Button */}
             <button
-              onClick={() => setIsTutorialOpen(true)}
+              onClick={() => setIsLoomTutorialOpen(true)}
               className="bg-cyan/15 hover:bg-cyan/25 text-cyan border border-cyan/40 font-bold px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-2 transition-all shadow-cyan-border"
+              title="Comment enregistrer un avis Loom pour débloquer +3 prospects offerts"
             >
-              <PlayCircle className="w-4 h-4 text-cyan" />
-              <span>Vidéo Tuto (2m30)</span>
+              <Gift className="w-4 h-4 text-cyan" />
+              <span>Guide Loom (+3 leads)</span>
             </button>
 
             <Link
@@ -96,62 +98,61 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* 4 KPIs Clés */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 4 KPIs Clés (Responsive: 2 colonnes mobile, 4 desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1 : Prospects Gagnés */}
-        <div className="bg-dark-800/80 border border-emerald-500/30 rounded-2xl p-5 relative overflow-hidden group hover:border-emerald-500/60 transition-all shadow-lg">
-          <div className="flex justify-between items-start mb-3">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Prospects Gagnés</span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
-              <Trophy className="w-5 h-5" />
+        <div className="bg-dark-800/80 border border-emerald-500/30 rounded-2xl p-4 sm:p-5 relative overflow-hidden group hover:border-emerald-500/60 transition-all shadow-lg">
+          <div className="flex justify-between items-start mb-2 sm:mb-3">
+            <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Prospects Gagnés</span>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center">
+              <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="text-3xl font-black text-white font-mono">{gagneProspects.length}</div>
-          <div className="text-xs text-emerald-400 font-semibold mt-1 flex items-center gap-1">
-            <span>Valeur estimée :</span>
-            <span className="font-bold font-mono">+{totalWonRevenue.toLocaleString('fr-FR')} €</span>
+          <div className="text-2xl sm:text-3xl font-black text-white font-mono">{gagneProspects.length}</div>
+          <div className="text-[11px] sm:text-xs text-emerald-400 font-semibold mt-1 flex items-center gap-1 flex-wrap">
+            <span>+{totalWonRevenue.toLocaleString('fr-FR')} €</span>
           </div>
         </div>
 
         {/* KPI 2 : En Discussion */}
-        <div className="bg-dark-800/80 border border-amber-500/30 rounded-2xl p-5 relative overflow-hidden group hover:border-amber-500/60 transition-all shadow-lg">
-          <div className="flex justify-between items-start mb-3">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">En Discussion</span>
-            <div className="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center">
-              <MessageSquare className="w-5 h-5" />
+        <div className="bg-dark-800/80 border border-amber-500/30 rounded-2xl p-4 sm:p-5 relative overflow-hidden group hover:border-amber-500/60 transition-all shadow-lg">
+          <div className="flex justify-between items-start mb-2 sm:mb-3">
+            <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">En Discussion</span>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="text-3xl font-black text-white font-mono">{enDiscussion.length}</div>
-          <div className="text-xs text-amber-400 font-semibold mt-1">
-            {enDiscussion.length > 0 ? "Conversations actives en cours" : "Lancez de nouveaux contacts"}
+          <div className="text-2xl sm:text-3xl font-black text-white font-mono">{enDiscussion.length}</div>
+          <div className="text-[11px] sm:text-xs text-amber-400 font-semibold mt-1 truncate">
+            {enDiscussion.length > 0 ? "Conversations actives" : "0 en cours"}
           </div>
         </div>
 
         {/* KPI 3 : Relances à faire */}
-        <div className="bg-dark-800/80 border border-cyan/30 rounded-2xl p-5 relative overflow-hidden group hover:border-cyan/60 transition-all shadow-lg">
-          <div className="flex justify-between items-start mb-3">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Relances du Jour</span>
-            <div className="w-9 h-9 rounded-xl bg-cyan/15 text-cyan flex items-center justify-center shadow-cyan-border">
-              <Clock className="w-5 h-5" />
+        <div className="bg-dark-800/80 border border-cyan/30 rounded-2xl p-4 sm:p-5 relative overflow-hidden group hover:border-cyan/60 transition-all shadow-lg">
+          <div className="flex justify-between items-start mb-2 sm:mb-3">
+            <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Relances du Jour</span>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-cyan/15 text-cyan flex items-center justify-center shadow-cyan-border">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="text-3xl font-black text-white font-mono">{focusList.length}</div>
-          <div className="text-xs text-cyan font-semibold mt-1">
-            Règle {avatar.followup_frequency} active
+          <div className="text-2xl sm:text-3xl font-black text-white font-mono">{focusList.length}</div>
+          <div className="text-[11px] sm:text-xs text-cyan font-semibold mt-1">
+            Règle {avatar.followup_frequency}
           </div>
         </div>
 
         {/* KPI 4 : Taux de Conversion */}
-        <div className="bg-dark-800/80 border border-purple-500/30 rounded-2xl p-5 relative overflow-hidden group hover:border-purple-500/60 transition-all shadow-lg">
-          <div className="flex justify-between items-start mb-3">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Taux de Closing</span>
-            <div className="w-9 h-9 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5" />
+        <div className="bg-dark-800/80 border border-purple-500/30 rounded-2xl p-4 sm:p-5 relative overflow-hidden group hover:border-purple-500/60 transition-all shadow-lg">
+          <div className="flex justify-between items-start mb-2 sm:mb-3">
+            <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Taux de Closing</span>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
           </div>
-          <div className="text-3xl font-black text-white font-mono">{conversionRate} %</div>
-          <div className="text-xs text-purple-300 font-semibold mt-1">
-            Moyenne du secteur : 12-15%
+          <div className="text-2xl sm:text-3xl font-black text-white font-mono">{conversionRate} %</div>
+          <div className="text-[11px] sm:text-xs text-purple-300 font-semibold mt-1">
+            Moyenne : 12-15%
           </div>
         </div>
       </div>
@@ -160,8 +161,8 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* BLOC FOCUS DU JOUR (7/12) */}
-        <div className="lg:col-span-7 bg-dark-900 border border-cyan/30 rounded-2xl p-6 space-y-4 shadow-xl">
-          <div className="flex justify-between items-center border-b border-dark-700/80 pb-3">
+        <div className="lg:col-span-7 bg-dark-900 border border-cyan/30 rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
+          <div className="flex justify-between items-center border-b border-dark-700/80 pb-3 flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-cyan/15 text-cyan flex items-center justify-center">
                 <Flame className="w-4 h-4 text-cyan" />
@@ -172,7 +173,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <span className="text-[10px] font-bold uppercase bg-dark-800 text-cyan px-2.5 py-1 rounded-md border border-cyan/30">
-              {focusList.length} action(s) restante(s)
+              {focusList.length} action(s)
             </span>
           </div>
 
@@ -187,25 +188,21 @@ export default function DashboardPage() {
               focusList.map((prospect) => (
                 <div 
                   key={prospect.id}
-                  className="p-4 bg-dark-800/90 border border-dark-600/80 hover:border-cyan/40 rounded-xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                  className="p-3.5 sm:p-4 bg-dark-800/90 border border-dark-600/80 hover:border-cyan/40 rounded-xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
                 >
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-bold text-white text-sm">{prospect.company_name}</span>
                       <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan/10 text-cyan border border-cyan/30">
                         Score : {prospect.qualification_score}/100
                       </span>
                     </div>
                     <p className="text-xs text-slate-400">
-                      {prospect.activity} • {prospect.city} ({prospect.channel})
-                    </p>
-                    <p className="text-[11px] text-rose-400/90 italic">
-                      Faille : {prospect.flaws_identified.substring(0, 65)}...
+                      {prospect.activity} • {prospect.city}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    {/* Bouton pour marquer la relance comme faite */}
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
                     <button
                       onClick={() => markFollowupDone(prospect.id)}
                       className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 transition-all flex items-center gap-1"
@@ -217,7 +214,7 @@ export default function DashboardPage() {
 
                     <button
                       onClick={() => setSelectedFocusProspect(prospect)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold bg-dark-700 hover:bg-cyan hover:text-dark-950 text-cyan border border-cyan/30 transition-all flex items-center gap-1.5"
+                      className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold bg-dark-700 hover:bg-cyan hover:text-dark-950 text-cyan border border-cyan/30 transition-all flex items-center gap-1.5"
                     >
                       <span>Voir message</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -242,7 +239,7 @@ export default function DashboardPage() {
         {/* BLOC TOP PROSPECTS CHAUDS & GAMIFICATION (5/12) */}
         <div className="lg:col-span-5 space-y-6">
           {/* Top Prospects Chauds (Score >= 80) */}
-          <div className="bg-dark-900 border border-dark-600 rounded-2xl p-6 space-y-4">
+          <div className="bg-dark-900 border border-dark-600 rounded-2xl p-4 sm:p-6 space-y-4">
             <div className="flex justify-between items-center border-b border-dark-700/80 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-400 flex items-center justify-center">
@@ -263,7 +260,7 @@ export default function DashboardPage() {
                 <div key={hp.id} className="p-3 bg-dark-800/80 rounded-xl border border-dark-700 flex items-center justify-between">
                   <div>
                     <div className="text-xs font-bold text-white">{hp.company_name}</div>
-                    <div className="text-[11px] text-slate-400">{hp.city} • {hp.channel}</div>
+                    <div className="text-[11px] text-slate-400">{hp.city}</div>
                   </div>
                   <div className="text-right">
                     <span className="text-xs font-bold text-cyan font-mono bg-cyan/10 border border-cyan/30 px-2 py-0.5 rounded-md">
@@ -361,10 +358,17 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Video Tutorial Modal */}
-      <VideoTutorialModal 
-        isOpen={isTutorialOpen} 
-        onClose={() => setIsTutorialOpen(false)} 
+      {/* Loom Tutorial Modal */}
+      <LoomTutorialModal
+        isOpen={isLoomTutorialOpen}
+        onClose={() => setIsLoomTutorialOpen(false)}
+        onOpenSubmitLoom={() => setIsLoomSubmitOpen(true)}
+      />
+
+      {/* Loom Submit Modal */}
+      <LoomModal
+        isOpen={isLoomSubmitOpen}
+        onClose={() => setIsLoomSubmitOpen(false)}
       />
     </div>
   );

@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { useStore } from '@/lib/store';
-import { X, Check, Zap, ArrowRight, Shield, Globe, Smartphone } from 'lucide-react';
+import { X, Check, Zap, ArrowRight, Shield, Globe, Smartphone, RotateCcw } from 'lucide-react';
 import { PlanType } from '@/lib/types';
 
 export default function UpgradeModal() {
-  const { showUpgradeModal, setShowUpgradeModal, upgradePlan } = useStore();
+  const { showUpgradeModal, setShowUpgradeModal, upgradePlan, isSubscriptionExpired, subscription } = useStore();
   const [gateway, setGateway] = useState<'flutterwave' | 'lemonsqueezy'>('flutterwave');
   const [loadingPlan, setLoadingPlan] = useState<PlanType | null>(null);
 
@@ -21,27 +21,35 @@ export default function UpgradeModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-dark-900 border border-cyan/40 rounded-2xl max-w-4xl w-full p-6 md:p-8 relative shadow-cyan-glow-lg max-h-[92vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+      <div className="bg-dark-900 border border-cyan/40 rounded-2xl max-w-4xl w-full p-4 sm:p-6 md:p-8 relative shadow-cyan-glow-lg max-h-[92vh] overflow-y-auto">
         {/* Close button */}
         <button
           onClick={() => setShowUpgradeModal(false)}
-          className="absolute top-5 right-5 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-dark-700 transition-colors"
+          className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-dark-700 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
-        <div className="text-center max-w-xl mx-auto mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan/15 border border-cyan/40 text-cyan text-xs font-bold uppercase tracking-wider mb-3">
-            <Zap className="w-3.5 h-3.5" />
-            Plafond de démonstration atteint
+        <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 border ${
+            isSubscriptionExpired
+              ? 'bg-rose-500/15 border-rose-500/40 text-rose-400'
+              : 'bg-cyan/15 border-cyan/40 text-cyan'
+          }`}>
+            {isSubscriptionExpired ? <RotateCcw className="w-3.5 h-3.5" /> : <Zap className="w-3.5 h-3.5" />}
+            <span>{isSubscriptionExpired ? "Échéance Mensuelle Atteinte" : "Plafond de démonstration atteint"}</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
-            Vos futurs clients n&apos;attendent pas !
+            {isSubscriptionExpired 
+              ? "Renouvelez votre formule pour réactiver vos crédits"
+              : "Vos futurs clients n'attendent pas !"}
           </h2>
-          <p className="text-slate-400 text-sm">
-            Vous avez généré vos prospects d&apos;essai. Libérez tout le potentiel de Prospectizi pour commencer à signer vos premiers contrats dès cette semaine.
+          <p className="text-slate-400 text-xs sm:text-sm">
+            {isSubscriptionExpired
+              ? "Votre période de 30 jours est échue. Validez votre renouvellement pour continuer à générer des prospects sans interruption."
+              : "Vous avez généré vos prospects d'essai. Débloquez Prospectizi pour signer vos premiers contrats dès cette semaine."}
           </p>
         </div>
 
@@ -139,7 +147,7 @@ export default function UpgradeModal() {
                 <span>Activation instantanée...</span>
               ) : (
                 <>
-                  <span>Débloquer 90 prospects pour 29 €</span>
+                  <span>{isSubscriptionExpired ? "Renouveler le Plan PRO (29 €)" : "Débloquer 90 prospects pour 29 €"}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -166,7 +174,7 @@ export default function UpgradeModal() {
 
               <div className="bg-dark-700/60 rounded-xl p-3 my-4 border border-dark-600/60 text-xs text-amber-400 flex items-center justify-between">
                 <span>Coût record par prospect :</span>
-                <span className="font-bold font-mono">0,13 € / prospect (5x plus de volume)</span>
+                <span className="font-bold font-mono">0,13 € / prospect (5x plus)</span>
               </div>
 
               <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
@@ -176,7 +184,7 @@ export default function UpgradeModal() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Gestion <strong>Multi-Avatars</strong> (jusqu&apos;à 5 cibles ou activités)</span>
+                  <span>Gestion <strong>Multi-Avatars</strong> (jusqu&apos;à 5 cibles)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0" />
@@ -206,7 +214,7 @@ export default function UpgradeModal() {
                 <span>Activation instantanée...</span>
               ) : (
                 <>
-                  <span>Passer sur AGENCE pour 59 €</span>
+                  <span>{isSubscriptionExpired ? "Renouveler le Plan AGENCE (59 €)" : "Passer sur AGENCE pour 59 €"}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
