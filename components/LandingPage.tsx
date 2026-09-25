@@ -1,90 +1,41 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useStore } from '@/lib/store';
 import Link from 'next/link';
 import { 
   Zap, 
   Sparkles, 
   Play, 
+  Pause,
   Check, 
   ArrowRight, 
-  ShieldCheck, 
   Clock, 
-  Target, 
-  MessageSquare, 
-  TrendingUp, 
   Download, 
-  Users, 
-  Globe, 
-  Smartphone, 
   CreditCard, 
-  FileText,
   Video,
-  Gift,
-  HelpCircle,
-  Award
+  Gift
 } from 'lucide-react';
 import AuthModal from './AuthModal';
 import LegalModal from './LegalModal';
-import UpgradeModal from './UpgradeModal';
 
 export default function LandingPage() {
-  const { openAuthModal, setShowUpgradeModal } = useStore();
-  const [activeScene, setActiveScene] = useState(1);
+  const { openAuthModal } = useStore();
   const [isPlaying, setIsPlaying] = useState(false);
   const [legalOpen, setLegalOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  const scenes = [
-    {
-      num: 1,
-      time: "0:00 - 0:25",
-      title: "1. L'Accroche sur la Douleur Commerciale",
-      headline: "92% des freelances et agences abandonnent la prospection",
-      text: "Vous passez des heures à chercher des prospects sur Google ou LinkedIn, à copier-coller des emails génériques et à envoyer des messages froids qui restent désespérément sans réponse ?",
-      detail: "La cause ? Contacter les mauvaises personnes avec les mauvais mots.",
-    },
-    {
-      num: 2,
-      time: "0:25 - 0:45",
-      title: "2. La Révélation de la Solution",
-      headline: "Prospectizi : Trouver & contactez mieux",
-      text: "Et si une plateforme identifiait pour vous les entreprises ayant un besoin urgent de vos services, vous donnait leurs coordonnées directes 100% vérifiées, et rédigeait le mot parfait pour déclencher une réponse en 2 minutes ?",
-      detail: "Une approche chirurgicale conçue pour les indépendants et agences ambitieuses.",
-    },
-    {
-      num: 3,
-      time: "0:45 - 1:20",
-      title: "3. Démonstration en 3 Étapes Simples",
-      headline: "Avatar Client ➔ Recherche Ciblée ➔ Messages Prêts à l'Emploi",
-      text: "1) Vous configurez votre offre en 3 clics. 2) Le moteur d'acquisition extrait des entreprises vérifiées et note leur pertinence de 60 à 100 points. 3) Vous ouvrez la fiche : une séquence de 5 messages personnalisés sans jargon est prête à être envoyée sur WhatsApp direct ou par email !",
-      detail: "Chaque fiche comporte une faille détectée et une solution sur-mesure recommandée.",
-    },
-    {
-      num: 4,
-      time: "1:20 - 1:50",
-      title: "4. L'Audit Mensuel IA & Test A/B",
-      headline: "Votre Coach Commercial Virtuel mensuel",
-      text: "Chaque mois, l'IA analyse vos résultats réels, détecte vos points de blocage et met en compétition deux variantes de messages. Dès qu'un script surclasse l'autre (+17% de réponses), appliquez-le à tout votre compte en un clic !",
-      detail: "Optimisation continue sans avoir besoin d'engager un expert en copywriting.",
-    },
-    {
-      num: 5,
-      time: "1:50 - 2:15",
-      title: "5. Paiements Universels & Sans Engagement",
-      headline: "Mobile Money & Cartes Internationales",
-      text: "Payez en toute sécurité par Mobile Money (Orange Money, MTN, Wave, Moov) ou Carte Bancaire et Apple Pay. Nos abonnements sont transparents et annulables à tout instant en 1 clic.",
-      detail: "À partir de 1 € seulement pour démarrer et tester sans risque.",
-    },
-    {
-      num: 6,
-      time: "2:15 - 2:30",
-      title: "6. L'Appel à l'Action Décisif",
-      headline: "Testez votre premier lot de prospects dès aujourd'hui",
-      text: "Arrêtez de chercher dans le vide. Cliquez sur le bouton, débloquez vos premiers prospects qualifiés pour 1 € seulement, et commencez à signer vos prochains clients !",
-      detail: "Garantie anti-gaspillage : tout contact erroné est recrédité immédiatement.",
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
     }
-  ];
+  };
 
   return (
     <div className="min-h-screen bg-dark-950 text-slate-100 flex flex-col font-sans selection:bg-cyan selection:text-dark-950">
@@ -162,7 +113,7 @@ export default function LandingPage() {
               className="w-full sm:w-auto py-3.5 px-6 rounded-xl font-bold text-sm bg-dark-800 hover:bg-dark-700 text-slate-200 border border-dark-600 flex items-center justify-center gap-2 transition-colors"
             >
               <Play className="w-4 h-4 text-cyan fill-cyan" />
-              <span>Voir la Démo Vidéo (2m30)</span>
+              <span>Voir la Démo Vidéo</span>
             </a>
           </div>
 
@@ -184,80 +135,76 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 3. DÉMO VIDÉO OFFICIELLE (2m30) & TÉLÉCHARGEMENT DU SCRIPT */}
+      {/* 3. DÉMO VIDÉO OFFICIELLE EN TEMPS RÉEL (LECTEUR VIDÉO MP4) */}
       <section id="demo" className="py-16 bg-dark-900 border-y border-dark-750 px-4">
         <div className="max-w-5xl mx-auto space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan/15 text-cyan text-xs font-bold uppercase tracking-wider border border-cyan/30">
               <Video className="w-3.5 h-3.5" />
-              Vidéo Officielle du MVP
+              Démonstration Vidéo en Direct
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-              Découvrez Prospectizi en 2 minutes 30 chrono
+              Regardez Prospectizi tourner en temps réel
             </h2>
             <p className="text-slate-400 text-xs sm:text-sm">
-              Explorez le scénario complet de présentation produit et téléchargez le script officiel ci-dessous.
+              Visite guidée complète de la plateforme : de la configuration de l&apos;Avatar à l&apos;envoi WhatsApp direct et l&apos;Audit IA mensuel.
             </p>
           </div>
 
-          {/* Interactive Player Mockup */}
+          {/* Video Player Card */}
           <div className="bg-dark-950 border border-cyan/40 rounded-2xl overflow-hidden shadow-cyan-glow relative">
-            <div className="aspect-video bg-gradient-to-br from-dark-950 via-dark-900 to-dark-850 p-6 sm:p-10 flex flex-col justify-between relative">
-              
-              {/* Top video controls header */}
-              <div className="flex items-center justify-between z-10">
-                <span className="text-[11px] font-mono text-cyan bg-cyan/15 border border-cyan/30 px-2.5 py-1 rounded-full font-bold">
-                  {scenes[activeScene - 1].time} • {scenes[activeScene - 1].title}
-                </span>
+            <div className="relative aspect-video bg-black flex items-center justify-center overflow-hidden">
+              <video
+                ref={videoRef}
+                src="/prospectizi_demo_video.mp4"
+                poster="/scene1_landing.png"
+                controls
+                playsInline
+                className="w-full h-full object-contain"
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+              />
 
-                {/* Direct DOCX Download Button */}
+              {/* Play Button Overlay when paused */}
+              {!isPlaying && (
+                <button
+                  onClick={togglePlay}
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/30 transition-all group"
+                >
+                  <div className="w-20 h-20 rounded-full bg-cyan text-dark-950 flex items-center justify-center shadow-cyan-glow group-hover:scale-110 transition-transform">
+                    <Play className="w-9 h-9 fill-dark-950 translate-x-0.5" />
+                  </div>
+                </button>
+              )}
+            </div>
+
+            {/* Video Controls Footer */}
+            <div className="p-4 bg-dark-900 border-t border-dark-700 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2 text-slate-300">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-bold text-white">Vidéo Démo Produit (Test Réel de la Plateforme)</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <a
+                  href="/prospectizi_demo_video.mp4"
+                  download="PROSPECTIZI_Demo_Video.mp4"
+                  className="text-cyan hover:underline flex items-center gap-1 font-semibold"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Télécharger la Vidéo (.MP4)</span>
+                </a>
+
+                <span className="text-slate-600">•</span>
+
                 <a
                   href="/PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
                   download="PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
-                  className="py-1.5 px-3 rounded-lg text-xs font-bold bg-dark-800 hover:bg-dark-700 text-cyan border border-cyan/30 flex items-center gap-1.5 transition-colors shadow-sm"
-                  title="Télécharger le script Word officiel complet"
+                  className="text-cyan hover:underline flex items-center gap-1 font-semibold"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Télécharger le Script (DOCX)</span>
-                  <span className="sm:hidden">Script .DOCX</span>
+                  <span>Télécharger le Script (.DOCX)</span>
                 </a>
-              </div>
-
-              {/* Center Play & Pitch Lines */}
-              <div className="max-w-xl mx-auto text-center space-y-4 my-auto z-10 py-6">
-                <button
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center mx-auto shadow-cyan-glow hover:scale-110 transition-all cursor-pointer"
-                >
-                  <Play className="w-8 h-8 fill-dark-950 translate-x-0.5" />
-                </button>
-
-                <h3 className="text-lg sm:text-2xl font-black text-white">
-                  &quot;{scenes[activeScene - 1].headline}&quot;
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 italic leading-relaxed">
-                  {scenes[activeScene - 1].text}
-                </p>
-                <span className="text-[11px] text-cyan block font-semibold">
-                  💡 {scenes[activeScene - 1].detail}
-                </span>
-              </div>
-
-              {/* Bottom Scenes Navigator Bar */}
-              <div className="grid grid-cols-6 gap-1.5 pt-4 border-t border-dark-700 z-10">
-                {scenes.map((sc) => (
-                  <button
-                    key={sc.num}
-                    onClick={() => setActiveScene(sc.num)}
-                    className={`py-1.5 px-1 rounded-lg text-[10px] font-bold truncate transition-all ${
-                      activeScene === sc.num
-                        ? 'bg-cyan text-dark-950 shadow-cyan-border'
-                        : 'bg-dark-800 text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    Scène {sc.num}
-                  </button>
-                ))}
               </div>
             </div>
           </div>
