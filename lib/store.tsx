@@ -23,12 +23,16 @@ interface StoreContextType {
   prospects: Prospect[];
   updateProspectStatus: (id: string, status: ProspectStatus) => void;
   updateProspectNotes: (id: string, notes: string) => void;
+  markFollowupDone: (id: string) => void;
+  recordSentVariant: (id: string, variant: 'A' | 'B') => void;
   reportFaultyContact: (id: string, reason: string) => { success: boolean; message: string };
   searchProspects: (params: { keyword: string; location: string; channel: Channel; count: number }) => Promise<{ success: boolean; added: number; error?: string }>;
   showUpgradeModal: boolean;
   setShowUpgradeModal: (show: boolean) => void;
   auditReport: AuditReport;
   generateAuditReport: () => Promise<{ success: boolean; message: string }>;
+  toggleABTest: (active: boolean) => void;
+  applyWinningScript: () => void;
   testimonials: Testimonial[];
   submitTestimonial: (loomUrl: string, commercialConsent: boolean) => void;
   updateTestimonialStatus: (id: string, status: 'approved' | 'rejected') => void;
@@ -43,7 +47,9 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export function ProspectiziProvider({ children }: { children: React.ReactNode }) {
-  // User state
+  // Load initial state with localStorage hydration
+  const [isLoaded, setIsLoaded] = useState(false);
+
   const [user, setUser] = useState<{
     email: string;
     full_name: string;
@@ -52,8 +58,8 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   }>({
     email: "dossou1992@gmail.com",
     full_name: "Edith Dossou",
-    role: "superadmin",
-    isSuperadminMode: true,
+    role: "user", // Default to normal test mode so quota limits are strictly respected!
+    isSuperadminMode: false,
   });
 
   const [subscription, setSubscription] = useState<Subscription>(initialSubscription);
@@ -64,6 +70,51 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Hydrate from localStorage on client mount
+  useEffect(() => {
+    try {
+      const savedUser = localStorage.getItem('prospectizi_user');
+      if (savedUser) setUser(JSON.parse(savedUser));
+
+      const savedSub = localStorage.getItem('prospectizi_sub');
+      if (savedSub) setSubscription(JSON.parse(savedSub));
+
+      const savedAvatar = localStorage.getItem('prospectizi_avatar');
+      if (savedAvatar) setAvatar(JSON.parse(savedAvatar));
+
+      const savedProspects = localStorage.getItem('prospectizi_prospects');
+      if (savedProspects) setProspects(JSON.parse(savedProspects));
+
+      const savedAudit = localStorage.getItem('prospectizi_audit');
+      if (savedAudit) setAuditReport(JSON.parse(savedAudit));
+
+      const savedTesti = localStorage.getItem('prospectizi_testimonials');
+      if (savedTesti) setTestimonials(JSON.parse(savedTesti));
+
+      const savedTeam = localStorage.getItem('prospectizi_team');
+      if (savedTeam) setTeamMembers(JSON.parse(savedTeam));
+    } catch (e) {
+      console.error("LocalStorage load error:", e);
+    }
+    setIsLoaded(true);
+  }, []);
+
+  // Save to localStorage whenever state changes
+  useEffect(() => {
+    if (!isLoaded) return;
+    try {
+      localStorage.setItem('prospectizi_user', JSON.stringify(user));
+      localStorage.setItem('prospectizi_sub', JSON.stringify(subscription));
+      localStorage.setItem('prospectizi_avatar', JSON.stringify(avatar));
+      localStorage.setItem('prospectizi_prospects', JSON.stringify(prospects));
+      localStorage.setItem('prospectizi_audit', JSON.stringify(auditReport));
+      localStorage.setItem('prospectizi_testimonials', JSON.stringify(testimonials));
+      localStorage.setItem('prospectizi_team', JSON.stringify(teamMembers));
+    } catch (e) {
+      console.error("LocalStorage save error:", e);
+    }
+  }, [user, subscription, avatar, prospects, auditReport, testimonials, teamMembers, isLoaded]);
 
   const showNotification = (msg: string) => {
     setToastMessage(msg);
@@ -76,7 +127,11 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     setUser(prev => {
       const newMode = !prev.isSuperadminMode;
       const newRole = newMode ? 'superadmin' : 'user';
-      showNotification(newMode ? "👑 Mode Superadmin VIP activé (Bypass de quotas activé)" : "👤 Mode Découverte standard activé pour tests utilisateurs");
+      showNotification(
+        newMode 
+          ? "👑 Mode Superadmin VIP activé (Quotas débloqués pour tests)" 
+          : "👤 Mode Test Normal activé (Quotas stricts du plan Découverte : 3 prospects max)"
+      );
       return {
         ...prev,
         role: newRole,
@@ -90,8 +145,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     setUser(prev => ({
       ...prev,
       email,
-      role: isOwner ? 'superadmin' : 'user',
-      isSuperadminMode: isOwner,
+      role: isOwner && prev.isSuperadminMode ? 'superadmin' : 'user',
     }));
   };
 
@@ -110,7 +164,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     }));
     setShowUpgradeModal(false);
     confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-    showNotification(`🚀 Félicitations ! Votre compte est passé sur le plan ${newPlan} (${quota} prospects débloqués)`);
+    showNotification(`🚀 Félicitations ! Votre compte est activé sur le plan ${newPlan} (${quota} prospects débloqués)`);
   };
 
   const resetQuota = () => {
@@ -128,8 +182,11 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   };
 
   const updateAvatar = (newFields: Partial<AvatarProfile>) => {
-    setAvatar(prev => ({ ...prev, ...newFields }));
-    showNotification("✅ Profil Avatar Client synchronisé avec succès !");
+    setAvatar(prev => {
+      const updated = { ...prev, ...newFields };
+      showNotification("✅ Profil Avatar Client sauvegardé et synchronisé !");
+      return updated;
+    });
   };
 
   const updateProspectStatus = (id: string, status: ProspectStatus) => {
@@ -152,28 +209,77 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     showNotification("Notes privées enregistrées.");
   };
 
+  const markFollowupDone = (id: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    setProspects(prev => prev.map(p => {
+      if (p.id === id) {
+        return {
+          ...p,
+          last_contact_date: today,
+          last_followup_done_date: today,
+          status: p.status === 'non_contacte' || p.status === 'nouveau' ? 'en_discussion' : p.status,
+        };
+      }
+      return p;
+    }));
+    showNotification("✅ Relance enregistrée ! Le prospect a été mis à jour.");
+  };
+
+  const recordSentVariant = (id: string, variant: 'A' | 'B') => {
+    setProspects(prev => prev.map(p => p.id === id ? { ...p, sent_variant: variant } : p));
+    setAuditReport(prev => {
+      const stats = prev.ab_test_stats || { variant_a_sent: 0, variant_b_sent: 0, variant_a_replies: 0, variant_b_replies: 0 };
+      return {
+        ...prev,
+        ab_test_stats: {
+          ...stats,
+          variant_a_sent: variant === 'A' ? stats.variant_a_sent + 1 : stats.variant_a_sent,
+          variant_b_sent: variant === 'B' ? stats.variant_b_sent + 1 : stats.variant_b_sent,
+        }
+      };
+    });
+    showNotification(`📨 Envoi enregistré avec la Variante ${variant} ! Le test A/B mesure vos résultats.`);
+  };
+
+  const toggleABTest = (active: boolean) => {
+    setAuditReport(prev => ({ ...prev, ab_test_active: active }));
+    showNotification(active ? "🧪 Test A/B activé sur vos prochaines fiches prospects !" : "Test A/B désactivé.");
+  };
+
+  const applyWinningScript = () => {
+    // Apply winning variant B to default
+    const winning = auditReport.recommended_script.first_contact_optimized;
+    setProspects(prev => prev.map(p => ({
+      ...p,
+      generated_messages: {
+        ...p.generated_messages,
+        first_contact: winning,
+      }
+    })));
+    confetti({ particleCount: 70, spread: 60 });
+    showNotification("🏆 Variante B validée et appliquée définitivement à l'ensemble de votre compte !");
+  };
+
   const reportFaultyContact = (id: string, reason: string) => {
-    // Anti-fraud: only allow if not exceeding 10%
     const reportedProspect = prospects.find(p => p.id === id);
     if (!reportedProspect) return { success: false, message: "Prospect introuvable" };
 
-    // Simulate backend Ping SMTP / HLR lookup
-    // If reason is valid hard bounce:
+    // Anti-fraud: recrédit
     setSubscription(prev => ({
       ...prev,
       prospects_used: Math.max(0, prev.prospects_used - 1)
     }));
-    // Remove or archive faulty prospect
     setProspects(prev => prev.filter(p => p.id !== id));
-    showNotification("🛡️ Vérification automatique réussie : 1 crédit recrédité sur votre solde !");
+    showNotification("🛡️ Vérification automatique réussie : 1 crédit restitué sur votre solde !");
     return { success: true, message: "Contact vérifié comme invalide. Votre crédit a été restitué." };
   };
 
   const searchProspects = async (params: { keyword: string; location: string; channel: Channel; count: number }) => {
-    // Quota check if not in superadmin bypass mode
-    const isBypass = user.isSuperadminMode || user.email === 'dossou1992@gmail.com';
-    const remainingQuota = (subscription.prospects_quota + subscription.bonus_prospects) - subscription.prospects_used;
+    const isBypass = user.isSuperadminMode;
+    const totalAllowed = subscription.prospects_quota + subscription.bonus_prospects;
+    const remainingQuota = totalAllowed - subscription.prospects_used;
 
+    // Strict quota check in Normal mode!
     if (!isBypass && remainingQuota <= 0) {
       setShowUpgradeModal(true);
       return { success: false, added: 0, error: "Plafond de quota atteint !" };
@@ -181,7 +287,6 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
 
     const toAddCount = isBypass ? params.count : Math.min(params.count, remainingQuota);
 
-    // Realistic generators based on query
     const newItems: Prospect[] = [];
     const companies = [
       { name: "Cabinet Stratégie Plus", act: "Conseil en management et stratégie", city: params.location || "Lomé" },
@@ -203,8 +308,8 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         city: params.location || comp.city,
         country: "Afrique / Europe",
         qualification_score: score,
-        qualification_reason: `Recherche ciblée sur "${params.keyword || comp.act}" via ${params.channel}. Besoin critique identifié sur l'acquisition et le suivi client.`,
-        flaws_identified: "Aucune relance après envoi de propositions commerciales et temps de latence de contact supérieur à 48h.",
+        qualification_reason: `Recherche ciblée sur "${params.keyword || comp.act}". Besoin critique identifié sur l'acquisition et le suivi client.`,
+        flaws_identified: "Aucune relance après devis et temps de latence de prise de contact supérieur à 48h.",
         recommended_offer: `${avatar.offer || "Mise en place d'un système de prospection et relance automatisé"}`,
         opportunity: "Proposer un diagnostic rapide de leurs goulots d'étranglement commerciaux et un modèle de conversion prêt à l'emploi.",
         channel: params.channel,
@@ -219,8 +324,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         status: "nouveau",
         estimated_deal_value: 1500,
         generated_messages: {
-          first_contact: `Bonjour ! J'ai remarqué le développement de ${comp.name} sur ${params.location || comp.city}. En observant votre présence, beaucoup de structures de votre secteur perdent des opportunités faute d'un suivi rapide des demandes. J'ai un système léger qui fait ça sans effort. Seriez-vous ouvert à un rapide échange de 2 min ?`,
-          value_offer: `Nous permettons aux entreprises comme la vôtre de réactiver jusqu'à 35% de prospects silencieux grâce à des messages courts et ciblés.`,
+          first_contact: `Bonjour ! J'ai remarqué le développement de ${comp.name} sur ${params.location || comp.city}. Beaucoup de structures de votre secteur perdent des devis faute d'un suivi rapide des demandes. J'ai un système léger qui fait ça sans effort. Seriez-vous ouvert à un rapide échange de 2 min ?`,
+          first_contact_variant_b: `Bonjour ! En analysant ${comp.name} sur ${params.location || comp.city}, j'ai constaté que vos offres méritaient une relance réactive en 5 secondes. Nous aidons les entreprises de votre secteur à récupérer 1 devis sur 3 sans forcer. Disponible pour une démo de 2 min ?`,
+          value_offer: `💡 Comment utiliser ce message : À envoyer si le prospect réagit favorablement à votre première accroche :\n\n« Nous permettons aux entreprises comme la vôtre de réactiver jusqu'à 35% de prospects silencieux grâce à des messages courts et ciblés. Par exemple, une structure équivalente sur ${params.location || comp.city} a généré 3 nouveaux contrats dès le premier mois. »`,
           followup_1: `Bonjour, je me permets un petit suivi suite à mon mot. Seriez-vous intéressé par un aperçu direct du script que nous utilisons ?`,
           followup_2: `Bonjour, je voulais juste vérifier si l'optimisation de vos prises de contact est un sujet d'actualité pour vous ce trimestre ?`,
           followup_final: `Dernier message de ma part pour respecter votre planning ! N'hésitez pas à revenir vers moi si l'opportunité se présente.`,
@@ -249,9 +355,18 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   };
 
   const generateAuditReport = async () => {
-    // Generate new fresh report
+    const isSuperadmin = user.isSuperadminMode;
+    const now = new Date();
+    const nextAvail = new Date(auditReport.next_audit_available_at);
+    
+    // Strict 30 days lock check in normal mode
+    if (!isSuperadmin && now < nextAvail) {
+      showNotification("🔒 Audit verrouillé : disponible une fois tous les 30 jours.");
+      return { success: false, message: "Verrouillé 30 jours" };
+    }
+
     const newReport: AuditReport = {
-      generated_at: new Date().toISOString(),
+      generated_at: now.toISOString(),
       next_audit_available_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       stats: {
         total_contacted: prospects.filter(p => p.status !== 'nouveau').length + 18,
@@ -260,7 +375,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       },
       main_bottleneck: "60% des prospects en discussion stagnent au moment de fixer la date d'échange.",
       key_findings: [
-        "Les accroches directes mentionnant la ville ont un taux d'ouverture supérieur de 24%.",
+        "Les accroches directes mentionnant la ville ont un taux de réponse supérieur de 24%.",
         "L'utilisation du bouton One-Click WhatsApp a réduit le temps de prise de contact de 8 minutes à 15 secondes par prospect.",
         "Le canal Google Maps génère les leads avec la meilleure réactivité aux relances douces."
       ],
@@ -268,7 +383,14 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         first_contact_optimized: "Bonjour ! J'ai vu l'activité de [Entreprise] à [Ville]. Beaucoup perdent 1 client sur 3 faute de relance après devis. J'ai un système qui résout exactement cela. Seriez-vous ouvert à une démo de 2 min ?",
         followup_optimized: "Bonjour, je vous laisse juste ce mot rapide ! Avez-vous eu 2 minutes pour voir ma précédente note ? Je peux vous envoyer le lien directement."
       },
-      avatar_suggestions: "Augmentez légèrement votre promesse chiffrée dans l'Avatar pour attirer des profils avec des budgets supérieurs à 2 000 €."
+      avatar_suggestions: "Augmentez légèrement votre promesse chiffrée dans l'Avatar pour attirer des profils avec des budgets supérieurs à 2 000 €.",
+      ab_test_active: true,
+      ab_test_stats: {
+        variant_a_sent: 18,
+        variant_b_sent: 14,
+        variant_a_replies: 6,
+        variant_b_replies: 7,
+      }
     };
     setAuditReport(newReport);
     showNotification("📊 Votre nouvel Audit Mensuel IA a été généré avec succès !");
@@ -371,12 +493,16 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       prospects,
       updateProspectStatus,
       updateProspectNotes,
+      markFollowupDone,
+      recordSentVariant,
       reportFaultyContact,
       searchProspects,
       showUpgradeModal,
       setShowUpgradeModal,
       auditReport,
       generateAuditReport,
+      toggleABTest,
+      applyWinningScript,
       testimonials,
       submitTestimonial,
       updateTestimonialStatus,

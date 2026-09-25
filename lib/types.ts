@@ -16,6 +16,7 @@ export interface ProspectSocialLinks {
 
 export interface ProspectMessages {
   first_contact: string;
+  first_contact_variant_b?: string; // Audit A/B test variant
   value_offer: string;
   followup_1: string;
   followup_2: string;
@@ -47,6 +48,8 @@ export interface Prospect {
   is_existing?: boolean;
   is_closed?: boolean;
   last_contact_date?: string;
+  last_followup_done_date?: string;
+  sent_variant?: 'A' | 'B';
   estimated_deal_value?: number;
 }
 
@@ -87,6 +90,13 @@ export interface AuditReport {
     followup_optimized: string;
   };
   avatar_suggestions?: string;
+  ab_test_active?: boolean;
+  ab_test_stats?: {
+    variant_a_sent: number;
+    variant_b_sent: number;
+    variant_a_replies: number;
+    variant_b_replies: number;
+  };
 }
 
 export interface Testimonial {

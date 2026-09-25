@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { useStore } from '@/lib/store';
-import { X, Check, Zap, Crown, ArrowRight, Shield, Globe, Smartphone, CreditCard } from 'lucide-react';
+import { X, Check, Zap, ArrowRight, Shield, Globe, Smartphone } from 'lucide-react';
 import { PlanType } from '@/lib/types';
 
 export default function UpgradeModal() {
-  const { showUpgradeModal, setShowUpgradeModal, upgradePlan, subscription } = useStore();
+  const { showUpgradeModal, setShowUpgradeModal, upgradePlan } = useStore();
   const [gateway, setGateway] = useState<'flutterwave' | 'lemonsqueezy'>('flutterwave');
   const [loadingPlan, setLoadingPlan] = useState<PlanType | null>(null);
 
@@ -45,13 +45,13 @@ export default function UpgradeModal() {
           </p>
         </div>
 
-        {/* Gateway Smart Routing Selector */}
+        {/* Payment Method Selector */}
         <div className="bg-dark-800 border border-dark-600 rounded-xl p-3 mb-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2 text-slate-300">
             <Globe className="w-4 h-4 text-cyan" />
             <span className="font-semibold">Moyen de paiement adapté à votre pays :</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap justify-center">
             <button
               onClick={() => setGateway('flutterwave')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
@@ -61,7 +61,7 @@ export default function UpgradeModal() {
               }`}
             >
               <Smartphone className="w-3.5 h-3.5" />
-              <span>Mobile Money (MTN, Orange, Wave) / Cartes</span>
+              <span>Mobile Money (MTN, Orange, Wave) &amp; Cartes</span>
             </button>
             <button
               onClick={() => setGateway('lemonsqueezy')}
@@ -71,8 +71,8 @@ export default function UpgradeModal() {
                   : 'bg-dark-700 text-slate-300 hover:text-white'
               }`}
             >
-              <CreditCard className="w-3.5 h-3.5" />
-              <span>International (Apple Pay / Cartes)</span>
+              <Globe className="w-3.5 h-3.5" />
+              <span>Carte Internationale, Apple Pay &amp; Google Pay</span>
             </button>
           </div>
         </div>
@@ -89,7 +89,7 @@ export default function UpgradeModal() {
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <h3 className="text-xl font-bold text-white">Plan PRO</h3>
-                  <p className="text-xs text-slate-400">Pour indépendants & freelances</p>
+                  <p className="text-xs text-slate-400">Pour indépendants &amp; freelances</p>
                 </div>
                 <div className="text-right">
                   <span className="text-3xl font-extrabold text-cyan">29 €</span>
@@ -109,15 +109,15 @@ export default function UpgradeModal() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-cyan shrink-0" />
-                  <span>Recherche Multi-Canaux (Google Maps, LinkedIn, etc.)</span>
+                  <span>Recherche Multi-Canaux complète (5 canaux)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-cyan shrink-0" />
-                  <span>IA Avatar Avancée & messages personnalisés</span>
+                  <span>IA Avatar Avancée &amp; messages personnalisés</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-cyan shrink-0" />
-                  <span><strong>Export CSV & Excel</strong> en 1 clic</span>
+                  <span><strong>Export CSV &amp; Excel</strong> en 1 clic</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-cyan shrink-0" />
@@ -149,14 +149,14 @@ export default function UpgradeModal() {
           {/* Plan AGENCE */}
           <div className="bg-dark-800/60 border border-dark-600 hover:border-cyan/50 rounded-2xl p-6 relative flex flex-col justify-between transition-colors">
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-amber-500 text-dark-950 text-[11px] font-black uppercase px-3 py-0.5 rounded-full">
-              ⚡ RENDEMENT & VOLUME MAXIMUM
+              ⚡ RENDEMENT &amp; VOLUME MAXIMUM
             </div>
 
             <div>
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <h3 className="text-xl font-bold text-white">Plan AGENCE</h3>
-                  <p className="text-xs text-slate-400">Pour agences, équipes & multi-projets</p>
+                  <p className="text-xs text-slate-400">Pour agences, équipes &amp; multi-projets</p>
                 </div>
                 <div className="text-right">
                   <span className="text-3xl font-extrabold text-white">59 €</span>
@@ -180,15 +180,15 @@ export default function UpgradeModal() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Accès <strong>Équipe & Sous-comptes</strong> (jusqu&apos;à 5 collaborateurs)</span>
+                  <span>Accès <strong>Équipe &amp; Sous-comptes</strong> (jusqu&apos;à 5 collaborateurs)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Scraping Haute Vitesse Apify prioritaire</span>
+                  <span>Moteur de recherche Haute Vitesse prioritaire</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Export CSV / Excel illimité & Audit Mensuel IA</span>
+                  <span>Export CSV / Excel illimité &amp; Audit Mensuel IA</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-amber-400 shrink-0" />
@@ -218,7 +218,7 @@ export default function UpgradeModal() {
         <div className="text-center text-[11px] text-slate-400 border-t border-dark-700/80 pt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span className="flex items-center gap-1">
             <Shield className="w-3.5 h-3.5 text-cyan" />
-            Paiement 100% sécurisé via {gateway === 'flutterwave' ? 'Flutterwave' : 'Lemon Squeezy'}. Résiliable à tout moment en 1 clic.
+            Paiement 100% sécurisé et chiffré. Résiliable à tout moment en 1 clic.
           </span>
           <span>
             Garantie anti-gaspillage : prospects inexploitables recrédités automatiquement.

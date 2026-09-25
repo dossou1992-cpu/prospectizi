@@ -5,21 +5,19 @@ import { useStore } from '@/lib/store';
 import ProspectCard from '@/components/ProspectCard';
 import FaultyContactModal from '@/components/FaultyContactModal';
 import { 
-  Users, 
   Search, 
-  Download, 
   Filter, 
   Zap, 
-  Sparkles, 
   MapPin, 
   Globe, 
   Loader2, 
   AlertCircle,
   FileSpreadsheet,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from 'lucide-react';
-import { Channel, Prospect, ProspectStatus } from '@/lib/types';
+import { Channel, Prospect } from '@/lib/types';
 import Link from 'next/link';
 
 export default function ProspectsPage() {
@@ -35,7 +33,7 @@ export default function ProspectsPage() {
   const [keyword, setKeyword] = useState('Architecte & Décoration');
   const [location, setLocation] = useState('Lomé');
   const [channel, setChannel] = useState<Channel>('google_maps');
-  const [searchCount, setSearchCount] = useState<number>(3);
+  const [searchCount] = useState<number>(3);
   const [isSearching, setIsSearching] = useState(false);
 
   // Filters
@@ -46,7 +44,7 @@ export default function ProspectsPage() {
   // Faulty modal
   const [faultyProspect, setFaultyProspect] = useState<Prospect | null>(null);
 
-  const isBypass = user.isSuperadminMode || user.email === 'dossou1992@gmail.com';
+  const isBypass = user.isSuperadminMode;
   const totalAllowed = subscription.prospects_quota + subscription.bonus_prospects;
   const remaining = Math.max(0, totalAllowed - subscription.prospects_used);
 
@@ -77,16 +75,16 @@ export default function ProspectsPage() {
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      {/* Top Banner & Apify Search Bar */}
+      {/* Top Banner & Search Bar */}
       <div className="bg-dark-900 border border-dark-600 rounded-2xl p-6 shadow-xl space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-dark-700/80 pb-5">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan/15 text-cyan text-xs font-bold uppercase tracking-wider mb-2 border border-cyan/30">
               <Zap className="w-3.5 h-3.5" />
-              Moteur Apify Multi-Canaux & Filtre 100% Contactable
+              Moteur d&apos;Acquisition B2B &amp; Filtre 100% Contactable
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-white">
-              Rechercher & Qualifier vos Nouveaux Prospects
+              Rechercher &amp; Qualifier vos Nouveaux Prospects
             </h1>
             <p className="text-slate-400 text-xs md:text-sm mt-1">
               Chaque prospect extrait fait l&apos;objet d&apos;une vérification stricte : failles détectées, contact direct actif et message rédigé sur-mesure.
@@ -109,7 +107,7 @@ export default function ProspectsPage() {
             </div>
             {!isBypass && (
               <span className="text-[10px] text-slate-400 text-right mt-0.5">
-                {remaining > 0 ? `${remaining} disponibles ce mois-ci` : "Plafond atteint — Passez en PRO"}
+                {remaining > 0 ? `${remaining} disponible(s) ce mois-ci` : "Plafond atteint — Passez en PRO"}
               </span>
             )}
           </div>
@@ -121,7 +119,7 @@ export default function ProspectsPage() {
           <div className="lg:col-span-4">
             <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
               <Search className="w-3.5 h-3.5 text-cyan" />
-              Mot-clé / Secteur d&apos;activité
+              Secteur ou Métier ciblé
             </label>
             <input
               type="text"
@@ -149,22 +147,22 @@ export default function ProspectsPage() {
             />
           </div>
 
-          {/* Canal Apify */}
+          {/* Canal */}
           <div className="lg:col-span-3">
             <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
               <Globe className="w-3.5 h-3.5 text-cyan" />
-              Canal de Scraping
+              Canal de Détection
             </label>
             <select
               value={channel}
               onChange={(e) => setChannel(e.target.value as any)}
               className="w-full bg-dark-950 border border-dark-600 focus:border-cyan text-xs text-white px-3.5 py-2.5 rounded-xl focus:outline-none transition-colors"
             >
-              <option value="google_maps">Google Maps (Commerces & Bureaux)</option>
-              <option value="linkedin">LinkedIn (B2B, Cadres & Agences)</option>
-              <option value="facebook">Facebook (Pages & Groupes locaux)</option>
-              <option value="instagram">Instagram (Créateurs & Marques)</option>
-              <option value="google">Google Recherche (Sites web & Annuaires)</option>
+              <option value="google_maps">Google Maps (Commerces &amp; Bureaux)</option>
+              <option value="linkedin">LinkedIn (B2B, Cadres &amp; Agences)</option>
+              <option value="facebook">Facebook (Pages &amp; Groupes professionnels)</option>
+              <option value="instagram">Instagram (Créateurs &amp; Marques)</option>
+              <option value="google">Google Recherche (Sites web &amp; Annuaires)</option>
             </select>
           </div>
 
@@ -178,12 +176,12 @@ export default function ProspectsPage() {
               {isSearching ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Scraping...</span>
+                  <span>Recherche...</span>
                 </>
               ) : (
                 <>
                   <Zap className="w-4 h-4 fill-dark-950" />
-                  <span>Chercher</span>
+                  <span>Rechercher</span>
                 </>
               )}
             </button>
@@ -256,7 +254,7 @@ export default function ProspectsPage() {
           <span>{filteredProspects.length} prospect(s) qualifié(s) affiché(s)</span>
           <span className="text-emerald-400 flex items-center gap-1 font-medium">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            Garantie Anti-Gaspillage : Seuls les prospects contactables sont facturés
+            Garantie Anti-Gaspillage : Seuls les prospects contactables sont comptabilisés
           </span>
         </div>
 
@@ -288,7 +286,7 @@ export default function ProspectsPage() {
           </div>
           <h3 className="text-lg font-bold text-white">Prêt pour votre Audit Mensuel de Conversion ?</h3>
           <p className="text-xs text-slate-400 max-w-xl">
-            L&apos;IA analyse les messages envoyés, le taux de réponse et les statuts gagnés pour reformuler vos scripts et corriger les goulots d&apos;étranglement.
+            L&apos;IA analyse vos messages, le taux de réponse et les statuts gagnés pour reformuler vos scripts et optimiser votre taux de signature.
           </p>
         </div>
 

@@ -5,8 +5,6 @@ import { useStore } from '@/lib/store';
 import { 
   CreditCard, 
   Check, 
-  Zap, 
-  Crown, 
   ArrowRight, 
   ShieldCheck, 
   Globe, 
@@ -17,7 +15,7 @@ import {
 import { PlanType } from '@/lib/types';
 
 export default function PricingPage() {
-  const { subscription, upgradePlan, user } = useStore();
+  const { subscription, upgradePlan } = useStore();
   const [gateway, setGateway] = useState<'flutterwave' | 'lemonsqueezy'>('flutterwave');
   const [loadingPlan, setLoadingPlan] = useState<PlanType | null>(null);
 
@@ -26,7 +24,7 @@ export default function PricingPage() {
     setTimeout(() => {
       upgradePlan(plan);
       setLoadingPlan(null);
-    }, 700);
+    }, 600);
   };
 
   return (
@@ -35,17 +33,17 @@ export default function PricingPage() {
       <div className="text-center max-w-2xl mx-auto space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan/15 text-cyan text-xs font-bold uppercase tracking-wider border border-cyan/30">
           <CreditCard className="w-3.5 h-3.5" />
-          Tarifs Transparents & Sans Engagement
+          Tarifs Transparents &amp; Sans Engagement
         </div>
         <h1 className="text-3xl md:text-4xl font-extrabold text-white">
-          Des offres conçues pour votre retour sur investissement
+          Des formules adaptées à votre croissance commerciale
         </h1>
         <p className="text-slate-400 text-xs md:text-sm">
-          Choisissez la formule adaptée à votre rythme de prospection. Annulable à tout moment en 1 clic.
+          Choisissez l&apos;offre qui correspond à votre volume de prospection. Annulable à tout moment en 1 clic.
         </p>
 
-        {/* Smart Routing Geo selector */}
-        <div className="inline-flex p-1 bg-dark-900 border border-dark-600 rounded-xl text-xs mt-3">
+        {/* Professional Payment Method Selector */}
+        <div className="inline-flex p-1 bg-dark-900 border border-dark-600 rounded-xl text-xs mt-3 flex-wrap justify-center">
           <button
             onClick={() => setGateway('flutterwave')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg transition-all ${
@@ -55,7 +53,7 @@ export default function PricingPage() {
             }`}
           >
             <Smartphone className="w-3.5 h-3.5" />
-            <span>Afrique (Mobile Money & Cartes via Flutterwave)</span>
+            <span>Payer par Mobile Money (MTN, Orange, Wave, Moov) &amp; Cartes</span>
           </button>
           <button
             onClick={() => setGateway('lemonsqueezy')}
@@ -66,7 +64,7 @@ export default function PricingPage() {
             }`}
           >
             <Globe className="w-3.5 h-3.5" />
-            <span>International (Apple Pay / Cartes via Lemon Squeezy)</span>
+            <span>Payer par Carte Internationale, Apple Pay &amp; Google Pay</span>
           </button>
         </div>
       </div>
@@ -81,7 +79,7 @@ export default function PricingPage() {
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-dark-800 px-2.5 py-0.5 rounded-full border border-dark-600">
-                Test & Prise en main
+                Test &amp; Prise en main
               </span>
               {subscription.plan_type === 'DECOUVERTE' && (
                 <span className="text-[10px] font-bold text-cyan bg-cyan/15 px-2 py-0.5 rounded-full">Actif</span>
@@ -91,7 +89,7 @@ export default function PricingPage() {
             <h3 className="text-xl font-bold text-white">DÉCOUVERTE</h3>
             <div className="my-4">
               <span className="text-3xl font-black text-white">1 €</span>
-              <span className="text-xs text-slate-400 block mt-0.5">Paiement unique, sans récurrence</span>
+              <span className="text-xs text-slate-400 block mt-0.5">Paiement unique, sans abonnement</span>
             </div>
 
             <p className="text-xs text-slate-400 mb-5 leading-relaxed">
@@ -109,19 +107,19 @@ export default function PricingPage() {
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span>Accès à 1 canal au choix (Google Maps)</span>
+                <span>Accès à 1 canal au choix (ex: Google Maps)</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span>Gestion CRM de base des fiches</span>
+                <span>Gestion CRM de base des 3 fiches</span>
               </li>
               <li className="flex items-center gap-2 text-cyan">
                 <Gift className="w-4 h-4 shrink-0" />
-                <span>Bonus +3 prospects offerts (avis Loom)</span>
+                <span>Possibilité d&apos;obtenir +3 prospects bonus (Loom)</span>
               </li>
               <li className="flex items-center gap-2 text-slate-500">
                 <span className="w-4 h-4 text-center">✕</span>
-                <span>Pas d&apos;export CSV ni d&apos;Audit Mensuel</span>
+                <span>Pas d&apos;export CSV ni d&apos;Audit Mensuel IA</span>
               </li>
             </ul>
           </div>
@@ -131,7 +129,7 @@ export default function PricingPage() {
             disabled={subscription.plan_type === 'DECOUVERTE'}
             className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-dark-800 hover:bg-dark-700 text-slate-300 border border-dark-600 disabled:opacity-50 transition-all"
           >
-            {subscription.plan_type === 'DECOUVERTE' ? "Plan Actif" : "Choisir l'offre Découverte (1 €)"}
+            {subscription.plan_type === 'DECOUVERTE' ? "Plan Actuel" : "Choisir l'offre Découverte (1 €)"}
           </button>
         </div>
 
@@ -144,7 +142,7 @@ export default function PricingPage() {
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] font-bold uppercase tracking-wider text-cyan bg-cyan/15 px-2.5 py-0.5 rounded-full border border-cyan/40">
-                Indépendants & Freelances
+                Indépendants &amp; Freelances
               </span>
               {subscription.plan_type === 'PRO' && (
                 <span className="text-[10px] font-bold text-cyan bg-cyan/15 px-2 py-0.5 rounded-full">Actif</span>
@@ -158,7 +156,7 @@ export default function PricingPage() {
             </div>
 
             <div className="bg-dark-800 rounded-lg p-2.5 mb-4 text-[11px] text-cyan font-mono flex items-center justify-between border border-cyan/20">
-              <span>Coût par prospect :</span>
+              <span>Coût par prospect qualifié :</span>
               <strong>0,32 € / prospect</strong>
             </div>
 
@@ -169,7 +167,7 @@ export default function PricingPage() {
             <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span><strong>90 Prospects Qualifiés / mois</strong> (3 / jour)</span>
+                <span><strong>90 Prospects Qualifiés / mois</strong> (3 / jour ouvré)</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
@@ -177,11 +175,11 @@ export default function PricingPage() {
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span>IA Avatar Avancée & messages sur-mesure</span>
+                <span>IA Avatar Avancée &amp; messages sur-mesure</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span><strong>Export CSV & Excel</strong> en 1 clic</span>
+                <span><strong>Export CSV &amp; Excel</strong> en 1 clic</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
@@ -215,13 +213,13 @@ export default function PricingPage() {
         {/* CARTE 3 : AGENCE (59 € / mois) */}
         <div className="bg-dark-900 border border-amber-500/40 hover:border-amber-500 rounded-2xl p-6 relative flex flex-col justify-between transition-all">
           <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-amber-500 text-dark-950 text-[10px] font-black uppercase px-3 py-0.5 rounded-full">
-            ⚡ RENDEMENT & VOLUME MAXIMUM
+            ⚡ RENDEMENT &amp; VOLUME MAXIMUM
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-amber-500/40">
-                Agences & Multi-Projets
+                Agences &amp; Multi-Projets
               </span>
               {subscription.plan_type === 'AGENCE' && (
                 <span className="text-[10px] font-bold text-amber-400 bg-amber-500/15 px-2 py-0.5 rounded-full">Actif</span>
@@ -258,11 +256,11 @@ export default function PricingPage() {
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Moteur Apify prioritaire Haute Vitesse</span>
+                <span>Moteur de détection prioritaire Haute Vitesse</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Audit Mensuel IA & exports CSV illimités</span>
+                <span>Audit Mensuel IA &amp; exports CSV illimités</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-amber-400 shrink-0" />
@@ -320,7 +318,7 @@ export default function PricingPage() {
       <div className="text-center text-xs text-slate-400 border-t border-dark-800 pt-6 space-y-1">
         <p className="flex items-center justify-center gap-1.5">
           <ShieldCheck className="w-4 h-4 text-cyan" />
-          Paiement 100% sécurisé via {gateway === 'flutterwave' ? 'Flutterwave (Mobile Money / Cartes)' : 'Lemon Squeezy (Stripe / Cartes / Apple Pay)'}.
+          Paiement 100% sécurisé et chiffré SSL 256-bit.
         </p>
         <p className="text-[11px] text-slate-400">
           En validant votre souscription, vous acceptez nos CGV. Les abonnements mensuels sont renouvelés automatiquement sauf annulation de votre part avant l&apos;échéance.

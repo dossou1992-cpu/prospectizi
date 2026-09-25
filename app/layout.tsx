@@ -15,19 +15,25 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const [isLoomOpen, setIsLoomOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [isLegalOpen, setIsLegalOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen bg-dark-950 text-slate-100 flex">
-      {/* Sidebar Navigation */}
+      {/* Collapsible Sidebar */}
       <Sidebar
+        collapsed={collapsed}
+        onToggleCollapse={() => setCollapsed(!collapsed)}
         onOpenTutorial={() => setIsTutorialOpen(true)}
         onOpenLegal={() => setIsLegalOpen(true)}
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-64 flex flex-col min-h-screen">
-        <Topbar onOpenLoomModal={() => setIsLoomOpen(true)} />
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
+      <div className={`flex-1 ${collapsed ? "ml-16" : "ml-60"} flex flex-col min-h-screen transition-all duration-300`}>
+        <Topbar 
+          onOpenLoomModal={() => setIsLoomOpen(true)} 
+          onOpenTutorialModal={() => setIsTutorialOpen(true)}
+        />
+        <main className="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>

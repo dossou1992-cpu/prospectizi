@@ -14,32 +14,38 @@ import {
   Copy, 
   Send, 
   X, 
-  Users, 
   Flame, 
-  Compass, 
   CheckCircle2, 
   Award,
   Zap,
-  Globe
+  PlayCircle,
+  CalendarCheck
 } from 'lucide-react';
 import { Prospect } from '@/lib/types';
+import VideoTutorialModal from '@/components/VideoTutorialModal';
 
 export default function DashboardPage() {
-  const { prospects, subscription, avatar, updateProspectStatus } = useStore();
+  const { prospects, avatar, markFollowupDone } = useStore();
   const [selectedFocusProspect, setSelectedFocusProspect] = useState<Prospect | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
   // KPIs Calculations
   const gagneProspects = prospects.filter(p => p.status === 'gagne');
   const enDiscussion = prospects.filter(p => p.status === 'en_discussion');
-  const nonContacte = prospects.filter(p => p.status === 'non_contacte' || p.status === 'nouveau');
   const totalContacted = prospects.filter(p => p.status !== 'nouveau').length;
   
   const totalWonRevenue = gagneProspects.reduce((acc, curr) => acc + (curr.estimated_deal_value || 1200), 0);
   const conversionRate = totalContacted > 0 ? Math.round((gagneProspects.length / totalContacted) * 100) : 0;
 
-  // Focus du Jour : prospects en cours à relancer aujourd'hui
-  const focusList = prospects.filter(p => p.status === 'en_discussion' || (p.status === 'non_contacte' && p.qualification_score >= 80)).slice(0, 5);
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  // Focus du Jour : prospects à relancer ou contacter aujourd'hui qui n'ont pas encore été relancés aujourd'hui
+  const focusList = prospects.filter(p => {
+    // Si déjà relancé aujourd'hui, on ne l'affiche plus dans les relances urgentes d'aujourd'hui
+    if (p.last_followup_done_date === todayStr) return false;
+    return p.status === 'en_discussion' || (p.status === 'non_contacte' && p.qualification_score >= 80);
+  }).slice(0, 5);
 
   // Top Prospects Chauds : score >= 80
   const topHotProspects = prospects.filter(p => p.qualification_score >= 80).slice(0, 4);
@@ -59,7 +65,7 @@ export default function DashboardPage() {
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan/15 text-cyan text-xs font-bold uppercase tracking-wider mb-2 border border-cyan/30">
               <Sparkles className="w-3.5 h-3.5" />
-              Pilotage Commercial Quotidien
+              Trouver &amp; contactez mieux
             </div>
             <h1 className="text-2xl md:text-3xl font-extrabold text-white">
               Prêt(e) à signer vos prochains contrats ?
@@ -69,20 +75,22 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Direct Video Tutorial trigger */}
+            <button
+              onClick={() => setIsTutorialOpen(true)}
+              className="bg-cyan/15 hover:bg-cyan/25 text-cyan border border-cyan/40 font-bold px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-2 transition-all shadow-cyan-border"
+            >
+              <PlayCircle className="w-4 h-4 text-cyan" />
+              <span>Vidéo Tuto (2m30)</span>
+            </button>
+
             <Link
               href="/prospects"
               className="bg-cyan hover:bg-cyan-intense text-dark-950 font-bold px-4 py-2.5 rounded-xl text-xs shadow-cyan-glow flex items-center gap-2 transition-all hover:scale-105"
             >
               <Zap className="w-4 h-4 fill-dark-950" />
-              <span>Lancer Scraping Apify</span>
-            </Link>
-            <Link
-              href="/audit"
-              className="bg-dark-800 hover:bg-dark-700 text-slate-200 border border-dark-600 font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 transition-colors"
-            >
-              <span>Audit Mensuel IA</span>
-              <ArrowRight className="w-3.5 h-3.5 text-cyan" />
+              <span>Rechercher des Prospects</span>
             </Link>
           </div>
         </div>
@@ -164,52 +172,70 @@ export default function DashboardPage() {
               </div>
             </div>
             <span className="text-[10px] font-bold uppercase bg-dark-800 text-cyan px-2.5 py-1 rounded-md border border-cyan/30">
-              {focusList.length} actions prêtes
+              {focusList.length} action(s) restante(s)
             </span>
           </div>
 
           <div className="space-y-3">
-            {focusList.map((prospect) => (
-              <div 
-                key={prospect.id}
-                className="p-4 bg-dark-800/90 border border-dark-600/80 hover:border-cyan/40 rounded-xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-white text-sm">{prospect.company_name}</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan/10 text-cyan border border-cyan/30">
-                      Score : {prospect.qualification_score}/100
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400">
-                    {prospect.activity} • {prospect.city} ({prospect.channel})
-                  </p>
-                  <p className="text-[11px] text-rose-400/90 italic">
-                    Faille : {prospect.flaws_identified.substring(0, 65)}...
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => setSelectedFocusProspect(prospect)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold bg-dark-700 hover:bg-cyan hover:text-dark-950 text-cyan border border-cyan/30 transition-all flex items-center gap-1.5"
-                  >
-                    <span>Voir le message</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-
-                  <a
-                    href={`https://wa.me/${(prospect.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(prospect.generated_messages.first_contact)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/40 transition-all"
-                    title="Ouvrir WhatsApp direct"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                  </a>
-                </div>
+            {focusList.length === 0 ? (
+              <div className="p-6 text-center bg-dark-800/60 rounded-xl border border-dark-700 space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
+                <p className="text-xs font-bold text-white">Toutes vos relances du jour sont terminées !</p>
+                <p className="text-[11px] text-slate-400">Bravo pour votre régularité. Lancez une nouvelle recherche pour ajouter de nouveaux prospects.</p>
               </div>
-            ))}
+            ) : (
+              focusList.map((prospect) => (
+                <div 
+                  key={prospect.id}
+                  className="p-4 bg-dark-800/90 border border-dark-600/80 hover:border-cyan/40 rounded-xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 group"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white text-sm">{prospect.company_name}</span>
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan/10 text-cyan border border-cyan/30">
+                        Score : {prospect.qualification_score}/100
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      {prospect.activity} • {prospect.city} ({prospect.channel})
+                    </p>
+                    <p className="text-[11px] text-rose-400/90 italic">
+                      Faille : {prospect.flaws_identified.substring(0, 65)}...
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    {/* Bouton pour marquer la relance comme faite */}
+                    <button
+                      onClick={() => markFollowupDone(prospect.id)}
+                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 transition-all flex items-center gap-1"
+                      title="Marquer comme relancé aujourd'hui"
+                    >
+                      <CalendarCheck className="w-3.5 h-3.5" />
+                      <span>Relancé</span>
+                    </button>
+
+                    <button
+                      onClick={() => setSelectedFocusProspect(prospect)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold bg-dark-700 hover:bg-cyan hover:text-dark-950 text-cyan border border-cyan/30 transition-all flex items-center gap-1.5"
+                    >
+                      <span>Voir message</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+
+                    <a
+                      href={`https://wa.me/${(prospect.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(prospect.generated_messages.first_contact)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/40 transition-all"
+                      title="Ouvrir WhatsApp direct"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -299,28 +325,47 @@ export default function DashboardPage() {
               &quot;{selectedFocusProspect.generated_messages.followup_1}&quot;
             </div>
 
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <button
-                onClick={() => handleCopyFocusMsg(selectedFocusProspect.generated_messages.followup_1)}
-                className="flex-1 py-2.5 px-4 rounded-xl text-xs font-bold bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-2 shadow-cyan-border transition-all"
+                onClick={() => {
+                  markFollowupDone(selectedFocusProspect.id);
+                  setSelectedFocusProspect(null);
+                }}
+                className="py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 shadow-sm transition-all"
               >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                <span>{copied ? "Copié !" : "Copier le message"}</span>
+                <CalendarCheck className="w-4 h-4" />
+                <span>Marquer comme relancé aujourd&apos;hui</span>
               </button>
 
-              <a
-                href={`https://wa.me/${(selectedFocusProspect.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(selectedFocusProspect.generated_messages.followup_1)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-2 transition-all"
-              >
-                <Send className="w-4 h-4" />
-                <span>Ouvrir WhatsApp</span>
-              </a>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleCopyFocusMsg(selectedFocusProspect.generated_messages.followup_1)}
+                  className="py-2.5 px-3 rounded-xl text-xs font-bold bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center gap-1.5 shadow-cyan-border transition-all"
+                >
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  <span>{copied ? "Copié !" : "Copier"}</span>
+                </button>
+
+                <a
+                  href={`https://wa.me/${(selectedFocusProspect.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(selectedFocusProspect.generated_messages.followup_1)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-2.5 px-3 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 transition-all"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>WhatsApp</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Video Tutorial Modal */}
+      <VideoTutorialModal 
+        isOpen={isTutorialOpen} 
+        onClose={() => setIsTutorialOpen(false)} 
+      />
     </div>
   );
 }

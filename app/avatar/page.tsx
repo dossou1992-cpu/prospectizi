@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import { 
   UserCheck, 
@@ -12,16 +12,19 @@ import {
   Clock, 
   Briefcase, 
   Award, 
-  CheckCircle2,
-  ChevronRight,
   ShieldCheck
 } from 'lucide-react';
 import { AvatarProfile } from '@/lib/types';
 
 export default function AvatarPage() {
-  const { avatar, updateAvatar, searchProspects, prospects } = useStore();
+  const { avatar, updateAvatar } = useStore();
   const [formData, setFormData] = useState<AvatarProfile>(avatar);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Sync with store on load
+  useEffect(() => {
+    setFormData(avatar);
+  }, [avatar]);
 
   const presets = [
     {
@@ -50,15 +53,24 @@ export default function AvatarPage() {
     }
   ];
 
+  const handleFieldChange = (field: keyof AvatarProfile, value: any) => {
+    const updated = { ...formData, [field]: value };
+    setFormData(updated);
+    // Instant background sync so navigating away never loses progress
+    updateAvatar(updated);
+  };
+
   const handleApplyPreset = (preset: typeof presets[0]) => {
-    setFormData(prev => ({
-      ...prev,
+    const updated = {
+      ...formData,
       profession: preset.profession,
       offer: preset.offer,
       target_audience: preset.target_audience,
       major_benefit: preset.major_benefit,
       tone: preset.tone,
-    }));
+    };
+    setFormData(updated);
+    updateAvatar(updated);
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -67,7 +79,7 @@ export default function AvatarPage() {
     setTimeout(() => {
       updateAvatar(formData);
       setIsSaving(false);
-    }, 600);
+    }, 500);
   };
 
   return (
@@ -80,10 +92,10 @@ export default function AvatarPage() {
             Paramétrage IA Avatar Client
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-white">
-            Définissez votre Profil Commercial & Client Idéal
+            Définissez votre Profil Commercial &amp; Client Idéal
           </h1>
           <p className="text-slate-400 text-xs md:text-sm mt-1">
-            Ces paramètres calibreront l&apos;algorithme de scoring et le copywriting de chaque message généré.
+            Vos données sont sauvegardées en temps réel. Elles calibrent le ciblage et la personnalisation de chaque message.
           </p>
         </div>
 
@@ -120,7 +132,7 @@ export default function AvatarPage() {
                 required
                 placeholder="Ex: Consultant en Acquisition B2B, Développeur SaaS, Agence Web..."
                 value={formData.profession}
-                onChange={(e) => setFormData({ ...formData, profession: e.target.value })}
+                onChange={(e) => handleFieldChange('profession', e.target.value)}
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none transition-colors"
               />
             </div>
@@ -129,14 +141,14 @@ export default function AvatarPage() {
             <div>
               <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-2">
                 <Award className="w-3.5 h-3.5 text-cyan" />
-                Votre Offre Principale (Ce que vous vendez)
+                Votre Offre Principale (Ce que vous proposez)
               </label>
               <textarea
                 required
                 rows={3}
                 placeholder="Ex: Mise en place d'un système de relance automatique WhatsApp et CRM pour doubler le closing..."
                 value={formData.offer}
-                onChange={(e) => setFormData({ ...formData, offer: e.target.value })}
+                onChange={(e) => handleFieldChange('offer', e.target.value)}
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none transition-colors"
               />
             </div>
@@ -152,7 +164,7 @@ export default function AvatarPage() {
                 required
                 placeholder="Ex: Cabinets de conseil, agences de services et PME en Afrique et en Europe..."
                 value={formData.target_audience}
-                onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })}
+                onChange={(e) => handleFieldChange('target_audience', e.target.value)}
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none transition-colors"
               />
             </div>
@@ -161,14 +173,14 @@ export default function AvatarPage() {
             <div>
               <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-cyan" />
-                Bénéfice Majeur Garanti (La promesse chiffrée)
+                Bénéfice Majeur Garanti (La promesse concrète)
               </label>
               <input
                 type="text"
                 required
                 placeholder="Ex: Générer +35% de rendez-vous qualifiés et transformer 2x plus de devis..."
                 value={formData.major_benefit}
-                onChange={(e) => setFormData({ ...formData, major_benefit: e.target.value })}
+                onChange={(e) => handleFieldChange('major_benefit', e.target.value)}
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none transition-colors"
               />
             </div>
@@ -183,13 +195,13 @@ export default function AvatarPage() {
                 </label>
                 <select
                   value={formData.tone}
-                  onChange={(e) => setFormData({ ...formData, tone: e.target.value as any })}
+                  onChange={(e) => handleFieldChange('tone', e.target.value)}
                   className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none transition-colors"
                 >
-                  <option value="chaleureux">Chaleureux & Conversationnel (Recommandé)</option>
-                  <option value="professionnel">Professionnel & Corporate</option>
-                  <option value="direct">Direct & Efficace (&lt; 50 mots)</option>
-                  <option value="persuasif">Persuasif & Axé Résultats</option>
+                  <option value="chaleureux">Chaleureux &amp; Conversationnel (Recommandé)</option>
+                  <option value="professionnel">Professionnel &amp; Corporate</option>
+                  <option value="direct">Direct &amp; Efficace (&lt; 50 mots)</option>
+                  <option value="persuasif">Persuasif &amp; Axé Résultats</option>
                 </select>
               </div>
 
@@ -201,12 +213,12 @@ export default function AvatarPage() {
                 </label>
                 <select
                   value={formData.followup_frequency}
-                  onChange={(e) => setFormData({ ...formData, followup_frequency: e.target.value as any })}
+                  onChange={(e) => handleFieldChange('followup_frequency', e.target.value)}
                   className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none transition-colors"
                 >
-                  <option value="J+3">J+3 (Recommandé pour WhatsApp / SMS)</option>
-                  <option value="J+5">J+5 (Standard B2B LinkedIn)</option>
-                  <option value="J+10">J+10 (Rythme lent grands comptes)</option>
+                  <option value="J+3">J+3 (Recommandé pour WhatsApp / Direct)</option>
+                  <option value="J+5">J+5 (Standard B2B)</option>
+                  <option value="J+10">J+10 (Rythme espacé)</option>
                 </select>
               </div>
             </div>
@@ -215,7 +227,7 @@ export default function AvatarPage() {
             <div className="pt-4 border-t border-dark-700/80 flex items-center justify-between">
               <span className="text-xs text-slate-400 flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-cyan" />
-                Données synchronisées côté serveur Supabase
+                Sauvegarde permanente sur votre compte
               </span>
 
               <button
@@ -224,7 +236,7 @@ export default function AvatarPage() {
                 className="py-3 px-6 rounded-xl font-extrabold text-xs md:text-sm bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center gap-2 shadow-cyan-glow transition-all hover:scale-105"
               >
                 <Save className="w-4 h-4 text-dark-950" />
-                <span>{isSaving ? "Synchronisation..." : "Sauvegarder & Synchroniser l'IA"}</span>
+                <span>{isSaving ? "Sauvegarde en cours..." : "Sauvegarder & Synchroniser l'IA"}</span>
               </button>
             </div>
           </form>
@@ -264,13 +276,13 @@ export default function AvatarPage() {
               <div className="p-3 bg-dark-800/80 rounded-xl border border-dark-700 space-y-1">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Proposition de valeur irrésistible :</span>
                 <p className="text-cyan font-semibold">
-                  {formData.major_benefit || "[Définissez votre bénéfice]"}
+                  {formData.major_benefit || "[Définissez votre promesse]"}
                 </p>
               </div>
 
               <div className="p-3 bg-dark-800/80 rounded-xl border border-dark-700 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Ton & Style de rédaction :</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Ton &amp; Style de rédaction :</span>
                   <span className="text-white font-bold capitalize">{formData.tone} (Moins de 75 mots, ton &quot;Je&quot;)</span>
                 </div>
                 <div className="text-right">
@@ -284,10 +296,10 @@ export default function AvatarPage() {
             <div className="p-3.5 bg-cyan/10 border border-cyan/30 rounded-xl text-xs space-y-1.5">
               <div className="font-bold text-cyan flex items-center gap-1.5">
                 <Wand2 className="w-4 h-4" />
-                <span>Expérience Magic Setup (Moins de 2 min)</span>
+                <span>Expérience Magic Setup</span>
               </div>
               <p className="text-slate-300 leading-relaxed text-[11px]">
-                Dès que votre Avatar est validé, Prospectizi calibre l&apos;IA pour générer vos premiers prospects qualifiés sans configuration complexe.
+                Dès que votre Avatar est enregistré, Prospectizi calibre l&apos;IA pour générer vos premiers prospects ultra-qualifiés sans configuration compliquée.
               </p>
             </div>
           </div>
