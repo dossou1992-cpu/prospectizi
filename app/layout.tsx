@@ -2,24 +2,39 @@
 
 import "./globals.css";
 import React, { useState } from "react";
-import { ProspectiziProvider } from "@/lib/store";
+import { ProspectiziProvider, useStore } from "@/lib/store";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
 import UpgradeModal from "@/components/UpgradeModal";
 import LoomModal from "@/components/LoomModal";
 import LoomTutorialModal from "@/components/LoomTutorialModal";
 import LegalModal from "@/components/LegalModal";
+import AuthModal from "@/components/AuthModal";
 import Toast from "@/components/Toast";
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useStore();
   const [isLoomSubmitOpen, setIsLoomSubmitOpen] = useState(false);
   const [isLoomTutorialOpen, setIsLoomTutorialOpen] = useState(false);
   const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // If user is NOT authenticated, render the public landing layout
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-dark-950 text-slate-100 font-sans">
+        {children}
+        <AuthModal />
+        <LegalModal />
+        <Toast />
+      </div>
+    );
+  }
+
+  // If user IS authenticated, render the full SaaS workspace
   return (
-    <div className="min-h-screen bg-dark-950 text-slate-100 flex flex-col md:flex-row relative">
+    <div className="min-h-screen bg-dark-950 text-slate-100 flex flex-col md:flex-row relative font-sans">
       {/* Mobile Backdrop Overlay */}
       {mobileMenuOpen && (
         <div 
@@ -67,6 +82,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       />
       <LoomModal isOpen={isLoomSubmitOpen} onClose={() => setIsLoomSubmitOpen(false)} />
       <LegalModal isOpen={isLegalOpen} onClose={() => setIsLegalOpen(false)} />
+      <AuthModal />
       <Toast />
     </div>
   );
@@ -78,8 +94,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className="dark">
-      <body className="bg-dark-950 text-slate-100 antialiased selection:bg-cyan selection:text-dark-950">
+    <html lang="fr" className="dark scroll-smooth">
+      <body className="bg-dark-950 text-slate-100 antialiased selection:bg-cyan selection:text-dark-950 font-sans">
         <ProspectiziProvider>
           <LayoutContent>{children}</LayoutContent>
         </ProspectiziProvider>

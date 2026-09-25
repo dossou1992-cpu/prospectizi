@@ -16,7 +16,7 @@ export interface ProspectSocialLinks {
 
 export interface ProspectMessages {
   first_contact: string;
-  first_contact_variant_b?: string; // Audit A/B test variant
+  first_contact_variant_b?: string;
   value_offer: string;
   followup_1: string;
   followup_2: string;
@@ -64,6 +64,14 @@ export interface AvatarProfile {
   tone: 'professionnel' | 'chaleureux' | 'direct' | 'persuasif';
   followup_frequency: 'J+3' | 'J+5' | 'J+10';
   auto_reminders: boolean;
+}
+
+export interface UserSettings {
+  notify_days_before: number; // e.g. 5 days before expiry
+  notify_channel: 'email' | 'whatsapp' | 'both';
+  email_notifications: boolean;
+  whatsapp_notifications: boolean;
+  phone_number: string;
 }
 
 export interface Subscription {

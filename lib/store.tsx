@@ -1,19 +1,47 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Prospect, AvatarProfile, Subscription, AuditReport, Testimonial, TeamMember, ProspectStatus, Channel, PlanType } from './types';
+import { 
+  Prospect, 
+  AvatarProfile, 
+  Subscription, 
+  AuditReport, 
+  Testimonial, 
+  TeamMember, 
+  ProspectStatus, 
+  Channel, 
+  PlanType, 
+  UserSettings 
+} from './types';
 import { initialAvatar, initialSubscription, initialProspects, initialTestimonials, initialTeamMembers, initialAuditReport } from './mockData';
 import confetti from 'canvas-confetti';
 
 interface StoreContextType {
+  // Auth state
+  isAuthenticated: boolean;
+  authModalOpen: boolean;
+  authModalMode: 'login' | 'register';
+  openAuthModal: (mode?: 'login' | 'register') => void;
+  closeAuthModal: () => void;
+  loginWithEmail: (email: string, pass: string) => Promise<{ success: boolean; message?: string }>;
+  loginWithGoogle: () => Promise<{ success: boolean }>;
+  logout: () => void;
+
   user: {
     email: string;
     full_name: string;
     role: 'user' | 'superadmin';
     isSuperadminMode: boolean;
   };
+  updateUserProfile: (name: string, email: string) => void;
   toggleSuperadminMode: () => void;
   setUserEmail: (email: string) => void;
+
+  // Settings
+  userSettings: UserSettings;
+  updateUserSettings: (settings: Partial<UserSettings>) => void;
+
+  // Subscription
   subscription: Subscription;
   isSubscriptionExpired: boolean;
   simulateMonthEndExpired: () => void;
@@ -21,8 +49,12 @@ interface StoreContextType {
   upgradePlan: (plan: PlanType) => void;
   resetQuota: () => void;
   addBonusProspects: (count: number) => void;
+
+  // Avatar
   avatar: AvatarProfile;
   updateAvatar: (avatar: Partial<AvatarProfile>) => void;
+
+  // Prospects & CRM
   prospects: Prospect[];
   updateProspectStatus: (id: string, status: ProspectStatus) => void;
   updateProspectNotes: (id: string, notes: string) => void;
@@ -30,6 +62,8 @@ interface StoreContextType {
   recordSentVariant: (id: string, variant: 'A' | 'B') => void;
   reportFaultyContact: (id: string, reason: string) => { success: boolean; message: string };
   searchProspects: (params: { keyword: string; location: string; channel: Channel; count: number }) => Promise<{ success: boolean; added: number; error?: string }>;
+  
+  // Modals & UI
   showUpgradeModal: boolean;
   setShowUpgradeModal: (show: boolean) => void;
   auditReport: AuditReport;
@@ -53,6 +87,11 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 export function ProspectiziProvider({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Authentication State: defaults to false so non-logged visitors land on the Landing Page!
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
+
   const [user, setUser] = useState<{
     email: string;
     full_name: string;
@@ -61,8 +100,16 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   }>({
     email: "dossou1992@gmail.com",
     full_name: "Edith Dossou",
-    role: "user", // Normal test mode by default
+    role: "user",
     isSuperadminMode: false,
+  });
+
+  const [userSettings, setUserSettings] = useState<UserSettings>({
+    notify_days_before: 3,
+    notify_channel: 'both',
+    email_notifications: true,
+    whatsapp_notifications: true,
+    phone_number: "+228 90 12 34 56",
   });
 
   const [subscription, setSubscription] = useState<Subscription>({
@@ -94,8 +141,14 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   // Hydrate from localStorage on client mount
   useEffect(() => {
     try {
+      const savedAuth = localStorage.getItem('prospectizi_auth');
+      if (savedAuth !== null) setIsAuthenticated(JSON.parse(savedAuth));
+
       const savedUser = localStorage.getItem('prospectizi_user');
       if (savedUser) setUser(JSON.parse(savedUser));
+
+      const savedSettings = localStorage.getItem('prospectizi_settings');
+      if (savedSettings) setUserSettings(JSON.parse(savedSettings));
 
       const savedSub = localStorage.getItem('prospectizi_sub');
       if (savedSub) setSubscription(JSON.parse(savedSub));
@@ -124,7 +177,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (!isLoaded) return;
     try {
+      localStorage.setItem('prospectizi_auth', JSON.stringify(isAuthenticated));
       localStorage.setItem('prospectizi_user', JSON.stringify(user));
+      localStorage.setItem('prospectizi_settings', JSON.stringify(userSettings));
       localStorage.setItem('prospectizi_sub', JSON.stringify(subscription));
       localStorage.setItem('prospectizi_avatar', JSON.stringify(avatar));
       localStorage.setItem('prospectizi_prospects', JSON.stringify(prospects));
@@ -134,13 +189,72 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     } catch (e) {
       console.error("LocalStorage save error:", e);
     }
-  }, [user, subscription, avatar, prospects, auditReport, testimonials, teamMembers, isLoaded]);
+  }, [isAuthenticated, user, userSettings, subscription, avatar, prospects, auditReport, testimonials, teamMembers, isLoaded]);
 
   const showNotification = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
     }, 4500);
+  };
+
+  // Auth Handlers
+  const openAuthModal = (mode: 'login' | 'register' = 'login') => {
+    setAuthModalMode(mode);
+    setAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setAuthModalOpen(false);
+  };
+
+  const loginWithEmail = async (email: string, pass: string) => {
+    if (!email || !email.includes('@')) {
+      return { success: false, message: "Adresse email invalide." };
+    }
+    const fullName = email.split('@')[0].replace(/[._-]/g, ' ');
+    const formattedName = fullName.charAt(0).toUpperCase() + fullName.slice(1);
+    
+    setUser(prev => ({
+      ...prev,
+      email,
+      full_name: formattedName || prev.full_name,
+    }));
+    setIsAuthenticated(true);
+    setAuthModalOpen(false);
+    confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
+    showNotification(`👋 Bienvenue sur Prospectizi, ${formattedName} !`);
+    return { success: true };
+  };
+
+  const loginWithGoogle = async () => {
+    // In production, this redirects to Supabase Google OAuth:
+    // supabase.auth.signInWithOAuth({ provider: 'google' })
+    setUser(prev => ({
+      ...prev,
+      email: "dossou1992@gmail.com",
+      full_name: "Edith Dossou",
+    }));
+    setIsAuthenticated(true);
+    setAuthModalOpen(false);
+    confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+    showNotification("✅ Connecté avec succès via votre compte Google !");
+    return { success: true };
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+    showNotification("Vous avez été déconnecté avec succès.");
+  };
+
+  const updateUserProfile = (name: string, email: string) => {
+    setUser(prev => ({ ...prev, full_name: name, email }));
+    showNotification("Profil utilisateur mis à jour !");
+  };
+
+  const updateUserSettings = (newSettings: Partial<UserSettings>) => {
+    setUserSettings(prev => ({ ...prev, ...newSettings }));
+    showNotification("Préférences et notifications sauvegardées !");
   };
 
   const toggleSuperadminMode = () => {
@@ -161,13 +275,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   };
 
   const setUserEmail = (email: string) => {
-    setUser(prev => ({
-      ...prev,
-      email,
-    }));
+    setUser(prev => ({ ...prev, email }));
   };
 
-  // Automatic upgrade upon validated payment
   const upgradePlan = (newPlan: PlanType) => {
     let quota = 3;
     if (newPlan === 'PRO') quota = 90;
@@ -189,7 +299,6 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     showNotification(`🚀 Paiement Validé ! Votre compte passe immédiatement au Plan ${newPlan} (${quota} prospects pour 30 jours)`);
   };
 
-  // Simulation: month-end expiration
   const simulateMonthEndExpired = () => {
     setSubscription(prev => ({
       ...prev,
@@ -274,7 +383,6 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       const stats = prev.ab_test_stats || { variant_a_sent: 0, variant_b_sent: 0, variant_a_replies: 0, variant_b_replies: 0 };
       const newSentA = variant === 'A' ? stats.variant_a_sent + 1 : stats.variant_a_sent;
       const newSentB = variant === 'B' ? stats.variant_b_sent + 1 : stats.variant_b_sent;
-      // Realistic simulation: variant B converts slightly more
       const newRepliesA = variant === 'A' && Math.random() > 0.6 ? stats.variant_a_replies + 1 : stats.variant_a_replies;
       const newRepliesB = variant === 'B' && Math.random() > 0.45 ? stats.variant_b_replies + 1 : stats.variant_b_replies;
       return {
@@ -300,7 +408,6 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   };
 
   const applyWinningScript = () => {
-    const winning = auditReport.recommended_script.followup_optimized;
     setProspects(prev => prev.map(p => ({
       ...p,
       generated_messages: {
@@ -319,8 +426,8 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       ab_test_stats: {
         variant_a_sent: 18,
         variant_b_sent: 16,
-        variant_a_replies: 6, // 33%
-        variant_b_replies: 8, // 50%
+        variant_a_replies: 6,
+        variant_b_replies: 8,
       }
     }));
     showNotification("⚡ Simulation : 34 envois enregistrés ! L'analyse de la variante gagnante est désormais disponible.");
@@ -337,14 +444,12 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   };
 
   const searchProspects = async (params: { keyword: string; location: string; channel: Channel; count: number }) => {
-    // 1. Check expiration
     if (isSubscriptionExpired && !user.isSuperadminMode) {
       setShowUpgradeModal(true);
       showNotification("🔒 Votre abonnement est arrivé à échéance. Veuillez le renouveler pour prospecter.");
       return { success: false, added: 0, error: "Abonnement échu" };
     }
 
-    // 2. Check quota
     const totalAllowed = subscription.prospects_quota + subscription.bonus_prospects;
     const remaining = totalAllowed - subscription.prospects_used;
     const isBypass = user.isSuperadminMode;
@@ -549,9 +654,20 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
 
   return (
     <StoreContext.Provider value={{
+      isAuthenticated,
+      authModalOpen,
+      authModalMode,
+      openAuthModal,
+      closeAuthModal,
+      loginWithEmail,
+      loginWithGoogle,
+      logout,
       user,
+      updateUserProfile,
       toggleSuperadminMode,
       setUserEmail,
+      userSettings,
+      updateUserSettings,
       subscription,
       isSubscriptionExpired,
       simulateMonthEndExpired,

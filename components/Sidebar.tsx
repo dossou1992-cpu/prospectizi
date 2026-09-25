@@ -15,6 +15,7 @@ import {
   MessageCircle, 
   FileText,
   Zap,
+  Settings,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -38,6 +39,7 @@ export default function Sidebar({ onOpenTutorial, onOpenLegal, collapsed, onTogg
     { href: "/audit", label: "Audit Mensuel IA", icon: Sparkles, badge: "IA 30j" },
     { href: "/pricing", label: "Plans & Tarifs", icon: CreditCard, badge: subscription.plan_type },
     { href: "/team", label: "Mon Équipe", icon: Users2, badge: "AGENCE" },
+    { href: "/settings", label: "Paramètres", icon: Settings, desc: "Compte & Alertes" },
     { href: "/admin", label: "Espace Superadmin", icon: ShieldCheck, badge: "VIP" },
   ];
 
