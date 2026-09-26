@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useStore } from '@/lib/store';
-import { Crown, User, Plus, Video, Gift, Menu, Calendar, AlertCircle } from 'lucide-react';
+import { Crown, User, Plus, Video, Gift, Menu, Calendar, AlertCircle, Star } from 'lucide-react';
 import Link from 'next/link';
 
 interface TopbarProps {
@@ -12,7 +12,7 @@ interface TopbarProps {
 }
 
 export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleMobileMenu }: TopbarProps) {
-  const { user, subscription, toggleSuperadminMode, setShowUpgradeModal, isSubscriptionExpired } = useStore();
+  const { user, subscription, toggleSuperadminMode, setShowUpgradeModal, isSubscriptionExpired, setFeedbackModalOpen } = useStore();
 
   const isBypass = user.isSuperadminMode;
   const totalAllowed = subscription.prospects_quota + subscription.bonus_prospects;
@@ -81,6 +81,16 @@ export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleM
 
       {/* Quota & Quick Actions */}
       <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        {/* Beta Feedback Trigger */}
+        <button
+          onClick={() => setFeedbackModalOpen(true)}
+          className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold py-1 px-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all shadow-sm"
+          title="Donnez votre avis sur l'offre Découverte et débloquez +1 prospect offert"
+        >
+          <Star className="w-3 h-3 fill-amber-400" />
+          <span>Avis Bêta (+1)</span>
+        </button>
+
         {/* Loom Bonus Trigger */}
         <button
           onClick={onOpenLoomModal}

@@ -11,6 +11,8 @@ import LoomTutorialModal from "@/components/LoomTutorialModal";
 import LegalModal from "@/components/LegalModal";
 import AuthModal from "@/components/AuthModal";
 import Toast from "@/components/Toast";
+import FeedbackModal from "@/components/FeedbackModal";
+import SupportChatWidget from "@/components/SupportChatWidget";
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useStore();
@@ -27,6 +29,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         {children}
         <AuthModal />
         <LegalModal />
+        <SupportChatWidget />
         <Toast />
       </div>
     );
@@ -75,6 +78,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Global Modals & Notifications */}
       <UpgradeModal />
+      <FeedbackModal />
+      <SupportChatWidget />
       <LoomTutorialModal 
         isOpen={isLoomTutorialOpen} 
         onClose={() => setIsLoomTutorialOpen(false)} 

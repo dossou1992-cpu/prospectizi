@@ -66,6 +66,8 @@ interface StoreContextType {
   // Modals & UI
   showUpgradeModal: boolean;
   setShowUpgradeModal: (show: boolean) => void;
+  isFeedbackModalOpen: boolean;
+  setFeedbackModalOpen: (open: boolean) => void;
   auditReport: AuditReport;
   generateAuditReport: () => Promise<{ success: boolean; message: string }>;
   toggleABTest: (active: boolean) => void;
@@ -131,6 +133,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [isFeedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Check if subscription has expired
@@ -751,6 +754,8 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       searchProspects,
       showUpgradeModal,
       setShowUpgradeModal,
+      isFeedbackModalOpen,
+      setFeedbackModalOpen,
       auditReport,
       generateAuditReport,
       toggleABTest,

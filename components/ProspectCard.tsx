@@ -57,19 +57,20 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
     setRegenerating(true);
     setTimeout(() => {
       let newMsg = "";
+      const cleanFlaw = prospect.flaws_identified ? prospect.flaws_identified.split('.')[0] : "une opportunité inexploitée";
       if (angle === 'direct') {
-        newMsg = `Bonjour ! J'ai vu l'activité de ${prospect.company_name} sur ${prospect.city}. En voyant vos offres, beaucoup perdent du temps faute de suivi automatisé. J'ai un système léger qui fait ça sans effort. Seriez-vous ouvert à une démo de 2 min ?`;
+        newMsg = `Bonjour ! En observant ${prospect.company_name} à ${prospect.city}, j'ai noté que vous avez ${cleanFlaw}. En tant que ${avatar.profession || "spécialiste"}, j'ai une solution rapide pour corriger ça. Ouvert à un mot de 2 min ?`;
       } else if (angle === 'question') {
-        newMsg = `Bonjour ! Comment gérez-vous le suivi de vos devis actuellement chez ${prospect.company_name} ? J'ai remarqué qu'un système automatisé WhatsApp permet de réactiver 35% des clients silencieux. Curieux d'en savoir plus ?`;
+        newMsg = `Bonjour ! Comment gérez-vous aujourd'hui ce point chez ${prospect.company_name} : ${cleanFlaw} ? Nous aidons les acteurs de votre secteur à éliminer ce frein. Curieux de voir nos résultats ?`;
       } else {
-        newMsg = `Bonjour ! Nous avons permis à un profil équivalent sur ${prospect.city} de signer 2 contrats supplémentaires dès son 1er mois grâce à des relances courtes. Seriez-vous ouvert à ce que je vous envoie la vidéo explicative ?`;
+        newMsg = `Bonjour ! Une structure similaire à ${prospect.company_name} sur ${prospect.city} a réussi à ${avatar.major_benefit || "doubler ses prises de contact"} en corrigeant précisément ${cleanFlaw}. Seriez-vous ouvert à une démo de 2 min ?`;
       }
       setCustomMessages(prev => ({
         ...prev,
         [activeTab]: newMsg
       }));
       setRegenerating(false);
-    }, 600);
+    }, 400);
   };
 
   // Determine current active message text
