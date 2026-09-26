@@ -69,6 +69,9 @@ interface StoreContextType {
   setShowUpgradeModal: (show: boolean) => void;
   isFeedbackModalOpen: boolean;
   setFeedbackModalOpen: (open: boolean) => void;
+  isFeedbackCollectionActive: boolean;
+  toggleFeedbackCollection: () => void;
+  setFeedbackCollectionActive: (active: boolean) => void;
   knowledgeBase: KnowledgeBaseData;
   updateKnowledgeBase: (data: Partial<KnowledgeBaseData>) => void;
   submitLinkedInFeedback: (params: { linkedinUrl: string; reviewText: string; rating: number; consent: boolean }) => void;
@@ -138,6 +141,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isFeedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [isFeedbackCollectionActive, setIsFeedbackCollectionActive] = useState<boolean>(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const [knowledgeBase, setKnowledgeBase] = useState<KnowledgeBaseData>({
@@ -187,6 +191,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
 
       const savedKB = localStorage.getItem('prospectizi_kb');
       if (savedKB) setKnowledgeBase(JSON.parse(savedKB));
+
+      const savedFeedbackActive = localStorage.getItem('prospectizi_feedback_active');
+      if (savedFeedbackActive !== null) setIsFeedbackCollectionActive(JSON.parse(savedFeedbackActive));
     } catch (e) {
       console.error("LocalStorage load error:", e);
     }
@@ -207,10 +214,11 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       localStorage.setItem('prospectizi_testimonials', JSON.stringify(testimonials));
       localStorage.setItem('prospectizi_team', JSON.stringify(teamMembers));
       localStorage.setItem('prospectizi_kb', JSON.stringify(knowledgeBase));
+      localStorage.setItem('prospectizi_feedback_active', JSON.stringify(isFeedbackCollectionActive));
     } catch (e) {
       console.error("LocalStorage save error:", e);
     }
-  }, [isAuthenticated, user, userSettings, subscription, avatar, prospects, auditReport, testimonials, teamMembers, isLoaded]);
+  }, [isAuthenticated, user, userSettings, subscription, avatar, prospects, auditReport, testimonials, teamMembers, knowledgeBase, isFeedbackCollectionActive, isLoaded]);
 
   const showNotification = (msg: string) => {
     setToastMessage(msg);
@@ -768,6 +776,18 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     showNotification("📥 Fichier CSV téléchargé avec succès !");
   };
 
+  const toggleFeedbackCollection = () => {
+    setIsFeedbackCollectionActive(prev => {
+      const next = !prev;
+      showNotification(next ? "Campagne d'avis activée (bouton visible)" : "Campagne d'avis désactivée (bouton masqué)");
+      return next;
+    });
+  };
+
+  const setFeedbackCollectionActive = (active: boolean) => {
+    setIsFeedbackCollectionActive(active);
+  };
+
   return (
     <StoreContext.Provider value={{
       isAuthenticated,
@@ -804,6 +824,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       setShowUpgradeModal,
       isFeedbackModalOpen,
       setFeedbackModalOpen,
+      isFeedbackCollectionActive,
+      toggleFeedbackCollection,
+      setFeedbackCollectionActive,
       knowledgeBase,
       updateKnowledgeBase,
       submitLinkedInFeedback,

@@ -39,7 +39,7 @@ export default function SettingsPage() {
     updateKnowledgeBase
   } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'profile' | 'billing' | 'notifications' | 'security' | 'resources' | 'knowledge'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'billing' | 'notifications' | 'security' | 'knowledge'>('profile');
 
   // Local form states
   const [name, setName] = useState(user.full_name);
@@ -175,29 +175,20 @@ export default function SettingsPage() {
           <span>Sécurité &amp; RGPD</span>
         </button>
 
-        <button
-          onClick={() => setActiveTab('resources')}
-          className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'resources'
-              ? 'bg-cyan text-dark-950 font-black shadow-cyan-border'
-              : 'text-cyan hover:text-white bg-dark-900 border border-cyan/40'
-          }`}
-        >
-          <Download className="w-3.5 h-3.5" />
-          <span>Ressources Créateur (VIP)</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('knowledge')}
-          className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeTab === 'knowledge'
-              ? 'bg-purple-500 text-white font-black shadow-lg shadow-purple-500/30'
-              : 'text-purple-400 hover:text-white bg-dark-900 border border-purple-500/40'
-          }`}
-        >
-          <MessageSquare className="w-3.5 h-3.5" />
-          <span>Base Notion &amp; Chatbot IA</span>
-        </button>
+        {/* Onglet Superadmin Exclusif : Édition Base Notion & Chatbot */}
+        {user.email === 'dossou1992@gmail.com' && user.isSuperadminMode && (
+          <button
+            onClick={() => setActiveTab('knowledge')}
+            className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === 'knowledge'
+                ? 'bg-purple-500 text-white font-black shadow-lg shadow-purple-500/30'
+                : 'text-purple-400 hover:text-white bg-dark-900 border border-purple-500/40'
+            }`}
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Base Notion &amp; Chatbot IA (Superadmin)</span>
+          </button>
+        )}
       </div>
 
       {/* TAB 1: PROFIL */}
@@ -516,135 +507,8 @@ export default function SettingsPage() {
         </div>
       )}
 
-      {/* TAB 5: RESSOURCES CRÉATEUR & TÉLÉCHARGEMENTS PRIVÉS */}
-      {activeTab === 'resources' && (
-        <div className="bg-dark-900 border-2 border-cyan/40 rounded-2xl p-6 md:p-8 space-y-6 shadow-cyan-glow">
-          <div className="border-b border-dark-700 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan/15 text-cyan text-[11px] font-bold uppercase tracking-wider mb-1 border border-cyan/30">
-                <Lock className="w-3 h-3" />
-                Accès Privé Créateur / Équipe
-              </div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Download className="w-4 h-4 text-cyan" />
-                <span>Ressources Médias &amp; Documents Officiels</span>
-              </h2>
-            </div>
-            <span className="text-xs text-slate-400">
-              Réservé à l&apos;administrateur et aux utilisateurs connectés
-            </span>
-          </div>
-
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Conformément à vos consignes de sécurité, la vidéo démo et le script ne sont pas téléchargeables par les simples visiteurs sur la page d&apos;accueil publique. Vous pouvez les télécharger directement ici en haute définition :
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Vidéo Démo */}
-            <div className="p-5 bg-dark-800 rounded-xl border border-cyan/30 flex flex-col justify-between space-y-4">
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-cyan/20 border border-cyan/40 flex items-center justify-center text-cyan">
-                  <Video className="w-5 h-5" />
-                </div>
-                <h3 className="text-sm font-extrabold text-white">Vidéo Démo Produit (HD 1080p)</h3>
-                <p className="text-xs text-slate-400">
-                  Fichier vidéo MP4 (30 secondes) présentant les 6 écrans clés du SaaS avec musique tech ambiante.
-                </p>
-                <div className="text-[11px] text-cyan font-mono">Format: .MP4 • Taille: ~1.27 Mo</div>
-              </div>
-
-              <a
-                href="/prospectizi_demo_video.mp4"
-                download="PROSPECTIZI_Demo_Video_HD.mp4"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-2 shadow-cyan-glow transition-all"
-              >
-                <Download className="w-4 h-4" />
-                <span>Télécharger la Vidéo (.MP4)</span>
-              </a>
-            </div>
-
-            {/* Script & Storyboard DOCX */}
-            <div className="p-5 bg-dark-800 rounded-xl border border-cyan/30 flex flex-col justify-between space-y-4">
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <h3 className="text-sm font-extrabold text-white">Script &amp; Storyboard Landing Page</h3>
-                <p className="text-xs text-slate-400">
-                  Document Word officiel détaillant le pitch, le timing scène par scène et le texte des sous-titres.
-                </p>
-                <div className="text-[11px] text-blue-400 font-mono">Format: .DOCX • Taille: ~40 Ko</div>
-              </div>
-
-              <a
-                href="/PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
-                download="PROSPECTIZI_Script_Video_Demo_Landing_Page.docx"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold bg-blue-500 hover:bg-blue-400 text-white flex items-center justify-center gap-2 shadow-lg transition-all"
-              >
-                <Download className="w-4 h-4" />
-                <span>Télécharger le Script (.DOCX)</span>
-              </a>
-            </div>
-
-            {/* Présentation Pitch PPTX */}
-            <div className="p-5 bg-dark-800 rounded-xl border border-amber-500/30 flex flex-col justify-between space-y-4">
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
-                  <FileSpreadsheet className="w-5 h-5" />
-                </div>
-                <h3 className="text-sm font-extrabold text-white">Présentation Stratégique MVP</h3>
-                <p className="text-xs text-slate-400">
-                  Support de présentation PowerPoint (11 slides complètes) de la vision B2B et de la monétisation.
-                </p>
-                <div className="text-[11px] text-amber-400 font-mono">Format: .PPTX • Taille: ~52 Ko</div>
-              </div>
-
-              <a
-                href="/PROSPECTIZI_Presentation_MVP.pptx"
-                download="PROSPECTIZI_Presentation_MVP.pptx"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold bg-amber-500 hover:bg-amber-400 text-dark-950 flex items-center justify-center gap-2 shadow-lg transition-all"
-              >
-                <Download className="w-4 h-4" />
-                <span>Télécharger la Présentation (.PPTX)</span>
-              </a>
-            </div>
-
-            {/* Base de Connaissances & Prompt Chatbot IA DOCX */}
-            <div className="p-5 bg-dark-800 rounded-xl border border-purple-500/30 flex flex-col justify-between space-y-4 md:col-span-2">
-              <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <h3 className="text-sm font-extrabold text-white">Base de Connaissances Notion &amp; Prompt Chatbot IA</h3>
-                <p className="text-xs text-slate-400">
-                  Document Word complet avec le Prompt Système officiel du Chatbot IA, les 6 sections Notion (FAQ, Tutos, Tarifs, Paiements, Apify, Loom) et les réponses types WhatsApp.
-                </p>
-                <div className="text-[11px] text-purple-400 font-mono">Format: .DOCX • Taille: ~38 Ko</div>
-              </div>
-
-              <a
-                href="/PROSPECTIZI_Base_de_Connaissances_et_Prompt_Chatbot.docx"
-                download="PROSPECTIZI_Base_de_Connaissances_et_Prompt_Chatbot.docx"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center gap-2 shadow-lg transition-all"
-              >
-                <Download className="w-4 h-4" />
-                <span>Télécharger la Base de Connaissances &amp; Prompt IA (.DOCX)</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* TAB 6: BASE DE CONNAISSANCES & CHATBOT IA ÉDITABLE */}
-      {activeTab === 'knowledge' && (
+      {/* TAB 5: BASE DE CONNAISSANCES & CHATBOT IA ÉDITABLE (SUPERADMIN UNIQUEMENT) */}
+      {user.email === 'dossou1992@gmail.com' && user.isSuperadminMode && activeTab === 'knowledge' && (
         <form onSubmit={handleSaveKnowledgeBase} className="bg-dark-900 border-2 border-purple-500/40 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
           <div className="border-b border-dark-700 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>

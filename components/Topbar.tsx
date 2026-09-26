@@ -12,7 +12,15 @@ interface TopbarProps {
 }
 
 export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleMobileMenu }: TopbarProps) {
-  const { user, subscription, toggleSuperadminMode, setShowUpgradeModal, isSubscriptionExpired, setFeedbackModalOpen } = useStore();
+  const { 
+    user, 
+    subscription, 
+    toggleSuperadminMode, 
+    setShowUpgradeModal, 
+    isSubscriptionExpired, 
+    setFeedbackModalOpen,
+    isFeedbackCollectionActive
+  } = useStore();
 
   const isBypass = user.isSuperadminMode;
   const totalAllowed = subscription.prospects_quota + subscription.bonus_prospects;
@@ -81,15 +89,17 @@ export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleM
 
       {/* Quota & Quick Actions */}
       <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-        {/* Real User Feedback Trigger */}
-        <button
-          onClick={() => setFeedbackModalOpen(true)}
-          className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold py-1 px-2.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border border-amber-500/40 transition-all shadow-sm"
-          title="Partagez votre avis ou post LinkedIn pour débloquer +3 prospects offerts après vérification"
-        >
-          <Star className="w-3 h-3 fill-amber-400" />
-          <span>⭐ Avis Utilisateur Réel (+3)</span>
-        </button>
+        {/* Real User Feedback Trigger - Visible only when active in Admin */}
+        {isFeedbackCollectionActive && (
+          <button
+            onClick={() => setFeedbackModalOpen(true)}
+            className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold py-1 px-2.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border border-amber-500/40 transition-all shadow-sm"
+            title="Partagez votre avis ou post LinkedIn pour débloquer +3 prospects offerts après vérification"
+          >
+            <Star className="w-3 h-3 fill-amber-400" />
+            <span>⭐ Avis Utilisateur Réel (+3)</span>
+          </button>
+        )}
 
         {/* Loom Bonus Trigger */}
         <button
