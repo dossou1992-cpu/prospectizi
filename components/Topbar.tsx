@@ -15,6 +15,7 @@ export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleM
   const { 
     user, 
     subscription, 
+    userSettings,
     toggleSuperadminMode, 
     setShowUpgradeModal, 
     isSubscriptionExpired, 
@@ -26,6 +27,19 @@ export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleM
   const totalAllowed = subscription.prospects_quota + subscription.bonus_prospects;
   const remaining = Math.max(0, totalAllowed - subscription.prospects_used);
   const percentage = Math.min(100, Math.round((subscription.prospects_used / totalAllowed) * 100));
+
+  const daysUntilExpiry = subscription.current_period_end
+    ? Math.ceil((new Date(subscription.current_period_end).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+    : 30;
+
+  const showInAppExpiryAlert = 
+    !isBypass && 
+    !isSubscriptionExpired && 
+    subscription.plan_type !== 'DECOUVERTE' &&
+    userSettings.site_notifications &&
+    (userSettings.notify_channel === 'in_app' || userSettings.notify_channel === 'both') &&
+    daysUntilExpiry <= userSettings.notify_days_before &&
+    daysUntilExpiry >= 0;
 
   const renewDate = subscription.current_period_end 
     ? new Date(subscription.current_period_end).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })
@@ -63,6 +77,18 @@ export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleM
             <span className="text-[9px] bg-cyan/15 text-cyan border border-cyan/30 px-1.5 py-0.5 rounded-full font-bold shrink-0">
               PLAN {subscription.plan_type}
             </span>
+          )}
+
+          {/* In-App Subscription Expiry Alert Badge (Notification sur le Site) */}
+          {showInAppExpiryAlert && (
+            <button
+              onClick={() => setShowUpgradeModal(true)}
+              className="text-[10px] bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 shrink-0 animate-pulse transition-all shadow-sm"
+              title="Alerte Notification Site : Cliquez pour renouveler votre abonnement avant l'échéance"
+            >
+              <Bell className="w-2.5 h-2.5 text-amber-400" />
+              <span>Alerte Site : Échéance dans {daysUntilExpiry}j</span>
+            </button>
           )}
 
           {/* Subscription Renewal Date Indicator */}

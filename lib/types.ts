@@ -68,9 +68,9 @@ export interface AvatarProfile {
 
 export interface UserSettings {
   notify_days_before: number; // e.g. 5 days before expiry
-  notify_channel: 'email' | 'whatsapp' | 'both';
+  notify_channel: 'email' | 'in_app' | 'both';
   email_notifications: boolean;
-  whatsapp_notifications: boolean;
+  site_notifications: boolean;
   phone_number: string;
 }
 

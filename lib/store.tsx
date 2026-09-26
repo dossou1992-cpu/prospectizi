@@ -117,7 +117,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     notify_days_before: 3,
     notify_channel: 'both',
     email_notifications: true,
-    whatsapp_notifications: true,
+    site_notifications: true,
     phone_number: "+228 90 12 34 56",
   });
 

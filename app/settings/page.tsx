@@ -50,7 +50,7 @@ export default function SettingsPage() {
   const [notifyDays, setNotifyDays] = useState(userSettings.notify_days_before);
   const [notifyChannel, setNotifyChannel] = useState(userSettings.notify_channel);
   const [emailNotifs, setEmailNotifs] = useState(userSettings.email_notifications);
-  const [whatsappNotifs, setWhatsappNotifs] = useState(userSettings.whatsapp_notifications);
+  const [siteNotifs, setSiteNotifs] = useState(userSettings.site_notifications);
 
   // Knowledge base states
   const [kbSystemPrompt, setKbSystemPrompt] = useState(knowledgeBase.systemPrompt);
@@ -91,7 +91,7 @@ export default function SettingsPage() {
       notify_days_before: Number(notifyDays),
       notify_channel: notifyChannel,
       email_notifications: emailNotifs,
-      whatsapp_notifications: whatsappNotifs,
+      site_notifications: siteNotifs,
     });
   };
 
@@ -390,20 +390,22 @@ export default function SettingsPage() {
                   }`}
                 >
                   <Mail className="w-4 h-4 text-cyan mb-1.5" />
-                  <span>Email Uniquement</span>
+                  <span className="font-bold block">Email Uniquement</span>
+                  <span className="text-[10px] text-slate-400">Préavis envoyé par email</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setNotifyChannel('whatsapp')}
+                  onClick={() => setNotifyChannel('in_app')}
                   className={`p-3 rounded-xl border text-left text-xs transition-all ${
-                    notifyChannel === 'whatsapp'
+                    notifyChannel === 'in_app'
                       ? 'bg-cyan/15 border-cyan text-white shadow-cyan-border font-bold'
                       : 'bg-dark-800 border-dark-700 text-slate-400 hover:text-white'
                   }`}
                 >
-                  <Smartphone className="w-4 h-4 text-emerald-400 mb-1.5" />
-                  <span>WhatsApp Uniquement</span>
+                  <Bell className="w-4 h-4 text-amber-400 mb-1.5" />
+                  <span className="font-bold block">Notification sur le Site</span>
+                  <span className="text-[10px] text-slate-400">Alerte directe dans l&apos;application</span>
                 </button>
 
                 <button
@@ -415,11 +417,12 @@ export default function SettingsPage() {
                       : 'bg-dark-800 border-dark-700 text-slate-400 hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-1 mb-1.5">
+                  <div className="flex items-center gap-1.5 mb-1.5">
                     <Mail className="w-3.5 h-3.5 text-cyan" />
-                    <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                    <Bell className="w-3.5 h-3.5 text-amber-400" />
                   </div>
-                  <span>Les Deux (Email + WhatsApp)</span>
+                  <span className="font-bold block">Les Deux</span>
+                  <span className="text-[10px] text-slate-400">Email + Notification sur le site</span>
                 </button>
               </div>
             </div>
@@ -439,11 +442,11 @@ export default function SettingsPage() {
               <label className="flex items-center gap-2.5 cursor-pointer text-xs text-slate-300">
                 <input
                   type="checkbox"
-                  checked={whatsappNotifs}
-                  onChange={(e) => setWhatsappNotifs(e.target.checked)}
+                  checked={siteNotifs}
+                  onChange={(e) => setSiteNotifs(e.target.checked)}
                   className="rounded border-dark-600 text-cyan focus:ring-cyan w-4 h-4"
                 />
-                <span>Recevoir une notification directe WhatsApp lorsqu&apos;un crédit de prospect bonus Loom est validé</span>
+                <span>Afficher une notification directe et bannière d&apos;alerte sur le site lorsque mon abonnement approche de son terme ou qu&apos;un bonus est validé</span>
               </label>
             </div>
           </div>
