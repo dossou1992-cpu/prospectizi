@@ -46,68 +46,245 @@ export default function SupportChatWidget() {
     }
   }, [messages, isOpen]);
 
-  // Base de connaissances Notion dynamique (Le "Cerveau" IA)
+  // Base de connaissances Notion dynamique & Moteur Conversationnel IA
   const answerFromKnowledgeBase = (query: string): { text: string; isEscalation?: boolean; whatsappUrl?: string } => {
-    const q = query.toLowerCase();
+    const q = query.toLowerCase().trim();
 
-    // RÈGLE D'ESCALATION 80/20 : Problème de paiement, débit, remboursement, bug critique
+    // 1. SALUTATIONS & POLITESSE
+    if (
+      q === 'bonjour' || 
+      q === 'bonsoir' || 
+      q === 'salut' || 
+      q === 'hello' || 
+      q === 'coucou' || 
+      q === 'hey' || 
+      q.startsWith('bonjour') || 
+      q.startsWith('bonsoir') || 
+      q.startsWith('salut') || 
+      q.startsWith('hello') ||
+      q.includes('ca va') ||
+      q.includes('ça va') ||
+      q.includes('comment vas-tu') ||
+      q.includes('comment allez-vous')
+    ) {
+      return {
+        text: "Bonjour ! Ravi de vous accueillir sur Prospectizi 👋 Slogan : \"Trouvez & contactez mieux !\".\n\nComment puis-je vous aider aujourd'hui ? Je peux répondre à toutes vos questions sur :\n• Le fonctionnement de la recherche et de l'Avatar Client\n• Vos quotas de prospects (Découverte, PRO, AGENCE)\n• Les moyens de paiement (Carte Bancaire & Mobile Money)\n• Le déblocage de +3 prospects bonus offerts via un avis Loom ou LinkedIn !"
+      };
+    }
+
+    // 2. PROBLÈMES DE CONNEXION / COMPTE / MOT DE PASSE / ACCÈS
+    if (
+      q.includes('connexion') || 
+      q.includes('connecter') || 
+      q.includes('connecte') || 
+      q.includes('mot de passe') || 
+      q.includes('login') || 
+      q.includes('accès') || 
+      q.includes('acces') || 
+      q.includes('compte') || 
+      q.includes('inscription') || 
+      q.includes('inscrire') || 
+      q.includes('identifiant') || 
+      q.includes('reconnecter')
+    ) {
+      return {
+        text: "Pour vous connecter à votre espace Prospectizi :\n1. Cliquez sur le bouton \"Connexion\" en haut à droite de l'écran.\n2. Choisissez votre mode préféré : soit en 1 clic avec votre compte Google, soit avec votre E-mail et votre mot de passe.\n\n💡 Si vous avez oublié votre mot de passe ou si vous rencontrez un blocage sur votre session, vous pouvez cliquer sur \"Mot de passe oublié ?\" ou contacter notre support direct sur WhatsApp avec votre adresse e-mail pour un rétablissement immédiat !",
+        whatsappUrl: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Bonjour, j'ai un problème de connexion sur Prospectizi avec mon compte : ${query}`)}`,
+        isEscalation: false
+      };
+    }
+
+    // 3. RÈGLE D'ESCALATION 80/20 : PAIEMENT DÉBITÉ, REMBOURSEMENT, BUG TECHNIQUE BLOQUANT
     if (
       q.includes('remboursement') || 
+      q.includes('rembourser') || 
       q.includes('débité') || 
+      q.includes('debite') || 
       q.includes('double débit') || 
       q.includes('bloqué') || 
+      q.includes('bloque') || 
       q.includes('paiement échoué') || 
       q.includes('non activé') || 
+      q.includes('pas activé') || 
       q.includes('bug') || 
-      q.includes('erreur technique')
+      q.includes('erreur') || 
+      q.includes('panne') || 
+      q.includes('urgent')
     ) {
-      const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Bonjour, j'ai besoin d'aide urgente sur Prospectizi concernant : ${query}`)}`;
+      const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Bonjour, j'ai besoin d'une prise en charge prioritaire sur Prospectizi : ${query}`)}`;
       return {
-        text: "Pour traiter votre demande (paiement, activation ou bug technique) en toute sécurité, notre support humain prend immédiatement le relais sur WhatsApp. Vous pouvez également enregistrer une courte vidéo d'écran de 30 secondes via Loom pour nous montrer le problème.",
+        text: "Pour les demandes prioritaires (compte débité non activé, demande de remboursement ou anomalie technique), notre support humain vous prend en charge directement sur WhatsApp en moins de 15 minutes !\n\nVous pouvez nous envoyer la capture de votre SMS de débit ou un court enregistrement d'écran Loom (loom.com).",
         isEscalation: true,
         whatsappUrl: waUrl
       };
     }
 
-    // 1. Qu'est-ce que Prospectizi & Quotas
-    if (q.includes('prospectizi') || q.includes('quota') || q.includes('crédit') || q.includes('combien')) {
+    // 4. COMMENT ÇA MARCHE / DÉMARRAGE RAPIDE
+    if (
+      q.includes('comment ça marche') || 
+      q.includes('comment ca marche') || 
+      q.includes('comment marche') || 
+      q.includes('démarrer') || 
+      q.includes('demarrer') || 
+      q.includes('commencer') || 
+      q.includes('fonctionne') || 
+      q.includes('guide') || 
+      q.includes('tuto') || 
+      q.includes('aide')
+    ) {
       return {
-        text: knowledgeBase.faqSummary || "Prospectizi est un SaaS B2B conçu pour trouver des entreprises ciblées, identifier leurs failles réelles et rédiger des messages de vente personnalisés. Quotas : 3 prospects sur Découverte (1 €), 90/mois sur PRO (29 €), et 450/mois sur AGENCE (59 €)."
+        text: "Prospectizi propulse votre prospection B2B en 3 étapes clés :\n\n1. **Avatar Client (`/avatar`)** : Vous configurez votre offre, votre bénéfice majeur et votre cible pour calibrer l'IA.\n2. **Recherche Ciblée (`/prospects`)** : Vous tapez le métier recherché (ex: Dentiste, Agence Web, IA Engineering) et la ville. L'IA extrait des entreprises réelles et détecte leurs failles concrètes.\n3. **Messages Prêts à l'Envoi** : L'IA rédige une séquence complète de 5 messages ultra-personnalisés (Premier contact, Offre de valeur, 3 relances) à envoyer en 1 clic par WhatsApp, Email ou LinkedIn !"
       };
     }
 
-    // 2. Moyens de paiement (Lemon Squeezy & Flutterwave)
-    if (q.includes('payer') || q.includes('carte') || q.includes('mobile money') || q.includes('wave') || q.includes('t-money') || q.includes('moov') || q.includes('mtn') || q.includes('orange')) {
+    // 5. BONUS +3 PROSPECTS / AVIS LOOM / LINKEDIN
+    if (
+      q.includes('bonus') || 
+      q.includes('avis') || 
+      q.includes('+3') || 
+      q.includes('loom') || 
+      q.includes('linkedin') || 
+      q.includes('témoignage') || 
+      q.includes('temoignage') || 
+      q.includes('gratuit') || 
+      q.includes('offert')
+    ) {
       return {
-        text: knowledgeBase.paymentProcedures || "Deux modes de paiement sécurisés : Carte Bancaire internationale via Lemon Squeezy (MoR, factures) et Mobile Money (T-Money, Moov, Orange, MTN, Wave) via Flutterwave sans carte requise."
+        text: "⭐ Vous pouvez obtenir **+3 prospects qualifiés bonus gratuits** !\n\nCliquez sur le bouton **\"⭐ Avis Utilisateur Réel (+3)\"** dans la barre supérieure :\n• **Option 1 : Vidéo Loom (60 secondes)** partageant votre expérience sur l'outil.\n• **Option 2 : Post d'avis sur LinkedIn** (copiez notre modèle et collez l'URL de votre publication).\n\nDès validation par notre équipe d'administration, vos 3 crédits bonus sont immédiatement ajoutés à votre compte !"
       };
     }
 
-    // 3. Scraping & Transparence
-    if (q.includes('scraping') || q.includes('apify') || q.includes('données') || q.includes('source') || q.includes('google maps')) {
+    // 6. QUOTAS, CRÉDITS & PLANS TARIFAIRES
+    if (
+      q.includes('quota') || 
+      q.includes('crédit') || 
+      q.includes('credit') || 
+      q.includes('combien') || 
+      q.includes('tarif') || 
+      q.includes('prix') || 
+      q.includes('forfait') || 
+      q.includes('abonnement') || 
+      q.includes('formule') || 
+      q.includes('pro') || 
+      q.includes('agence') || 
+      q.includes('découverte')
+    ) {
       return {
-        text: knowledgeBase.apifyTransparency || "Les données proviennent de sources professionnelles et publiques (Google Maps, registres légaux). Garantie Anti-Gaspillage : remboursement automatique de crédit en cas de contact inexploitable."
+        text: "1 prospect extrait = 1 crédit de prospection.\n\nNos formules disponibles sans engagement :\n• **Formule Découverte (1 €)** : 3 prospects qualifiés complets pour tester l'outil.\n• **Formule PRO (29 € HT/mois)** : 90 prospects qualifiés par mois (3/jour ouvré) + Séquences IA complètes.\n• **Formule AGENCE (59 € HT/mois)** : 450 prospects qualifiés par mois (15/jour ouvré) + Mode Multi-Comptes / Équipe.\n\nVos quotas sont renouvelés chaque mois à la date d'anniversaire."
       };
     }
 
-    // 4. Tutoriels & Avatar
-    if (q.includes('avatar') || q.includes('métier') || q.includes('recherche') || q.includes('relance')) {
+    // 7. MOYENS DE PAIEMENT (LEMON SQUEEZY & FLUTTERWAVE)
+    if (
+      q.includes('payer') || 
+      q.includes('paiement') || 
+      q.includes('carte') || 
+      q.includes('cb') || 
+      q.includes('visa') || 
+      q.includes('mastercard') || 
+      q.includes('mobile money') || 
+      q.includes('t-money') || 
+      q.includes('tmoney') || 
+      q.includes('moov') || 
+      q.includes('wave') || 
+      q.includes('mtn') || 
+      q.includes('orange') || 
+      q.includes('facture')
+    ) {
       return {
-        text: knowledgeBase.tutorialsSummary || "Renseignez votre Avatar Client pour que l'IA calibre les failles et le ton des messages. Lancez une recherche par ville et secteur, puis utilisez les séquences de relance WhatsApp en 1 clic."
+        text: "Prospectizi accepte deux moyens de paiement 100% sécurisés :\n\n1. **Carte Bancaire Internationale via Lemon Squeezy** : Visa, Mastercard, factures avec TVA automatique transmise par e-mail.\n2. **Mobile Money Afrique via Flutterwave** : T-Money (Togo), Moov Africa, Wave (Sénégal, Côte d'Ivoire), MTN MoMo, Orange Money, sans aucune carte bancaire requise !\n\nL'activation du forfait est instantanée après confirmation de votre opérateur."
       };
     }
 
-    // 5. Tarifs & Annulation
-    if (q.includes('tarif') || q.includes('prix') || q.includes('abonnement') || q.includes('annuler') || q.includes('résilier')) {
+    // 8. AVATAR CLIENT & PERSONNALISATION
+    if (
+      q.includes('avatar') || 
+      q.includes('métier') || 
+      q.includes('metier') || 
+      q.includes('offre') || 
+      q.includes('cible') || 
+      q.includes('ton') || 
+      q.includes('personnalisation')
+    ) {
       return {
-        text: knowledgeBase.pricingRules || "Offres sans engagement, résiliables en 1 clic. Découverte 1 €, PRO 29 €/mois, AGENCE 59 €/mois. Verrouillage temporaire après 30 jours jusqu'au renouvellement pour préserver vos données."
+        text: "L'Avatar Client (`/avatar`) calibre la pertinence de l'IA :\n• Vous pouvez saisir n'importe quel métier, y compris sur-mesure (ex: \"IA Engineering\", \"Consultant Growth\", \"Agence Vidéo TikTok\").\n• Définissez votre bénéfice majeur et votre ton préféré (professionnel, chaleureux, persuasif, direct).\n• L'IA utilisera ces informations pour identifier les failles spécifiques des entreprises trouvées et formuler l'offre idéale !"
       };
     }
 
-    // Réponse par défaut avec proposition de contact WhatsApp
-    const defaultWaUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Bonjour, j'ai une question sur Prospectizi : ${query}`)}`;
+    // 9. EXTRACTION, DONNÉES & SCRAPING (ANTI-GASPILLAGE)
+    if (
+      q.includes('scraping') || 
+      q.includes('données') || 
+      q.includes('donnees') || 
+      q.includes('source') || 
+      q.includes('google maps') || 
+      q.includes('apify') || 
+      q.includes('garantie') || 
+      q.includes('injoignable') || 
+      q.includes('faux')
+    ) {
+      return {
+        text: "Nos données de prospection sont 100% professionnelles, publiques et conformes au RGPD B2B (Google Maps et annuaires d'entreprises officiels).\n\n🛡️ **Garantie Anti-Gaspillage** : Si un numéro de téléphone ou un e-mail extrait s'avère non joignable, cliquez sur \"Signaler un contact erroné\" sur la fiche du prospect. Votre crédit vous est automatiquement recrédité sans formalité !"
+      };
+    }
+
+    // 10. EXPORT CSV & DONNÉES RGPD
+    if (
+      q.includes('export') || 
+      q.includes('csv') || 
+      q.includes('excel') || 
+      q.includes('télécharger') || 
+      q.includes('telecharger')
+    ) {
+      return {
+        text: "Vous pouvez exporter tous vos prospects et messages au format CSV (compatible Excel et Google Sheets) en un clic !\n\nCliquez sur le bouton **\"Exporter en CSV\"** en haut à droite de la page Prospects (`/prospects`) ou dans les Paramètres (`/settings`). L'export est inclus dans tous les forfaits PRO et AGENCE."
+      };
+    }
+
+    // 11. A/B TESTING & AUDIT
+    if (
+      q.includes('a/b') || 
+      q.includes('ab test') || 
+      q.includes('variante') || 
+      q.includes('audit') || 
+      q.includes('conversion') || 
+      q.includes('statistiques')
+    ) {
+      return {
+        text: "Dans la page Audit (`/audit`), activez l'A/B Testing en 1 clic. Vous pourrez choisir d'envoyer la **Variante A** ou la **Variante B** à chaque prospect. Après plusieurs jours de tests réels, l'IA compare les taux de réponses et vous recommande la variante gagnante à appliquer définitivement !"
+      };
+    }
+
+    // 12. ÉQUIPE & MULTI-COMPTES
+    if (
+      q.includes('équipe') || 
+      q.includes('equipe') || 
+      q.includes('collaborateur') || 
+      q.includes('inviter') || 
+      q.includes('membre')
+    ) {
+      return {
+        text: "La gestion d'équipe est disponible avec la formule **AGENCE (59 €/mois)**. Rendez-vous dans l'onglet Équipe (`/team`) pour inviter vos collaborateurs par e-mail en leur attribuant des rôles (Admin, Éditeur, Lecteur)."
+      };
+    }
+
+    // 13. QUI ÊTES-VOUS / SLOGAN / IDENTITÉ
+    if (
+      q.includes('qui es-tu') || 
+      q.includes('qui êtes-vous') || 
+      q.includes('qui est-ce') || 
+      q.includes('slogan') || 
+      q.includes('présente-toi')
+    ) {
+      return {
+        text: "Je suis l'assistant support virtuel officiel de **Prospectizi** ! Notre mission : vous aider à prospecter plus intelligemment et signer plus de clients. Slogan officiel : \"Trouvez & contactez mieux !\" 🎯"
+      };
+    }
+
+    // RÉPONSE ENRICHIE PAR DÉFAUT + RELAIS WHATSAPP SIMPLE
+    const defaultWaUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Bonjour, j'ai une question spécifique sur Prospectizi : ${query}`)}`;
     return {
-      text: "Je n'ai pas la réponse exacte dans ma base de connaissances actuelle pour cette question. Notre équipe est disponible immédiatement sur WhatsApp pour vous répondre personnellement !",
+      text: `J'ai bien noté votre message concernant "${query.length > 50 ? query.substring(0, 50) + '...' : query}".\n\nPour vous donner la réponse la plus précise possible, sur quel sujet porte votre besoin ?\n1. 🔍 **Recherche de prospects & Avatar Client**\n2. 💳 **Paiement, factures ou renouvellement**\n3. 🔑 **Problème de connexion ou compte**\n4. ⭐ **Crédits bonus offerts (+3) via avis Loom ou LinkedIn**\n\nSi vous préférez échanger directement avec un conseiller humain, cliquez sur le bouton ci-dessous pour ouvrir une conversation WhatsApp prioritaire !`,
       isEscalation: true,
       whatsappUrl: defaultWaUrl
     };
@@ -191,7 +368,31 @@ export default function SupportChatWidget() {
           {/* Quick chips FAQ */}
           <div className="p-2 bg-dark-900 border-b border-dark-800 flex items-center gap-1.5 overflow-x-auto text-[10px] select-none">
             <button
-              onClick={() => handleSendMessage("Comment fonctionnent les crédits ?")}
+              onClick={() => handleSendMessage("Bonjour !")}
+              className="px-2 py-1 rounded-md bg-dark-800 text-slate-300 hover:text-cyan border border-dark-700 whitespace-nowrap transition-colors"
+            >
+              👋 Bonjour
+            </button>
+            <button
+              onClick={() => handleSendMessage("J'ai un problème de connexion")}
+              className="px-2 py-1 rounded-md bg-dark-800 text-slate-300 hover:text-cyan border border-dark-700 whitespace-nowrap transition-colors"
+            >
+              🔑 Connexion
+            </button>
+            <button
+              onClick={() => handleSendMessage("Comment ça marche ?")}
+              className="px-2 py-1 rounded-md bg-dark-800 text-slate-300 hover:text-cyan border border-dark-700 whitespace-nowrap transition-colors"
+            >
+              🚀 Comment ça marche ?
+            </button>
+            <button
+              onClick={() => handleSendMessage("Comment débloquer les +3 prospects bonus offerts ?")}
+              className="px-2 py-1 rounded-md bg-dark-800 text-slate-300 hover:text-cyan border border-dark-700 whitespace-nowrap transition-colors"
+            >
+              ⭐ +3 Bonus offerts
+            </button>
+            <button
+              onClick={() => handleSendMessage("Comment fonctionnent les quotas et crédits ?")}
               className="px-2 py-1 rounded-md bg-dark-800 text-slate-300 hover:text-cyan border border-dark-700 whitespace-nowrap transition-colors"
             >
               📊 Quotas &amp; Crédits
@@ -201,12 +402,6 @@ export default function SupportChatWidget() {
               className="px-2 py-1 rounded-md bg-dark-800 text-slate-300 hover:text-cyan border border-dark-700 whitespace-nowrap transition-colors"
             >
               📱 Mobile Money
-            </button>
-            <button
-              onClick={() => handleSendMessage("D'où viennent les données de scraping ?")}
-              className="px-2 py-1 rounded-md bg-dark-800 text-slate-300 hover:text-cyan border border-dark-700 whitespace-nowrap transition-colors"
-            >
-              🔍 Origine des données
             </button>
           </div>
 
