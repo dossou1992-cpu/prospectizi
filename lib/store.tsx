@@ -67,6 +67,8 @@ interface StoreContextType {
   // Modals & UI
   showUpgradeModal: boolean;
   setShowUpgradeModal: (show: boolean) => void;
+  showLegalModal: boolean;
+  setShowLegalModal: (show: boolean) => void;
   isFeedbackModalOpen: boolean;
   setFeedbackModalOpen: (open: boolean) => void;
   isFeedbackCollectionActive: boolean;
@@ -140,6 +142,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showLegalModal, setShowLegalModal] = useState(false);
   const [isFeedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [isFeedbackCollectionActive, setIsFeedbackCollectionActive] = useState<boolean>(true);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -822,6 +825,8 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       searchProspects,
       showUpgradeModal,
       setShowUpgradeModal,
+      showLegalModal,
+      setShowLegalModal,
       isFeedbackModalOpen,
       setFeedbackModalOpen,
       isFeedbackCollectionActive,

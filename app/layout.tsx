@@ -28,7 +28,6 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-dark-950 text-slate-100 font-sans">
         {children}
         <AuthModal />
-        <LegalModal />
         <SupportChatWidget />
         <Toast />
       </div>

@@ -10,17 +10,35 @@ interface LegalModalProps {
 }
 
 export default function LegalModal({ isOpen, onClose }: LegalModalProps) {
+  const { showLegalModal, setShowLegalModal } = useStore();
   const [activeTab, setActiveTab] = useState<'mentions' | 'cgv' | 'rgpd'>('mentions');
 
-  if (isOpen === false) return null;
+  // Determine if modal is open: prop takes precedence if defined, otherwise store
+  const isModalOpen = isOpen !== undefined ? isOpen : showLegalModal;
+
+  if (!isModalOpen) return null;
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    }
+    setShowLegalModal(false);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-dark-900 border border-cyan/40 rounded-2xl max-w-4xl w-full p-6 md:p-8 relative shadow-cyan-glow-lg max-h-[92vh] flex flex-col">
+    <div 
+      onClick={handleClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn"
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="bg-dark-900 border border-cyan/40 rounded-2xl max-w-4xl w-full p-6 md:p-8 relative shadow-cyan-glow-lg max-h-[92vh] flex flex-col"
+      >
         {/* Close Button */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute top-5 right-5 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-dark-700 transition-colors"
+          title="Fermer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -235,8 +253,8 @@ export default function LegalModal({ isOpen, onClose }: LegalModalProps) {
         <div className="border-t border-dark-700 pt-4 mt-4 flex items-center justify-between text-xs text-slate-400">
           <span>Dernière mise à jour légale : Septembre 2026</span>
           <button
-            onClick={onClose}
-            className="py-2 px-5 rounded-xl font-bold bg-cyan hover:bg-cyan-intense text-dark-950 transition-all shadow-cyan-glow"
+            onClick={handleClose}
+            className="py-2 px-5 rounded-xl font-bold bg-cyan hover:bg-cyan-intense text-dark-950 transition-all shadow-cyan-glow hover:scale-105"
           >
             J&apos;ai compris et j&apos;accepte
           </button>

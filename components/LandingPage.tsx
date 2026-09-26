@@ -440,7 +440,7 @@ export default function LandingPage() {
 
       {/* Modales */}
       <AuthModal />
-      <LegalModal />
+      <LegalModal isOpen={legalOpen} onClose={() => setLegalOpen(false)} />
     </div>
   );
 }
