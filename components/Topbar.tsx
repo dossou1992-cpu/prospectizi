@@ -81,14 +81,14 @@ export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleM
 
       {/* Quota & Quick Actions */}
       <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-        {/* Beta Feedback Trigger */}
+        {/* Real User Feedback Trigger */}
         <button
           onClick={() => setFeedbackModalOpen(true)}
-          className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold py-1 px-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all shadow-sm"
-          title="Donnez votre avis sur l'offre Découverte et débloquez +1 prospect offert"
+          className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold py-1 px-2.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border border-amber-500/40 transition-all shadow-sm"
+          title="Partagez votre avis ou post LinkedIn pour débloquer +3 prospects offerts après vérification"
         >
           <Star className="w-3 h-3 fill-amber-400" />
-          <span>Avis Bêta (+1)</span>
+          <span>⭐ Avis Utilisateur Réel (+3)</span>
         </button>
 
         {/* Loom Bonus Trigger */}

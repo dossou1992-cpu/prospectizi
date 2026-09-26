@@ -113,9 +113,22 @@ export interface Testimonial {
   user_email: string;
   user_name: string;
   loom_url: string;
+  type?: 'loom' | 'linkedin';
+  review_text?: string;
+  rating?: number;
   commercial_consent: boolean;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
+}
+
+export interface KnowledgeBaseData {
+  systemPrompt: string;
+  faqSummary: string;
+  tutorialsSummary: string;
+  pricingRules: string;
+  paymentProcedures: string;
+  apifyTransparency: string;
+  whatsappContactNumber: string;
 }
 
 export interface TeamMember {

@@ -11,7 +11,8 @@ import {
   ProspectStatus, 
   Channel, 
   PlanType, 
-  UserSettings 
+  UserSettings,
+  KnowledgeBaseData 
 } from './types';
 import { initialAvatar, initialSubscription, initialProspects, initialTestimonials, initialTeamMembers, initialAuditReport } from './mockData';
 import confetti from 'canvas-confetti';
@@ -68,6 +69,9 @@ interface StoreContextType {
   setShowUpgradeModal: (show: boolean) => void;
   isFeedbackModalOpen: boolean;
   setFeedbackModalOpen: (open: boolean) => void;
+  knowledgeBase: KnowledgeBaseData;
+  updateKnowledgeBase: (data: Partial<KnowledgeBaseData>) => void;
+  submitLinkedInFeedback: (params: { linkedinUrl: string; reviewText: string; rating: number; consent: boolean }) => void;
   auditReport: AuditReport;
   generateAuditReport: () => Promise<{ success: boolean; message: string }>;
   toggleABTest: (active: boolean) => void;
@@ -136,6 +140,16 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   const [isFeedbackModalOpen, setFeedbackModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  const [knowledgeBase, setKnowledgeBase] = useState<KnowledgeBaseData>({
+    systemPrompt: `Tu es l'assistant support virtuel officiel de PROSPECTIZI. Slogan : "Trouvez & contactez mieux !". Ton rôle : Répondre aux questions des utilisateurs en t'appuyant exclusivement sur la base de connaissances. Règle des 80/20 : Résous 80% des questions courantes, et pour les 20% de cas sensibles (débit sans activation, problème de paiement, remboursement, bug technique), propose immédiatement le lien direct vers le support WhatsApp (+228 90 12 34 56).`,
+    faqSummary: `1 prospect extrait = 1 crédit. Découverte (1 €) : 3 prospects. PRO (29 €) : 90/mois. AGENCE (59 €) : 450/mois. Export CSV disponible en 1 clic.`,
+    tutorialsSummary: `Avatar Client pour calibrer l'IA. Recherche ciblée par secteur et ville. Séquence complète de 5 messages de relance avec WhatsApp direct.`,
+    pricingRules: `Offres sans engagement, résiliables en 1 clic. Suspension temporaire des nouveaux crédits au bout de 30 jours jusqu'au renouvellement.`,
+    paymentProcedures: `Carte Bancaire internationale via Lemon Squeezy (MoR, factures TVA). Mobile Money via Flutterwave (T-Money, Moov, Wave, MTN, Orange). Activation prioritaire par WhatsApp en cas de retard de confirmation.`,
+    apifyTransparency: `Données 100% professionnelles et publiques (Google Maps, registres légaux). Garantie Anti-Gaspillage : remboursement automatique de crédit en cas de contact inexploitable.`,
+    whatsappContactNumber: `22890123456`,
+  });
+
   // Check if subscription has expired
   const isSubscriptionExpired = 
     subscription.status === 'expired' || 
@@ -170,6 +184,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
 
       const savedTeam = localStorage.getItem('prospectizi_team');
       if (savedTeam) setTeamMembers(JSON.parse(savedTeam));
+
+      const savedKB = localStorage.getItem('prospectizi_kb');
+      if (savedKB) setKnowledgeBase(JSON.parse(savedKB));
     } catch (e) {
       console.error("LocalStorage load error:", e);
     }
@@ -189,6 +206,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       localStorage.setItem('prospectizi_audit', JSON.stringify(auditReport));
       localStorage.setItem('prospectizi_testimonials', JSON.stringify(testimonials));
       localStorage.setItem('prospectizi_team', JSON.stringify(teamMembers));
+      localStorage.setItem('prospectizi_kb', JSON.stringify(knowledgeBase));
     } catch (e) {
       console.error("LocalStorage save error:", e);
     }
@@ -644,6 +662,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       user_email: user.email,
       user_name: user.full_name,
       loom_url: loomUrl,
+      type: "loom",
       commercial_consent: commercialConsent,
       status: "pending",
       created_at: new Date().toISOString().replace('T', ' ').substring(0, 16),
@@ -652,19 +671,48 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     showNotification("🎥 Vidéo Loom envoyée avec succès ! Le Superadmin la validera pour créditer vos +3 prospects bonus.");
   };
 
+  const submitLinkedInFeedback = (params: { linkedinUrl: string; reviewText: string; rating: number; consent: boolean }) => {
+    const newTesti: Testimonial = {
+      id: "linkedin-" + Date.now(),
+      user_email: user.email,
+      user_name: user.full_name,
+      loom_url: params.linkedinUrl,
+      type: "linkedin",
+      review_text: params.reviewText,
+      rating: params.rating,
+      commercial_consent: params.consent,
+      status: "pending",
+      created_at: new Date().toISOString().replace('T', ' ').substring(0, 16),
+    };
+    setTestimonials(prev => [newTesti, ...prev]);
+    showNotification("🌟 Avis & Post LinkedIn transmis ! Dès validation par l'administrateur, +3 prospects bonus vous seront crédités.");
+  };
+
   const updateTestimonialStatus = (id: string, status: 'approved' | 'rejected') => {
     setTestimonials(prev => prev.map(t => {
       if (t.id === id) {
         if (status === 'approved') {
           addBonusProspects(3);
-          showNotification("👑 Vidéo approuvée ! +3 prospects bonus crédités.");
+          const typeLabel = t.type === 'linkedin' ? "Avis LinkedIn" : "Vidéo Loom";
+          showNotification(`👑 ${typeLabel} validé ! +3 prospects bonus crédités.`);
         } else {
-          showNotification("Vidéo rejetée.");
+          showNotification("Soumission rejetée.");
         }
         return { ...t, status };
       }
       return t;
     }));
+  };
+
+  const updateKnowledgeBase = (data: Partial<KnowledgeBaseData>) => {
+    setKnowledgeBase(prev => {
+      const updated = { ...prev, ...data };
+      try {
+        localStorage.setItem('prospectizi_kb', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+    showNotification("💾 Base de Connaissances & Prompt Chatbot IA mis à jour avec succès !");
   };
 
   const inviteTeamMember = (email: string, role: 'admin' | 'editor' | 'viewer') => {
@@ -756,6 +804,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       setShowUpgradeModal,
       isFeedbackModalOpen,
       setFeedbackModalOpen,
+      knowledgeBase,
+      updateKnowledgeBase,
+      submitLinkedInFeedback,
       auditReport,
       generateAuditReport,
       toggleABTest,

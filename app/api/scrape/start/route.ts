@@ -1,28 +1,48 @@
 import { NextResponse } from 'next/server';
 
+// Protection Anti-Piratage & Anti-Abus : Rate Limiting en mémoire par IP / Utilisateur
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+
 export async function POST(request: Request) {
   try {
+    // 1. Contrôle Anti-Brute-Force & Rate Limiting (5 requêtes max par 60 secondes)
+    const clientIp = request.headers.get('x-forwarded-for') || 'local_user';
+    const now = Date.now();
+    const rateLimit = rateLimitMap.get(clientIp);
+
+    if (rateLimit && now < rateLimit.resetTime) {
+      if (rateLimit.count >= 5) {
+        return NextResponse.json({ 
+          error: "Trop de requêtes détectées (Rate Limit). Veuillez patienter 60 secondes avant de relancer une recherche." 
+        }, { status: 429 });
+      }
+      rateLimit.count += 1;
+    } else {
+      rateLimitMap.set(clientIp, { count: 1, resetTime: now + 60000 });
+    }
+
     const body = await request.json();
     const { keyword, location, channel, userId, userEmail, maxItems = 3 } = body;
 
+    // 2. Validation & Sanitization strictes (Anti-Injection)
     if (!keyword || !location) {
       return NextResponse.json({ error: "Secteur d'activité et ville obligatoires" }, { status: 400 });
     }
 
+    const cleanKeyword = String(keyword).replace(/[<>{}]/g, '').trim().substring(0, 80);
+    const cleanLocation = String(location).replace(/[<>{}]/g, '').trim().substring(0, 80);
+
     const searchId = `search_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
-    // 1. Configuration stricte pour éviter tout timeout ou boucle infinie :
-    // - timeoutSecs: 120 max (2 minutes max sur Apify)
-    // - maxItems: 3 pour l'offre Découverte (ou selon le plan)
+    // 3. Configuration stricte pour éviter tout timeout ou surconsommation de crédits
     const apifyActorId = process.env.APIFY_ACTOR_ID || "compass~crawler-google-places";
     const apifyToken = process.env.APIFY_TOKEN || "mock_token";
     const webhookReturnUrl = process.env.NEXT_PUBLIC_APP_URL 
       ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/apify`
       : "https://prospectizi.com/api/webhooks/apify";
 
-    console.log(`[Scrape Queue] Démarrage recherche asynchrone: "${keyword}" à "${location}" (${channel}) - Search ID: ${searchId}`);
+    console.log(`[Scrape Secure] Démarrage recherche: "${cleanKeyword}" à "${cleanLocation}" (${channel}) - IP: ${clientIp}`);
 
-    // Si les clés Apify réelles sont présentes, on déclenche l'Actor Apify de manière non-bloquante
     if (process.env.APIFY_TOKEN && process.env.APIFY_TOKEN !== "mock_token") {
       const apifyRunUrl = `https://api.apify.com/v2/acts/${apifyActorId}/runs?token=${apifyToken}&timeout=120`;
       
@@ -30,8 +50,8 @@ export async function POST(request: Request) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          searchStringsArray: [`${keyword} ${location}`],
-          maxCrawledPlacesPerSearch: maxItems,
+          searchStringsArray: [`${cleanKeyword} ${cleanLocation}`],
+          maxCrawledPlacesPerSearch: Math.min(Number(maxItems) || 3, 10),
           language: "fr",
           webhooks: [
             {
@@ -49,15 +69,15 @@ export async function POST(request: Request) {
       }).catch(err => console.error("[Apify Trigger Error]", err));
     }
 
-    // Réponse ultra-rapide à Vercel (< 200ms) pour éviter tout timeout de 10s
+    // Réponse asynchrone instantanée (< 200ms) pour parer au timeout de Vercel
     return NextResponse.json({
       success: true,
       status: "PENDING",
       searchId,
-      keyword,
-      location,
+      keyword: cleanKeyword,
+      location: cleanLocation,
       channel,
-      message: "Scraping lancé en tâche de fond. Le webhook mettra à jour le statut en COMPLETED dès la fin de l'extraction."
+      message: "Extraction asynchrone lancée. Statut initial : PENDING."
     });
 
   } catch (error: any) {

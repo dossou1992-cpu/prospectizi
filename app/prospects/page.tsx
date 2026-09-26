@@ -295,18 +295,18 @@ export default function ProspectsPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-extrabold text-white">Extraction Apify en tâche de fond</h3>
+                  <h3 className="text-sm font-extrabold text-white">Extraction en tâche de fond - Statut : PENDING</h3>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan/15 text-cyan border border-cyan/30 font-bold uppercase tracking-wider animate-pulse">
-                    Statut : PENDING
+                    PENDING
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Robot Apify actif sur Google Places &amp; Web • Timeout strict de 120s max
+                  Robot d&apos;analyse multi-sources actif • Timeout strict de 120s max
                 </p>
               </div>
             </div>
             <span className="text-xs font-mono text-cyan bg-dark-800 px-3 py-1.5 rounded-lg border border-dark-600">
-              Extraction 1 par 1 (File QStash)
+              Extraction 1 par 1 (File Sécurisée)
             </span>
           </div>
 

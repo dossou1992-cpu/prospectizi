@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useStore } from '@/lib/store';
 import { 
   MessageSquare, 
   X, 
@@ -24,6 +25,7 @@ interface ChatMessage {
 }
 
 export default function SupportChatWidget() {
+  const { knowledgeBase } = useStore();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -36,7 +38,7 @@ export default function SupportChatWidget() {
   const [isTyping, setIsTyping] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
-  const whatsappNumber = "22890123456";
+  const whatsappNumber = knowledgeBase.whatsappContactNumber || "22890123456";
 
   useEffect(() => {
     if (isOpen) {
@@ -44,7 +46,7 @@ export default function SupportChatWidget() {
     }
   }, [messages, isOpen]);
 
-  // Base de connaissances Notion intégrée (Le "Cerveau" IA)
+  // Base de connaissances Notion dynamique (Le "Cerveau" IA)
   const answerFromKnowledgeBase = (query: string): { text: string; isEscalation?: boolean; whatsappUrl?: string } => {
     const q = query.toLowerCase();
 
@@ -70,49 +72,42 @@ export default function SupportChatWidget() {
     // 1. Qu'est-ce que Prospectizi & Quotas
     if (q.includes('prospectizi') || q.includes('quota') || q.includes('crédit') || q.includes('combien')) {
       return {
-        text: "Prospectizi est un SaaS B2B conçu pour trouver des entreprises ciblées, identifier leurs failles réelles (site obsolète, absence d'IA, réseaux inactifs) et rédiger des messages de vente personnalisés. Vos quotas dépendent de votre plan : 3 prospects sur l'offre Découverte (1 €), 90 prospects/mois sur le plan PRO (29 €), et 450 prospects/mois sur le plan AGENCE (59 €)."
+        text: knowledgeBase.faqSummary || "Prospectizi est un SaaS B2B conçu pour trouver des entreprises ciblées, identifier leurs failles réelles et rédiger des messages de vente personnalisés. Quotas : 3 prospects sur Découverte (1 €), 90/mois sur PRO (29 €), et 450/mois sur AGENCE (59 €)."
       };
     }
 
     // 2. Moyens de paiement (Lemon Squeezy & Flutterwave)
     if (q.includes('payer') || q.includes('carte') || q.includes('mobile money') || q.includes('wave') || q.includes('t-money') || q.includes('moov') || q.includes('mtn') || q.includes('orange')) {
       return {
-        text: "Nous proposons deux modes de paiement sécurisés selon votre localisation :\n• Carte Bancaire internationale (Visa, Mastercard) via Lemon Squeezy pour les abonnements automatiques.\n• Mobile Money (T-Money, Moov Money, Orange, MTN, Wave) via Flutterwave sans carte requise."
+        text: knowledgeBase.paymentProcedures || "Deux modes de paiement sécurisés : Carte Bancaire internationale via Lemon Squeezy (MoR, factures) et Mobile Money (T-Money, Moov, Orange, MTN, Wave) via Flutterwave sans carte requise."
       };
     }
 
-    // 3. Apify & Transparence Scraping
+    // 3. Scraping & Transparence
     if (q.includes('scraping') || q.includes('apify') || q.includes('données') || q.includes('source') || q.includes('google maps')) {
       return {
-        text: "Les données proviennent d'informations publiques vérifiées (Google Maps, registres d'entreprises, profils professionnels). L'extraction prend environ 30 à 60 secondes en tâche de fond. Si un contact s'avère erroné, notre Garantie Anti-Gaspillage vous rembourse automatiquement le crédit sous 72h !"
+        text: knowledgeBase.apifyTransparency || "Les données proviennent de sources professionnelles et publiques (Google Maps, registres légaux). Garantie Anti-Gaspillage : remboursement automatique de crédit en cas de contact inexploitable."
       };
     }
 
-    // 4. Export CSV / Excel
-    if (q.includes('export') || q.includes('csv') || q.includes('excel') || q.includes('télécharger')) {
+    // 4. Tutoriels & Avatar
+    if (q.includes('avatar') || q.includes('métier') || q.includes('recherche') || q.includes('relance')) {
       return {
-        text: "Vous pouvez exporter vos prospects en CSV ou Excel en 1 clic ! Rendez-vous sur la page 'Mes Prospects' et cliquez sur le bouton 'Exporter CSV' en haut à droite. L'export inclut les téléphones, emails, failles détectées et tous les messages rédigés par l'IA."
+        text: knowledgeBase.tutorialsSummary || "Renseignez votre Avatar Client pour que l'IA calibre les failles et le ton des messages. Lancez une recherche par ville et secteur, puis utilisez les séquences de relance WhatsApp en 1 clic."
       };
     }
 
-    // 5. Bonus Vidéo Loom (+3 crédits gratuits)
-    if (q.includes('loom') || q.includes('bonus') || q.includes('gratuit') || q.includes('+3') || q.includes('témoignage')) {
+    // 5. Tarifs & Annulation
+    if (q.includes('tarif') || q.includes('prix') || q.includes('abonnement') || q.includes('annuler') || q.includes('résilier')) {
       return {
-        text: "Pour obtenir +3 prospects qualifiés 100% gratuits : cliquez sur 'Bonus Vidéo Loom' dans la barre du haut, enregistrez une courte vidéo de 60 secondes sur loom.com montrant votre écran avec Prospectizi et partagez le lien. Dès validation, vos 3 crédits sont ajoutés automatiquement !"
-      };
-    }
-
-    // 6. Avatar Client & Métiers
-    if (q.includes('avatar') || q.includes('métier') || q.includes('ia engineering') || q.includes('profil')) {
-      return {
-        text: "Sur la page 'Avatar Client', vous pouvez définir n'importe quel métier digital (Développeur, IA Engineer, Community Manager, Expert Ads, Copywriter, Designer, Closer). L'IA s'adapte automatiquement pour détecter les failles précises de vos prospects et rédiger des messages ciblés sur vos compétences."
+        text: knowledgeBase.pricingRules || "Offres sans engagement, résiliables en 1 clic. Découverte 1 €, PRO 29 €/mois, AGENCE 59 €/mois. Verrouillage temporaire après 30 jours jusqu'au renouvellement pour préserver vos données."
       };
     }
 
     // Réponse par défaut avec proposition de contact WhatsApp
     const defaultWaUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`Bonjour, j'ai une question sur Prospectizi : ${query}`)}`;
     return {
-      text: "Je n'ai pas la réponse exacte dans ma base de connaissances pour cette demande spécifique. Notre équipe support est disponible en direct sur WhatsApp pour vous assister personnellement !",
+      text: "Je n'ai pas la réponse exacte dans ma base de connaissances actuelle pour cette question. Notre équipe est disponible immédiatement sur WhatsApp pour vous répondre personnellement !",
       isEscalation: true,
       whatsappUrl: defaultWaUrl
     };

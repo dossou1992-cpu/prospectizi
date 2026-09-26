@@ -20,6 +20,7 @@ export const initialSubscription: Subscription = {
   prospects_used: 2,
   bonus_prospects: 0,
   current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+  auto_renew: true,
 };
 
 export const initialProspects: Prospect[] = [

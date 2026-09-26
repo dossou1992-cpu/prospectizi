@@ -31,7 +31,7 @@ interface ProspectCardProps {
 }
 
 export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardProps) {
-  const { updateProspectStatus, updateProspectNotes, recordSentVariant, auditReport } = useStore();
+  const { updateProspectStatus, updateProspectNotes, recordSentVariant, auditReport, avatar } = useStore();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'first_contact' | 'value_offer' | 'followup_1' | 'followup_2' | 'followup_final'>('first_contact');
   const [selectedVariant, setSelectedVariant] = useState<'A' | 'B'>(prospect.sent_variant || 'A');

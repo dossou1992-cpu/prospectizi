@@ -248,25 +248,33 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* SECTION 2 : GESTION DES TÉMOIGNAGES LOOM (+3 PROSPECTS) */}
+      {/* SECTION 2 : GESTION DES TÉMOIGNAGES LOOM & POSTS LINKEDIN (+3 PROSPECTS) */}
       <div className="bg-dark-900 border border-dark-600 rounded-2xl p-6 space-y-4 shadow-xl">
         <div className="flex items-center justify-between border-b border-dark-700 pb-3">
           <div className="flex items-center gap-2">
             <Video className="w-4 h-4 text-cyan" />
-            <h2 className="text-base font-bold text-white">File de Modération des Vidéos Loom</h2>
+            <h2 className="text-base font-bold text-white">File de Modération des Avis : Vidéos Loom &amp; Posts LinkedIn</h2>
           </div>
           <span className="text-xs text-slate-400 font-mono">
-            {testimonials.filter(t => t.status === 'pending').length} vidéo(s) en attente
+            {testimonials.filter(t => t.status === 'pending').length} retour(s) en attente de validation
           </span>
         </div>
 
         <div className="divide-y divide-dark-700/60">
           {testimonials.map((testi) => (
             <div key={testi.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                    testi.type === 'linkedin' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/40' : 'bg-cyan/15 text-cyan border border-cyan/30'
+                  }`}>
+                    {testi.type === 'linkedin' ? 'Post LinkedIn' : 'Vidéo Loom'}
+                  </span>
                   <span className="font-bold text-white text-xs">{testi.user_name}</span>
                   <span className="text-slate-400 text-xs">({testi.user_email})</span>
+                  {testi.rating && (
+                    <span className="text-amber-400 text-xs font-bold font-mono">★ {testi.rating}/5</span>
+                  )}
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
                     testi.status === 'approved' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' :
                     testi.status === 'rejected' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' :
@@ -276,6 +284,12 @@ export default function AdminPage() {
                   </span>
                 </div>
 
+                {testi.review_text && (
+                  <p className="text-xs text-slate-300 italic max-w-xl">
+                    &quot;{testi.review_text}&quot;
+                  </p>
+                )}
+
                 <div className="flex items-center gap-3 text-xs">
                   <a
                     href={testi.loom_url}
@@ -283,12 +297,12 @@ export default function AdminPage() {
                     rel="noopener noreferrer"
                     className="text-cyan hover:underline flex items-center gap-1 font-mono"
                   >
-                    <span>Regarder la vidéo Loom</span>
+                    <span>{testi.type === 'linkedin' ? 'Consulter le post LinkedIn' : 'Regarder la vidéo Loom'}</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                   <span className="text-slate-400">•</span>
                   <span className="text-emerald-400 text-[11px]">
-                    {testi.commercial_consent ? "✔ Accord commercial signé" : "❌ Accord manquant"}
+                    {testi.commercial_consent ? "✔ Accord commercial accordé" : "❌ Accord manquant"}
                   </span>
                 </div>
               </div>

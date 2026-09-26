@@ -20,7 +20,8 @@ import {
   Video,
   FileText,
   FileSpreadsheet,
-  Lock
+  Lock,
+  MessageSquare
 } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -33,10 +34,12 @@ export default function SettingsPage() {
     setShowUpgradeModal, 
     isSubscriptionExpired,
     logout,
-    exportProspectsCSV
+    exportProspectsCSV,
+    knowledgeBase,
+    updateKnowledgeBase
   } = useStore();
 
-  const [activeTab, setActiveTab] = useState<'profile' | 'billing' | 'notifications' | 'security' | 'resources'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'billing' | 'notifications' | 'security' | 'resources' | 'knowledge'>('profile');
 
   // Local form states
   const [name, setName] = useState(user.full_name);
@@ -49,14 +52,36 @@ export default function SettingsPage() {
   const [emailNotifs, setEmailNotifs] = useState(userSettings.email_notifications);
   const [whatsappNotifs, setWhatsappNotifs] = useState(userSettings.whatsapp_notifications);
 
+  // Knowledge base states
+  const [kbSystemPrompt, setKbSystemPrompt] = useState(knowledgeBase.systemPrompt);
+  const [kbFaq, setKbFaq] = useState(knowledgeBase.faqSummary);
+  const [kbTuto, setKbTuto] = useState(knowledgeBase.tutorialsSummary);
+  const [kbPricing, setKbPricing] = useState(knowledgeBase.pricingRules);
+  const [kbPayment, setKbPayment] = useState(knowledgeBase.paymentProcedures);
+  const [kbApify, setKbApify] = useState(knowledgeBase.apifyTransparency);
+  const [kbWhatsapp, setKbWhatsapp] = useState(knowledgeBase.whatsappContactNumber);
+
   // Password state
   const [currentPass, setCurrentPass] = useState('');
   const [newPass, setNewPass] = useState('');
   const [passMessage, setPassMessage] = useState<string | null>(null);
 
+  const handleSaveKnowledgeBase = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateKnowledgeBase({
+      systemPrompt: kbSystemPrompt,
+      faqSummary: kbFaq,
+      tutorialsSummary: kbTuto,
+      pricingRules: kbPricing,
+      paymentProcedures: kbPayment,
+      apifyTransparency: kbApify,
+      whatsappContactNumber: kbWhatsapp,
+    });
+  };
+
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
-    updateUserProfile({ full_name: name, email });
+    updateUserProfile(name, email);
     updateUserSettings({ phone_number: phone });
   };
 
@@ -161,6 +186,18 @@ export default function SettingsPage() {
           <Download className="w-3.5 h-3.5" />
           <span>Ressources Créateur (VIP)</span>
         </button>
+
+        <button
+          onClick={() => setActiveTab('knowledge')}
+          className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+            activeTab === 'knowledge'
+              ? 'bg-purple-500 text-white font-black shadow-lg shadow-purple-500/30'
+              : 'text-purple-400 hover:text-white bg-dark-900 border border-purple-500/40'
+          }`}
+        >
+          <MessageSquare className="w-3.5 h-3.5" />
+          <span>Base Notion &amp; Chatbot IA</span>
+        </button>
       </div>
 
       {/* TAB 1: PROFIL */}
@@ -250,7 +287,7 @@ export default function SettingsPage() {
               <div>
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Plan Actuel</span>
                 <div className="flex items-center gap-3 mt-1">
-                  <h2 className="text-2xl font-black text-white">{subscription.plan_name}</h2>
+                  <h2 className="text-2xl font-black text-white">Formule {subscription.plan_type}</h2>
                   <span className={`text-xs px-2.5 py-1 rounded-full font-bold uppercase border ${
                     isSubscriptionExpired 
                       ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 animate-pulse'
@@ -274,7 +311,7 @@ export default function SettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 bg-dark-800 rounded-xl border border-dark-700">
                 <span className="text-xs text-slate-400 block mb-1">Prospects mensuels alloués</span>
-                <p className="text-xl font-bold text-white">{subscription.prospects_limit} prospects</p>
+                <p className="text-xl font-bold text-white">{subscription.prospects_quota} prospects</p>
                 <span className="text-[11px] text-slate-400">Renouvelés chaque mois</span>
               </div>
 
@@ -604,6 +641,138 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* TAB 6: BASE DE CONNAISSANCES & CHATBOT IA ÉDITABLE */}
+      {activeTab === 'knowledge' && (
+        <form onSubmit={handleSaveKnowledgeBase} className="bg-dark-900 border-2 border-purple-500/40 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl">
+          <div className="border-b border-dark-700 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/15 text-purple-400 text-[11px] font-bold uppercase tracking-wider mb-1 border border-purple-500/30">
+                <ShieldCheck className="w-3 h-3" />
+                Espace Édition Superadmin
+              </div>
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-purple-400" />
+                <span>Édition de la Base de Connaissances &amp; Chatbot IA</span>
+              </h2>
+            </div>
+            <span className="text-xs text-slate-400">
+              Modifiez les textes ici : le Chatbot IA se mettra à jour en direct !
+            </span>
+          </div>
+
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Cet espace vous permet d&apos;ajuster les consignes de l&apos;IA support, d&apos;enrichir la FAQ et de modifier votre numéro WhatsApp de relais pour les 20% de cas complexes (paiements bloqués, bugs vidéo Loom, remboursements).
+          </p>
+
+          <div className="space-y-5">
+            {/* 1. Prompt Système */}
+            <div>
+              <label className="block text-xs font-bold text-purple-300 uppercase tracking-wider mb-1.5 flex items-center gap-2">
+                <span>1. Prompt Système Officiel (Consignes d&apos;entraînement de l&apos;IA)</span>
+              </label>
+              <textarea
+                rows={4}
+                value={kbSystemPrompt}
+                onChange={(e) => setKbSystemPrompt(e.target.value)}
+                className="w-full bg-dark-950 border border-dark-700 focus:border-purple-400 rounded-xl p-3 text-xs text-white placeholder-slate-500 font-mono leading-relaxed focus:outline-none"
+              />
+            </div>
+
+            {/* 2. FAQ & Quotas */}
+            <div>
+              <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-1.5">
+                2. FAQ &amp; Fonctionnement des Quotas
+              </label>
+              <textarea
+                rows={3}
+                value={kbFaq}
+                onChange={(e) => setKbFaq(e.target.value)}
+                className="w-full bg-dark-950 border border-dark-700 focus:border-purple-400 rounded-xl p-3 text-xs text-white focus:outline-none"
+              />
+            </div>
+
+            {/* 3. Tutoriels & Avatar */}
+            <div>
+              <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-1.5">
+                3. Tutoriels &amp; Avatar Client
+              </label>
+              <textarea
+                rows={2}
+                value={kbTuto}
+                onChange={(e) => setKbTuto(e.target.value)}
+                className="w-full bg-dark-950 border border-dark-700 focus:border-purple-400 rounded-xl p-3 text-xs text-white focus:outline-none"
+              />
+            </div>
+
+            {/* 4. Tarifs & Annulation */}
+            <div>
+              <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-1.5">
+                4. Tarification, 30 jours &amp; Politique d&apos;annulation
+              </label>
+              <textarea
+                rows={2}
+                value={kbPricing}
+                onChange={(e) => setKbPricing(e.target.value)}
+                className="w-full bg-dark-950 border border-dark-700 focus:border-purple-400 rounded-xl p-3 text-xs text-white focus:outline-none"
+              />
+            </div>
+
+            {/* 5. Procédures de Paiement */}
+            <div>
+              <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-1.5">
+                5. Procédures de Paiement (Lemon Squeezy CB &amp; Flutterwave Mobile Money)
+              </label>
+              <textarea
+                rows={2}
+                value={kbPayment}
+                onChange={(e) => setKbPayment(e.target.value)}
+                className="w-full bg-dark-950 border border-dark-700 focus:border-purple-400 rounded-xl p-3 text-xs text-white focus:outline-none"
+              />
+            </div>
+
+            {/* 6. Scraping & Apify */}
+            <div>
+              <label className="block text-xs font-bold text-slate-200 uppercase tracking-wider mb-1.5">
+                6. Explications Scraping &amp; Garantie Anti-Gaspillage
+              </label>
+              <textarea
+                rows={2}
+                value={kbApify}
+                onChange={(e) => setKbApify(e.target.value)}
+                className="w-full bg-dark-950 border border-dark-700 focus:border-purple-400 rounded-xl p-3 text-xs text-white focus:outline-none"
+              />
+            </div>
+
+            {/* 7. Numéro WhatsApp pour les 20% de cas complexes */}
+            <div>
+              <label className="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1.5">
+                7. Numéro WhatsApp de Relais Support (Pour les 20% de cas complexes)
+              </label>
+              <input
+                type="text"
+                placeholder="22890123456"
+                value={kbWhatsapp}
+                onChange={(e) => setKbWhatsapp(e.target.value)}
+                className="w-full sm:w-80 bg-dark-950 border border-dark-700 focus:border-emerald-400 rounded-xl px-4 py-2 text-xs text-white font-mono focus:outline-none"
+              />
+              <span className="text-[11px] text-slate-400 block mt-1">
+                Format international sans le signe + (ex: 22890123456)
+              </span>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-dark-700 flex justify-end">
+            <button
+              type="submit"
+              className="py-3 px-6 rounded-xl font-extrabold text-xs bg-purple-600 hover:bg-purple-500 text-white flex items-center gap-2 shadow-lg shadow-purple-600/30 transition-all hover:scale-105"
+            >
+              <Save className="w-4 h-4" />
+              <span>Enregistrer &amp; Mettre à jour le Chatbot IA</span>
+            </button>
+          </div>
+        </form>
       )}
     </div>
   );
