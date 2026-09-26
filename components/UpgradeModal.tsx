@@ -49,7 +49,7 @@ export default function UpgradeModal() {
           <p className="text-slate-400 text-xs sm:text-sm">
             {isSubscriptionExpired
               ? "Votre période de 30 jours est échue. Validez votre renouvellement pour continuer à générer des prospects sans interruption."
-              : "Vous avez généré vos prospects d'essai. Débloquez Prospectizi pour signer vos premiers contrats dès cette semaine."}
+              : "Vous avez épuisé vos 3 prospects d'essai ! Passez au plan PRO à 29 €/mois pour débloquer 90 prospects par mois ou au plan AGENCE à 59 €/mois pour débloquer 450 prospects par mois."}
           </p>
         </div>
 

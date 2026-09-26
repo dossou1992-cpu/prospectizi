@@ -578,28 +578,28 @@ export default function SettingsPage() {
               </a>
             </div>
 
-            {/* Dossier Cahier des Charges DOCX */}
-            <div className="p-5 bg-dark-800 rounded-xl border border-emerald-500/30 flex flex-col justify-between space-y-4">
+            {/* Base de Connaissances & Prompt Chatbot IA DOCX */}
+            <div className="p-5 bg-dark-800 rounded-xl border border-purple-500/30 flex flex-col justify-between space-y-4 md:col-span-2">
               <div className="space-y-2">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400">
                   <FileText className="w-5 h-5" />
                 </div>
-                <h3 className="text-sm font-extrabold text-white">Dossier Cahier des Charges MVP</h3>
+                <h3 className="text-sm font-extrabold text-white">Base de Connaissances Notion &amp; Prompt Chatbot IA</h3>
                 <p className="text-xs text-slate-400">
-                  Document Word complet de synthèse technique, scoring IA et modèles de données du SaaS.
+                  Document Word complet avec le Prompt Système officiel du Chatbot IA, les 6 sections Notion (FAQ, Tutos, Tarifs, Paiements, Apify, Loom) et les réponses types WhatsApp.
                 </p>
-                <div className="text-[11px] text-emerald-400 font-mono">Format: .DOCX • Taille: ~40 Ko</div>
+                <div className="text-[11px] text-purple-400 font-mono">Format: .DOCX • Taille: ~38 Ko</div>
               </div>
 
               <a
-                href="/PROSPECTIZI_Dossier_Cahier_des_Charges.docx"
-                download="PROSPECTIZI_Dossier_Cahier_des_Charges.docx"
+                href="/PROSPECTIZI_Base_de_Connaissances_et_Prompt_Chatbot.docx"
+                download="PROSPECTIZI_Base_de_Connaissances_et_Prompt_Chatbot.docx"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold bg-emerald-500 hover:bg-emerald-400 text-dark-950 flex items-center justify-center gap-2 shadow-lg transition-all"
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center gap-2 shadow-lg transition-all"
               >
                 <Download className="w-4 h-4" />
-                <span>Télécharger le Cahier des Charges (.DOCX)</span>
+                <span>Télécharger la Base de Connaissances &amp; Prompt IA (.DOCX)</span>
               </a>
             </div>
           </div>

@@ -285,6 +285,43 @@ export default function ProspectsPage() {
         </div>
       </div>
 
+      {/* Indicateur de Scraping en Arrière-plan (Asynchrone Apify & QStash) */}
+      {isSearching && (
+        <div className="bg-dark-900 border-2 border-cyan/40 rounded-2xl p-6 shadow-cyan-glow space-y-4 animate-fadeIn">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-dark-700 pb-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-cyan/20 border border-cyan/40 flex items-center justify-center text-cyan">
+                <Loader2 className="w-5 h-5 animate-spin text-cyan" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-extrabold text-white">Extraction Apify en tâche de fond</h3>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan/15 text-cyan border border-cyan/30 font-bold uppercase tracking-wider animate-pulse">
+                    Statut : PENDING
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Robot Apify actif sur Google Places &amp; Web • Timeout strict de 120s max
+                </p>
+              </div>
+            </div>
+            <span className="text-xs font-mono text-cyan bg-dark-800 px-3 py-1.5 rounded-lg border border-dark-600">
+              Extraction 1 par 1 (File QStash)
+            </span>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex justify-between text-[11px] text-slate-400">
+              <span>Collecte des données publiques &amp; Détection des failles réelles...</span>
+              <span className="text-cyan font-bold font-mono">En cours...</span>
+            </div>
+            <div className="w-full h-2 bg-dark-800 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-cyan to-cyan-intense animate-pulse w-3/4 rounded-full" />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Liste des Fiches Prospects */}
       <div className="space-y-6">
         {filteredProspects.length === 0 ? (
