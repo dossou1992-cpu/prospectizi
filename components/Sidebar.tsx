@@ -119,16 +119,6 @@ export default function Sidebar({ onOpenTutorial, onOpenLegal, collapsed, onTogg
 
       {/* Footer Support & Tools */}
       <div className="p-2.5 border-t border-dark-600/60 bg-dark-950/60 space-y-1.5">
-        {/* Loom Video Tutorial Button */}
-        <button
-          onClick={onOpenTutorial}
-          title="Guide Loom (+3 leads offerts)"
-          className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold bg-cyan/15 hover:bg-cyan/25 text-cyan border border-cyan/30 transition-all shadow-cyan-border"
-        >
-          <Gift className="w-3.5 h-3.5 shrink-0 text-cyan" />
-          {!collapsed && <span className="truncate font-bold">Guide Loom (+3 leads)</span>}
-        </button>
-
         {/* WhatsApp Support Direct Button */}
         <a
           href="https://wa.me/22890123456?text=Bonjour%20Prospectizi,%20j'ai%20une%20question%20concernant%20mon%20compte."

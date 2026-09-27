@@ -275,8 +275,8 @@ export default function AdminPage() {
           
           {/* Master Toggle pour la Campagne d'Avis */}
           <div className="flex items-center gap-3 bg-dark-800 border border-dark-700 px-3 py-1.5 rounded-xl">
-            <span className="text-xs font-medium text-slate-300">
-              Collecte d&apos;Avis (+3) :
+            <span className="text-xs font-bold text-amber-300">
+              ⭐ Avis Utilisateur Réel (+3)⭐ :
             </span>
             <button
               onClick={toggleFeedbackCollection}
