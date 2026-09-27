@@ -1,6 +1,6 @@
 # ⚡ Prospectizi - SaaS B2B de Prospection Intelligente
 
-> **"Trouver & contactez mieux"**
+> **"Trouvez & contactez mieux !"**
 
 Plateforme SaaS B2B conçue pour les freelances, consultants, agences et entrepreneurs : recherche intelligente multi-sources (Google Maps, Annuaires pros, LinkedIn), fiches d'opportunité commerciale scorées de 60 à 100, génération de messages d'approche personnalisés par IA, CRM intégré, Audit Mensuel de conversion avec A/B testing et routage de paiement adapté (Mobile Money Afrique & Cartes bancaires internationales).
 
