@@ -14,6 +14,30 @@ export default function UpgradeModal() {
 
   const handleCheckout = (plan: PlanType) => {
     setLoadingPlan(plan);
+
+    // 1. Redirection vers Lemon Squeezy si URL configurée
+    if (gateway === 'lemonsqueezy') {
+      const lemonUrl = plan === 'AGENCE' 
+        ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_AGENCE_URL 
+        : process.env.NEXT_PUBLIC_LEMONSQUEEZY_PRO_URL;
+      if (lemonUrl) {
+        window.location.href = lemonUrl;
+        return;
+      }
+    }
+
+    // 2. Redirection vers Flutterwave Mobile Money si URL configurée
+    if (gateway === 'flutterwave') {
+      const flwUrl = plan === 'AGENCE'
+        ? process.env.NEXT_PUBLIC_FLUTTERWAVE_AGENCE_URL
+        : process.env.NEXT_PUBLIC_FLUTTERWAVE_PRO_URL;
+      if (flwUrl) {
+        window.location.href = flwUrl;
+        return;
+      }
+    }
+
+    // 3. Mode Bêta-Test / Démonstration : surclassement instantané
     setTimeout(() => {
       upgradePlan(plan);
       setLoadingPlan(null);

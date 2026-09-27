@@ -16,6 +16,14 @@ import {
 } from './types';
 import { initialAvatar, initialSubscription, initialProspects, initialTestimonials, initialTeamMembers, initialAuditReport } from './mockData';
 import confetti from 'canvas-confetti';
+import { 
+  supabase, 
+  isSupabaseConfigured, 
+  supabaseSignInWithEmail, 
+  supabaseSignUpWithEmail, 
+  supabaseSignInWithGoogle, 
+  supabaseSignOut 
+} from './supabase';
 
 interface StoreContextType {
   // Auth state
@@ -244,6 +252,24 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     if (!email || !email.includes('@')) {
       return { success: false, message: "Adresse email invalide." };
     }
+
+    // Si Supabase est configuré avec des clés réelles
+    if (isSupabaseConfigured && supabase) {
+      if (authModalMode === 'register') {
+        const fullName = email.split('@')[0].replace(/[._-]/g, ' ');
+        const res = await supabaseSignUpWithEmail(email, pass, fullName);
+        if (!res.success) {
+          return { success: false, message: res.error || "Erreur d'inscription Supabase." };
+        }
+        showNotification("Inscription Supabase réussie ! Vérifiez vos emails si la confirmation est requise.");
+      } else {
+        const res = await supabaseSignInWithEmail(email, pass);
+        if (!res.success) {
+          return { success: false, message: res.error || "Email ou mot de passe incorrect." };
+        }
+      }
+    }
+
     const fullName = email.split('@')[0].replace(/[._-]/g, ' ');
     const formattedName = fullName.charAt(0).toUpperCase() + fullName.slice(1);
     
@@ -251,6 +277,8 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       ...prev,
       email,
       full_name: formattedName || prev.full_name,
+      role: email === 'dossou1992@gmail.com' ? 'superadmin' : 'user',
+      isSuperadminMode: email === 'dossou1992@gmail.com',
     }));
     setIsAuthenticated(true);
     setAuthModalOpen(false);
@@ -260,10 +288,21 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   };
 
   const loginWithGoogle = async () => {
+    // Si Supabase est configuré avec des clés réelles, rediriger vers Google OAuth
+    if (isSupabaseConfigured && supabase) {
+      const res = await supabaseSignInWithGoogle();
+      if (!res.success && !res.fallback) {
+        showNotification(`Erreur Google Auth : ${res.error}`);
+        return { success: false, message: res.error };
+      }
+    }
+
     setUser(prev => ({
       ...prev,
       email: "dossou1992@gmail.com",
       full_name: "Edith Dossou",
+      role: "superadmin",
+      isSuperadminMode: true,
     }));
     setIsAuthenticated(true);
     setAuthModalOpen(false);
@@ -272,7 +311,10 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     return { success: true };
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (isSupabaseConfigured && supabase) {
+      await supabaseSignOut();
+    }
     setIsAuthenticated(false);
     showNotification("Vous avez été déconnecté avec succès.");
   };
