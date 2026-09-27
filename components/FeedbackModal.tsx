@@ -75,8 +75,10 @@ export default function FeedbackModal() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Header */}
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 text-xs font-bold uppercase tracking-wider mb-2 border border-amber-500/30">
-                <span>⭐ Avis Utilisateur Réel (+3)⭐</span>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 text-xs font-bold uppercase tracking-wider mb-2 border border-amber-500/30">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                <span>Avis Utilisateur Réel (+3)</span>
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
               </div>
               <h2 className="text-xl md:text-2xl font-black text-white">
                 Partagez votre avis &amp; gagnez +3 leads

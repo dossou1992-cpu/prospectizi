@@ -99,6 +99,18 @@ export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleM
             </span>
           )}
         </div>
+
+        {/* Loom Video Tutorial Button in Topbar */}
+        {onOpenTutorialModal && (
+          <button
+            onClick={onOpenTutorialModal}
+            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan/15 hover:bg-cyan/25 text-cyan border border-cyan/40 text-[11px] font-bold shadow-cyan-border transition-all"
+            title="Comment enregistrer un avis Loom pour débloquer +3 prospects offerts"
+          >
+            <Gift className="w-3.5 h-3.5 text-cyan animate-pulse" />
+            <span>Guide Loom (+3 leads)</span>
+          </button>
+        )}
       </div>
 
       {/* Quota & Quick Actions */}
@@ -107,12 +119,24 @@ export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleM
         {isFeedbackCollectionActive && (
           <button
             onClick={() => setFeedbackModalOpen(true)}
-            className="flex items-center gap-1.5 text-[11px] font-bold py-1.5 px-3 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 transition-all shadow-sm hover:scale-105"
+            className="flex items-center gap-1.5 text-[11px] font-extrabold py-1.5 px-3 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 transition-all shadow-sm hover:scale-105"
             title="Partagez votre avis vidéo Loom ou post LinkedIn pour débloquer +3 prospects offerts"
           >
-            <span>⭐ Avis Utilisateur Réel (+3)⭐</span>
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+            <span>Avis Utilisateur Réel (+3)</span>
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
           </button>
         )}
+
+        {/* Loom Bonus Direct Trigger */}
+        <button
+          onClick={onOpenLoomModal}
+          className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold py-1.5 px-2.5 rounded-lg bg-cyan/10 hover:bg-cyan/20 text-cyan border border-cyan/30 transition-all shadow-cyan-border"
+          title="Soumettre directement votre lien vidéo Loom"
+        >
+          <Video className="w-3.5 h-3.5" />
+          <span>+3 Bonus Loom</span>
+        </button>
 
         {/* Quota Status Box */}
         <div 

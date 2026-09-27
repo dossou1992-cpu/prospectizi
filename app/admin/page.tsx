@@ -23,6 +23,7 @@ import {
   Sparkles,
   ToggleLeft,
   ToggleRight,
+  Star,
   Lock,
   Smartphone
 } from 'lucide-react';
@@ -275,9 +276,12 @@ export default function AdminPage() {
           
           {/* Master Toggle pour la Campagne d'Avis */}
           <div className="flex items-center gap-3 bg-dark-800 border border-dark-700 px-3 py-1.5 rounded-xl">
-            <span className="text-xs font-bold text-amber-300">
-              ⭐ Avis Utilisateur Réel (+3)⭐ :
-            </span>
+            <div className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+              <span>Avis Utilisateur Réel (+3)</span>
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+              <span>:</span>
+            </div>
             <button
               onClick={toggleFeedbackCollection}
               className={`text-xs font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 transition-all ${
