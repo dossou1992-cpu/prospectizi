@@ -20,13 +20,15 @@ export async function POST(request: Request) {
       const customerEmail = data?.customer?.email;
       const amount = data?.amount;
 
-      // Determine plan
+      // Determine plan from amount (EUR or XOF / FCFA) or plan keywords
+      const narration = `${data?.narration || ''} ${data?.tx_ref || ''} ${data?.meta?.plan || ''}`.toLowerCase();
       let plan = 'DECOUVERTE';
       let quota = 3;
-      if (amount >= 50) {
+
+      if (narration.includes('agence') || (amount >= 50 && amount < 1000) || amount >= 30000) {
         plan = 'AGENCE';
         quota = 450;
-      } else if (amount >= 25) {
+      } else if (narration.includes('pro') || (amount >= 20 && amount < 1000) || (amount >= 10000 && amount < 30000)) {
         plan = 'PRO';
         quota = 90;
       }

@@ -16,43 +16,28 @@ import { PlanType } from '@/lib/types';
 
 export default function PricingPage() {
   const { subscription, upgradePlan, user } = useStore();
-  const [gateway, setGateway] = useState<'flutterwave' | 'lemonsqueezy'>('flutterwave');
   const [loadingPlan, setLoadingPlan] = useState<PlanType | null>(null);
 
   const handleSelectPlan = (plan: PlanType) => {
     setLoadingPlan(plan);
 
-    // 1. Redirection vers Lemon Squeezy si URL configurée
-    if (gateway === 'lemonsqueezy') {
-      let lemonUrl = plan === 'AGENCE'
-        ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_AGENCE_URL
-        : plan === 'PRO'
-          ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_PRO_URL
-          : process.env.NEXT_PUBLIC_LEMONSQUEEZY_DECOUVERTE_URL;
-      if (lemonUrl) {
-        if (user?.email) {
-          const sep = lemonUrl.includes('?') ? '&' : '?';
-          lemonUrl = `${lemonUrl}${sep}checkout[email]=${encodeURIComponent(user.email)}`;
-        }
-        window.location.href = lemonUrl;
-        return;
+    // 1. Redirection vers Flutterwave (Cartes Bancaires & Mobile Money) si URL configurée
+    let flwUrl = plan === 'AGENCE'
+      ? process.env.NEXT_PUBLIC_FLUTTERWAVE_AGENCE_URL
+      : plan === 'PRO'
+        ? process.env.NEXT_PUBLIC_FLUTTERWAVE_PRO_URL
+        : process.env.NEXT_PUBLIC_FLUTTERWAVE_DECOUVERTE_URL;
+
+    if (flwUrl) {
+      if (user?.email) {
+        const sep = flwUrl.includes('?') ? '&' : '?';
+        flwUrl = `${flwUrl}${sep}email=${encodeURIComponent(user.email)}`;
       }
+      window.location.href = flwUrl;
+      return;
     }
 
-    // 2. Redirection vers Flutterwave si URL configurée
-    if (gateway === 'flutterwave') {
-      const flwUrl = plan === 'AGENCE'
-        ? process.env.NEXT_PUBLIC_FLUTTERWAVE_AGENCE_URL
-        : plan === 'PRO'
-          ? process.env.NEXT_PUBLIC_FLUTTERWAVE_PRO_URL
-          : process.env.NEXT_PUBLIC_FLUTTERWAVE_DECOUVERTE_URL;
-      if (flwUrl) {
-        window.location.href = flwUrl;
-        return;
-      }
-    }
-
-    // 3. Fallback Bêta-Test / Démonstration : activation instantanée
+    // 2. Fallback Bêta-Test / Démonstration : activation instantanée
     setTimeout(() => {
       upgradePlan(plan);
       setLoadingPlan(null);
@@ -74,30 +59,20 @@ export default function PricingPage() {
           Choisissez l&apos;offre qui correspond à votre volume de prospection. Annulable à tout moment en 1 clic.
         </p>
 
-        {/* Professional Payment Method Selector */}
-        <div className="inline-flex p-1 bg-dark-900 border border-dark-600 rounded-xl text-xs mt-3 flex-wrap justify-center">
-          <button
-            onClick={() => setGateway('flutterwave')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg transition-all ${
-              gateway === 'flutterwave'
-                ? 'bg-cyan text-dark-950 font-bold shadow-cyan-border'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            <span>Payer par Mobile Money (MTN, Orange, Wave, Moov) &amp; Cartes</span>
-          </button>
-          <button
-            onClick={() => setGateway('lemonsqueezy')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg transition-all ${
-              gateway === 'lemonsqueezy'
-                ? 'bg-cyan text-dark-950 font-bold shadow-cyan-border'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5" />
-            <span>Payer par Carte Internationale, Apple Pay &amp; Google Pay</span>
-          </button>
+        {/* Universal Payment Reassurance Banner */}
+        <div className="inline-flex items-center justify-center gap-3 p-2 bg-dark-900 border border-cyan/30 rounded-xl text-xs mt-3 flex-wrap shadow-cyan-border">
+          <div className="flex items-center gap-1.5 text-cyan font-bold px-2">
+            <ShieldCheck className="w-4 h-4" />
+            <span>Paiement Universel Sécurisé :</span>
+          </div>
+          <span className="flex items-center gap-1.5 bg-dark-800 px-3 py-1.5 rounded-lg text-slate-300 border border-dark-600">
+            <Globe className="w-3.5 h-3.5 text-cyan" />
+            <span>Cartes Bancaires Internationales (Visa, Mastercard)</span>
+          </span>
+          <span className="flex items-center gap-1.5 bg-dark-800 px-3 py-1.5 rounded-lg text-slate-300 border border-dark-600">
+            <Smartphone className="w-3.5 h-3.5 text-cyan" />
+            <span>Mobile Money (T-Money, Moov, Wave, MTN, Orange)</span>
+          </span>
         </div>
       </div>
 
