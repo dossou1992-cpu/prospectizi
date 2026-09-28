@@ -231,6 +231,53 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     }
   }, [isAuthenticated, user, userSettings, subscription, avatar, prospects, auditReport, testimonials, teamMembers, knowledgeBase, isFeedbackCollectionActive, isLoaded]);
 
+  // Synchronisation Authentification Supabase en temps réel
+  useEffect(() => {
+    if (!supabase || !isSupabaseConfigured) return;
+
+    // Récupération de la session active (ex: retour de redirection Google)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const email = session.user.email || 'dossou1992@gmail.com';
+        const isSuperadmin = email === 'dossou1992@gmail.com';
+        const name = session.user.user_metadata?.full_name || (isSuperadmin ? 'Edith Dossou' : email.split('@')[0]);
+
+        setUser({
+          email,
+          full_name: name,
+          role: isSuperadmin ? 'superadmin' : 'user',
+          isSuperadminMode: isSuperadmin,
+        });
+        setIsAuthenticated(true);
+      }
+    });
+
+    // Écoute des événements de connexion / déconnexion
+    const { data: { subscription: authListener } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          const email = session.user.email || 'dossou1992@gmail.com';
+          const isSuperadmin = email === 'dossou1992@gmail.com';
+          const name = session.user.user_metadata?.full_name || (isSuperadmin ? 'Edith Dossou' : email.split('@')[0]);
+
+          setUser({
+            email,
+            full_name: name,
+            role: isSuperadmin ? 'superadmin' : 'user',
+            isSuperadminMode: isSuperadmin,
+          });
+          setIsAuthenticated(true);
+        } else if (event === 'SIGNED_OUT') {
+          setIsAuthenticated(false);
+        }
+      }
+    );
+
+    return () => {
+      authListener?.unsubscribe();
+    };
+  }, []);
+
   const showNotification = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => {

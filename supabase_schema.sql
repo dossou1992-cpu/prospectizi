@@ -177,22 +177,26 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', 'Membre Prospectizi'),
+    COALESCE(NEW.raw_user_meta_data->>'full_name', CASE WHEN NEW.email = 'dossou1992@gmail.com' THEN 'Edith Dossou' ELSE 'Membre Prospectizi' END),
     CASE WHEN NEW.email = 'dossou1992@gmail.com' THEN 'superadmin' ELSE 'user' END
   )
-  ON CONFLICT (id) DO NOTHING;
+  ON CONFLICT (id) DO UPDATE SET 
+    role = CASE WHEN NEW.email = 'dossou1992@gmail.com' THEN 'superadmin' ELSE profiles.role END,
+    full_name = CASE WHEN NEW.email = 'dossou1992@gmail.com' THEN 'Edith Dossou' ELSE profiles.full_name END;
 
-  -- 2. Création de l'abonnement initial (3 prospects offerts en formule Découverte)
+  -- 2. Création de l'abonnement initial (999999 prospects pour superadmin, 3 prospects offerts pour les utilisateurs)
   INSERT INTO public.subscriptions (user_id, plan_type, status, prospects_quota, prospects_used, bonus_prospects)
   VALUES (
     NEW.id,
-    'DECOUVERTE',
+    CASE WHEN NEW.email = 'dossou1992@gmail.com' THEN 'AGENCE' ELSE 'DECOUVERTE' END,
     'active',
     CASE WHEN NEW.email = 'dossou1992@gmail.com' THEN 999999 ELSE 3 END,
     0,
     0
   )
-  ON CONFLICT (user_id) DO NOTHING;
+  ON CONFLICT (user_id) DO UPDATE SET 
+    plan_type = CASE WHEN NEW.email = 'dossou1992@gmail.com' THEN 'AGENCE' ELSE subscriptions.plan_type END,
+    prospects_quota = CASE WHEN NEW.email = 'dossou1992@gmail.com' THEN 999999 ELSE subscriptions.prospects_quota END;
 
   -- 3. Création de l'avatar par défaut
   INSERT INTO public.user_avatars (user_id)
