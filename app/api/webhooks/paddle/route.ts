@@ -12,13 +12,15 @@ export async function POST(request: Request) {
     if (signature && secretKey) {
       try {
         const parts = signature.split(';');
-        const tsMatch = parts.find(p => p.startsWith('ts='))?.split('=')[1];
-        const h1Match = parts.find(p => p.startsWith('h1='))?.split('=')[1];
+        const tsMatch = parts.find(p => p.trim().startsWith('ts='))?.split('=')[1]?.trim();
+        const h1Matches = parts.filter(p => p.trim().startsWith('h1=')).map(p => p.split('=')[1]?.trim());
 
-        if (tsMatch && h1Match) {
+        if (tsMatch && h1Matches.length > 0) {
           const signedPayload = `${tsMatch}:${rawBody}`;
           const expectedH1 = crypto.createHmac('sha256', secretKey).update(signedPayload).digest('hex');
-          if (expectedH1 !== h1Match) {
+          const isValid = h1Matches.some(h1 => h1 === expectedH1);
+          if (!isValid) {
+            console.error('[Paddle Webhook] Signature invalide');
             return NextResponse.json({ error: 'Signature Paddle invalide' }, { status: 401 });
           }
         }
@@ -31,8 +33,8 @@ export async function POST(request: Request) {
     const eventType = payload.event_type;
     const data = payload.data;
 
-    // Traitement des transactions validées et nouveaux abonnements
-    if (eventType === 'transaction.completed' || eventType === 'subscription.created') {
+    // Traitement des transactions validées et abonnements créés/mis à jour
+    if (eventType === 'transaction.completed' || eventType === 'subscription.created' || eventType === 'subscription.updated') {
       const customerEmail = data?.customer?.email || data?.custom_data?.user_email;
       const items = data?.items || [];
       const itemDescription = items.map((i: any) => `${i?.price?.description || ''} ${i?.product?.name || ''}`).join(' ').toLowerCase();
@@ -85,6 +87,35 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json({ status: 'success', plan, quota });
+    }
+
+    // Gestion des résiliations d'abonnement
+    if (eventType === 'subscription.canceled') {
+      const customerEmail = data?.customer?.email || data?.custom_data?.user_email;
+      if (supabaseAdmin && customerEmail) {
+        try {
+          const { data: profile } = await supabaseAdmin
+            .from('profiles')
+            .select('id')
+            .eq('email', customerEmail)
+            .single();
+
+          if (profile?.id) {
+            await supabaseAdmin
+              .from('subscriptions')
+              .update({
+                status: 'canceled',
+                auto_renew: false,
+                updated_at: new Date().toISOString()
+              })
+              .eq('user_id', profile.id);
+            console.log(`[Supabase] Abonnement Paddle annulé pour ${customerEmail}`);
+          }
+        } catch (dbErr) {
+          console.error('[Supabase Paddle Cancel Error]', dbErr);
+        }
+      }
+      return NextResponse.json({ status: 'canceled' });
     }
 
     return NextResponse.json({ status: 'received' });
