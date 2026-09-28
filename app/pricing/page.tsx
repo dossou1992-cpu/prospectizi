@@ -21,7 +21,23 @@ export default function PricingPage() {
   const handleSelectPlan = (plan: PlanType) => {
     setLoadingPlan(plan);
 
-    // 1. Redirection vers Flutterwave (Cartes Bancaires & Mobile Money) si URL configurée
+    // 1. Redirection vers Paddle si URL configurée
+    let paddleUrl = plan === 'AGENCE'
+      ? process.env.NEXT_PUBLIC_PADDLE_AGENCE_URL
+      : plan === 'PRO'
+        ? process.env.NEXT_PUBLIC_PADDLE_PRO_URL
+        : process.env.NEXT_PUBLIC_PADDLE_DECOUVERTE_URL;
+
+    if (paddleUrl) {
+      if (user?.email) {
+        const sep = paddleUrl.includes('?') ? '&' : '?';
+        paddleUrl = `${paddleUrl}${sep}_customer_email=${encodeURIComponent(user.email)}`;
+      }
+      window.location.href = paddleUrl;
+      return;
+    }
+
+    // 2. Redirection vers Flutterwave si URL configurée
     let flwUrl = plan === 'AGENCE'
       ? process.env.NEXT_PUBLIC_FLUTTERWAVE_AGENCE_URL
       : plan === 'PRO'
@@ -37,7 +53,7 @@ export default function PricingPage() {
       return;
     }
 
-    // 2. Fallback Bêta-Test / Démonstration : activation instantanée
+    // 3. Fallback Bêta-Test / Démonstration : activation instantanée
     setTimeout(() => {
       upgradePlan(plan);
       setLoadingPlan(null);
