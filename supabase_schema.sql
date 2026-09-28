@@ -1,5 +1,6 @@
 -- ==============================================================================
 -- PROSPECTIZI — SCHÉMA OFFICIEL SUPABASE (PostgreSQL + RLS + Triggers)
+-- 100% IDEMPOTENT (Peut être exécuté plusieurs fois sans aucune erreur)
 -- À copier-coller dans l'Éditeur SQL de votre tableau de bord Supabase (SQL Editor)
 -- ==============================================================================
 
@@ -115,7 +116,7 @@ CREATE TABLE IF NOT EXISTS public.team_members (
 );
 
 -- ==============================================================================
--- SÉCURITÉ ROW LEVEL SECURITY (RLS) — Isolation stricte des données de chaque client
+-- SÉCURITÉ ROW LEVEL SECURITY (RLS)
 -- ==============================================================================
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
@@ -126,30 +127,46 @@ ALTER TABLE public.searches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.testimonials ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.team_members ENABLE ROW LEVEL SECURITY;
 
--- Politiques RLS (Chaque utilisateur ne lit et modifie que ses propres données)
+-- Politiques RLS avec DROP préalable (évite l'erreur 42710 "already exists")
+DROP POLICY IF EXISTS "Users read own profile" ON public.profiles;
 CREATE POLICY "Users read own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users update own profile" ON public.profiles;
 CREATE POLICY "Users update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users read own subscription" ON public.subscriptions;
 CREATE POLICY "Users read own subscription" ON public.subscriptions FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users read own avatar" ON public.user_avatars;
 CREATE POLICY "Users read own avatar" ON public.user_avatars FOR ALL USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users manage own prospects" ON public.prospects;
 CREATE POLICY "Users manage own prospects" ON public.prospects FOR ALL USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users manage own searches" ON public.searches;
 CREATE POLICY "Users manage own searches" ON public.searches FOR ALL USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users read own team" ON public.team_members;
 CREATE POLICY "Users read own team" ON public.team_members FOR ALL USING (auth.uid() = owner_id);
 
--- Superadmin Bypass Policy (dossou1992@gmail.com a accès pour modérer et surclasser)
+-- Politiques Superadmin Bypass (dossou1992@gmail.com)
+DROP POLICY IF EXISTS "Superadmin full access profiles" ON public.profiles;
 CREATE POLICY "Superadmin full access profiles" ON public.profiles FOR ALL USING (
   EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND (email = 'dossou1992@gmail.com' OR role = 'superadmin'))
 );
+
+DROP POLICY IF EXISTS "Superadmin full access subscriptions" ON public.subscriptions;
 CREATE POLICY "Superadmin full access subscriptions" ON public.subscriptions FOR ALL USING (
   EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND (email = 'dossou1992@gmail.com' OR role = 'superadmin'))
 );
+
+DROP POLICY IF EXISTS "Superadmin full access testimonials" ON public.testimonials;
 CREATE POLICY "Superadmin full access testimonials" ON public.testimonials FOR ALL USING (
   EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND (email = 'dossou1992@gmail.com' OR role = 'superadmin'))
 );
 
 -- ==============================================================================
--- TRIGGER AUTOMATIQUE : Inscription d'un nouvel utilisateur = Création de profil & abonnement
+-- TRIGGER AUTOMATIQUE : Inscription d'un nouvel utilisateur
 -- ==============================================================================
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -162,7 +179,8 @@ BEGIN
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'Membre Prospectizi'),
     CASE WHEN NEW.email = 'dossou1992@gmail.com' THEN 'superadmin' ELSE 'user' END
-  );
+  )
+  ON CONFLICT (id) DO NOTHING;
 
   -- 2. Création de l'abonnement initial (3 prospects offerts en formule Découverte)
   INSERT INTO public.subscriptions (user_id, plan_type, status, prospects_quota, prospects_used, bonus_prospects)
@@ -173,17 +191,19 @@ BEGIN
     CASE WHEN NEW.email = 'dossou1992@gmail.com' THEN 999999 ELSE 3 END,
     0,
     0
-  );
+  )
+  ON CONFLICT (user_id) DO NOTHING;
 
   -- 3. Création de l'avatar par défaut
   INSERT INTO public.user_avatars (user_id)
-  VALUES (NEW.id);
+  VALUES (NEW.id)
+  ON CONFLICT (user_id) DO NOTHING;
 
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Déclencheur sur la table auth.users de Supabase
+-- Déclencheur sur auth.users
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
