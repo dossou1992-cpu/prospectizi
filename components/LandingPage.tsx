@@ -423,13 +423,16 @@ export default function LandingPage() {
             <span className="text-slate-400">- Trouvez &amp; contactez mieux !</span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <button onClick={() => setLegalOpen(true)} className="hover:text-cyan transition-colors underline">
-              Mentions Légales &amp; CGU
-            </button>
-            <button onClick={() => setLegalOpen(true)} className="hover:text-cyan transition-colors underline">
-              Politique RGPD B2B
-            </button>
+          <div className="flex items-center gap-4 flex-wrap justify-center text-xs">
+            <Link href="/terms" className="hover:text-cyan transition-colors underline">
+              Conditions Générales (CGU / CGV)
+            </Link>
+            <Link href="/privacy" className="hover:text-cyan transition-colors underline">
+              Politique de Confidentialité (RGPD)
+            </Link>
+            <Link href="/refund" className="hover:text-cyan transition-colors underline">
+              Politique de Remboursement
+            </Link>
           </div>
 
           <div className="text-slate-500">
