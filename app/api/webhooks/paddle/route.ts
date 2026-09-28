@@ -38,15 +38,19 @@ export async function POST(request: Request) {
       const itemDescription = items.map((i: any) => `${i?.price?.description || ''} ${i?.product?.name || ''}`).join(' ').toLowerCase();
       const customPlan = data?.custom_data?.plan?.toUpperCase();
 
+      const priceIds = items.map((i: any) => i?.price?.id || '').join(' ');
       let plan = 'DECOUVERTE';
       let quota = 3;
 
-      if (customPlan === 'AGENCE' || itemDescription.includes('agence')) {
+      if (priceIds.includes('pri_01m3mc1fbnh16wctb5p219b0q3') || customPlan === 'AGENCE' || itemDescription.includes('agence')) {
         plan = 'AGENCE';
         quota = 450;
-      } else if (customPlan === 'PRO' || itemDescription.includes('pro')) {
+      } else if (priceIds.includes('pri_01m3mbxb3m147tmnzzveegmk09') || customPlan === 'PRO' || itemDescription.includes('pro')) {
         plan = 'PRO';
         quota = 90;
+      } else if (priceIds.includes('pri_01m3mcbzzpxtn4ebh9n0tny4m') || customPlan === 'DECOUVERTE' || itemDescription.includes('decouverte')) {
+        plan = 'DECOUVERTE';
+        quota = 3;
       }
 
       console.log(`[Paddle Webhook] Paiement validé pour ${customerEmail}: Plan ${plan} (${quota} prospects)`);
