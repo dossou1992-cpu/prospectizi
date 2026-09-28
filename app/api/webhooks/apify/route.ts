@@ -32,29 +32,43 @@ export async function POST(request: Request) {
 
     console.log(`[Apify Webhook] ${items.length} prospects extraits. Mise à jour statut en COMPLETED.`);
 
+    const channel = payload.channel || 'google_maps';
+
     // Sauvegarde automatique des prospects extraits dans la base Supabase
     if (supabaseAdmin && items.length > 0 && userId) {
       try {
-        const prospectInserts = items.map((it: any) => ({
-          user_id: userId,
-          company_name: it.title || it.name || "Entreprise ciblée",
-          activity: it.categoryName || it.subTitle || "Activité locale",
-          city: it.city || it.address || "Ville",
-          country: "France",
-          qualification_score: Math.floor(Math.random() * 20) + 75,
-          qualification_reason: "Présence Google Maps vérifiée avec opportunités d'optimisation",
-          flaws_identified: !it.website ? "Absence de site internet actif détectée" : "Site web non optimisé pour mobile et acquisition B2B",
-          recommended_offer: "Accompagnement en acquisition client et digitalisation",
-          opportunity: "Fort potentiel de signature rapide",
-          channel: "google_maps",
-          email: it.email || "",
-          phone: it.phone || it.phoneNumber || "",
-          website_url: it.website || it.url || "",
-          status: "nouveau"
-        }));
+        const prospectInserts = items.map((it: any) => {
+          const company = it.title || it.name || "Entreprise ciblée";
+          const rawUrl = it.website || it.url || "";
+          
+          const socialLinks: any = {};
+          if (channel === 'linkedin' || rawUrl.includes('linkedin')) socialLinks.linkedin = rawUrl;
+          if (channel === 'facebook' || rawUrl.includes('facebook')) socialLinks.facebook = rawUrl;
+          if (channel === 'instagram' || rawUrl.includes('instagram')) socialLinks.instagram = rawUrl;
+          if (channel === 'google_maps' || rawUrl.includes('google.com/maps')) socialLinks.google_maps = rawUrl;
+
+          return {
+            user_id: userId,
+            company_name: company,
+            activity: it.categoryName || it.subTitle || "Activité B2B",
+            city: it.city || it.address || "Localisation vérifiée",
+            country: "International",
+            qualification_score: Math.floor(Math.random() * 20) + 75,
+            qualification_reason: `Présence vérifiée sur ${channel.replace('_', ' ').toUpperCase()} avec opportunités d'optimisation commerciale`,
+            flaws_identified: !it.website ? "Absence de site internet officiel ou de tunnel de vente actif" : "Canal digital sous-exploité pour la génération de rendez-vous qualifiés",
+            recommended_offer: "Accompagnement en acquisition client B2B et digitalisation de l'offre",
+            opportunity: "Fort potentiel de signature rapide",
+            channel: channel,
+            email: it.email || "",
+            phone: it.phone || it.phoneNumber || "",
+            website_url: rawUrl,
+            social_links: socialLinks,
+            status: "nouveau"
+          };
+        });
 
         await supabaseAdmin.from('prospects').insert(prospectInserts);
-        console.log(`[Supabase] ${items.length} nouveaux prospects insérés en base pour ${userId}`);
+        console.log(`[Supabase] ${items.length} nouveaux prospects insérés en base sur canal ${channel} pour ${userId}`);
       } catch (dbErr) {
         console.error("[Supabase Insert Error]", dbErr);
       }

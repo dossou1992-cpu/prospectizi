@@ -34,39 +34,84 @@ export async function POST(request: Request) {
 
     const searchId = `search_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
-    // 3. Configuration stricte pour éviter tout timeout ou surconsommation de crédits
-    const apifyActorId = process.env.APIFY_ACTOR_ID || "compass~crawler-google-places";
-    const apifyToken = process.env.APIFY_TOKEN || "mock_token";
+    // 3. Routage dynamique selon le canal choisi (5 canaux 100% couverts)
+    let actorId = "compass~crawler-google-places";
+    let runInput: any = {};
+
+    const targetCount = Math.min(Number(maxItems) || 3, 10);
     const webhookReturnUrl = process.env.NEXT_PUBLIC_APP_URL 
       ? `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/apify`
-      : "https://prospectizi.com/api/webhooks/apify";
+      : "https://prospectizi.vercel.app/api/webhooks/apify";
 
-    console.log(`[Scrape Secure] Démarrage recherche: "${cleanKeyword}" à "${cleanLocation}" (${channel}) - IP: ${clientIp}`);
+    if (channel === 'google_maps') {
+      actorId = process.env.APIFY_MAPS_ACTOR_ID || "compass~crawler-google-places";
+      runInput = {
+        searchStringsArray: [`${cleanKeyword} ${cleanLocation}`],
+        maxCrawledPlacesPerSearch: targetCount,
+        language: "fr"
+      };
+    } else if (channel === 'linkedin') {
+      actorId = process.env.APIFY_SEARCH_ACTOR_ID || "apify~google-search-scraper";
+      runInput = {
+        queries: `site:linkedin.com/company "${cleanKeyword}" "${cleanLocation}"`,
+        maxPagesPerQuery: 1,
+        resultsPerPage: targetCount,
+        countryCode: "fr"
+      };
+    } else if (channel === 'facebook') {
+      actorId = process.env.APIFY_SEARCH_ACTOR_ID || "apify~google-search-scraper";
+      runInput = {
+        queries: `site:facebook.com "${cleanKeyword}" "${cleanLocation}"`,
+        maxPagesPerQuery: 1,
+        resultsPerPage: targetCount,
+        countryCode: "fr"
+      };
+    } else if (channel === 'instagram') {
+      actorId = process.env.APIFY_SEARCH_ACTOR_ID || "apify~google-search-scraper";
+      runInput = {
+        queries: `site:instagram.com "${cleanKeyword}" "${cleanLocation}"`,
+        maxPagesPerQuery: 1,
+        resultsPerPage: targetCount,
+        countryCode: "fr"
+      };
+    } else {
+      // Canal 'google' standard
+      actorId = process.env.APIFY_SEARCH_ACTOR_ID || "apify~google-search-scraper";
+      runInput = {
+        queries: `"${cleanKeyword}" "${cleanLocation}" email contact telephone`,
+        maxPagesPerQuery: 1,
+        resultsPerPage: targetCount,
+        countryCode: "fr"
+      };
+    }
 
-    if (process.env.APIFY_TOKEN && process.env.APIFY_TOKEN !== "mock_token") {
-      const apifyRunUrl = `https://api.apify.com/v2/acts/${apifyActorId}/runs?token=${apifyToken}&timeout=120`;
+    // Ajout du webhook de retour asynchrone
+    runInput.webhooks = [
+      {
+        eventTypes: ["ACTOR.RUN.SUCCEEDED", "ACTOR.RUN.FAILED"],
+        requestUrl: webhookReturnUrl,
+        payloadTemplate: JSON.stringify({
+          searchId,
+          userId,
+          channel,
+          status: "{{status}}",
+          datasetId: "{{defaultDatasetId}}"
+        })
+      }
+    ];
+
+    console.log(`[Scrape Multi-Canal] Démarrage recherche: "${cleanKeyword}" à "${cleanLocation}" sur canal: ${channel} (Actor: ${actorId}) - IP: ${clientIp}`);
+
+    const apifyToken = process.env.APIFY_TOKEN || process.env.APIFY_API_TOKEN;
+
+    if (apifyToken && apifyToken !== "mock_token") {
+      const apifyRunUrl = `https://api.apify.com/v2/acts/${actorId}/runs?token=${apifyToken}&timeout=120`;
       
       fetch(apifyRunUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          searchStringsArray: [`${cleanKeyword} ${cleanLocation}`],
-          maxCrawledPlacesPerSearch: Math.min(Number(maxItems) || 3, 10),
-          language: "fr",
-          webhooks: [
-            {
-              eventTypes: ["ACTOR.RUN.SUCCEEDED", "ACTOR.RUN.FAILED"],
-              requestUrl: webhookReturnUrl,
-              payloadTemplate: JSON.stringify({
-                searchId,
-                userId,
-                status: "{{status}}",
-                datasetId: "{{defaultDatasetId}}"
-              })
-            }
-          ]
-        })
-      }).catch(err => console.error("[Apify Trigger Error]", err));
+        body: JSON.stringify(runInput)
+      }).catch(err => console.error("[Apify Multi-Channel Trigger Error]", err));
     }
 
     // Réponse asynchrone instantanée (< 200ms) pour parer au timeout de Vercel
