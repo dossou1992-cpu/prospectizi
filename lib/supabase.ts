@@ -10,9 +10,20 @@ export const isSupabaseConfigured = Boolean(
   !supabaseUrl.includes('placeholder')
 );
 
-// Client Supabase officiel pour le navigateur et le serveur
+// Client Supabase officiel pour le navigateur (clé publique)
 export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
+
+// Client Supabase avec droits d'administration (pour les webhooks et actions serveur)
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+export const supabaseAdmin = supabaseUrl && supabaseServiceKey
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
   : null;
 
 // ==============================================================================

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: Request) {
   try {
@@ -37,6 +38,36 @@ export async function POST(request: Request) {
       }
 
       console.log(`[LemonSqueezy Webhook] Paiement validé pour ${userEmail}: Plan ${plan} (${quota} prospects)`);
+
+      // Synchronisation directe dans la base de données Supabase
+      if (supabaseAdmin && userEmail) {
+        try {
+          const { data: profile } = await supabaseAdmin
+            .from('profiles')
+            .select('id')
+            .eq('email', userEmail)
+            .single();
+
+          if (profile?.id) {
+            await supabaseAdmin
+              .from('subscriptions')
+              .update({
+                plan_type: plan,
+                status: 'active',
+                prospects_quota: quota,
+                prospects_used: 0,
+                current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+                auto_renew: true,
+                updated_at: new Date().toISOString()
+              })
+              .eq('user_id', profile.id);
+            console.log(`[Supabase] Abonnement Lemon Squeezy activé pour ${userEmail}`);
+          }
+        } catch (dbErr) {
+          console.error("[Supabase Update Error]", dbErr);
+        }
+      }
+
       return NextResponse.json({ status: 'success', plan, quota });
     }
 
