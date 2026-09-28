@@ -56,17 +56,17 @@ export default function UpgradeModal() {
               : 'bg-cyan/15 border-cyan/40 text-cyan'
           }`}>
             {isSubscriptionExpired ? <RotateCcw className="w-3.5 h-3.5" /> : <Zap className="w-3.5 h-3.5" />}
-            <span>{isSubscriptionExpired ? "Échéance Mensuelle Atteinte" : "Plafond de démonstration atteint"}</span>
+            <span>{isSubscriptionExpired ? "Échéance Mensuelle Atteinte" : "Plafond d'essai atteint"}</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-2">
             {isSubscriptionExpired 
-              ? "Renouvelez votre formule pour réactiver vos crédits"
+              ? "Renouvelez votre abonnement mensuel"
               : "Vos futurs clients n'attendent pas !"}
           </h2>
           <p className="text-slate-400 text-xs sm:text-sm">
             {isSubscriptionExpired
-              ? "Votre période de 30 jours est échue. Validez votre renouvellement pour continuer à générer des prospects sans interruption."
-              : "Choisissez l'offre adaptée à vos besoins : testez avec le plan Découverte à 1 €, passez au plan PRO (29 € / 90 prospects) ou débloquez le plein potentiel avec AGENCE (59 € / 450 prospects)."}
+              ? "Votre période mensuelle de 30 jours est échue. Renouvelez votre formule PRO (90 leads) ou AGENCE (450 leads) pour continuer vos prospections sans interruption."
+              : "Vous avez atteint la limite de vos prospects d'essai ! Choisissez l'offre qui vous convient : le plan Découverte à 1 € (offre d'essai unique) ou nos abonnements mensuels sans engagement."}
           </p>
         </div>
 
@@ -88,66 +88,76 @@ export default function UpgradeModal() {
           </div>
         </div>
 
-        {/* 3 Offer Cards Comparison */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 items-stretch">
+        {/* Offer Cards Comparison */}
+        <div className={`grid gap-5 mb-6 items-stretch ${
+          isSubscriptionExpired ? 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto' : 'grid-cols-1 md:grid-cols-3'
+        }`}>
           
-          {/* Plan DÉCOUVERTE (1 €) */}
-          <div className="bg-dark-800/60 border border-dark-600 hover:border-slate-500 rounded-2xl p-5 flex flex-col justify-between transition-colors">
-            <div>
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-dark-700 px-2 py-0.5 rounded-full border border-dark-600">
-                    Test &amp; Prise en main
-                  </span>
-                  <h3 className="text-lg font-bold text-white mt-2">DÉCOUVERTE</h3>
-                  <p className="text-[11px] text-slate-400">Pour tester l&apos;outil</p>
+          {/* Plan DÉCOUVERTE (1 €) - Affiché UNIQUEMENT en surclassement initial, JAMAIS en renouvellement d'échéance */}
+          {!isSubscriptionExpired && (
+            <div className="bg-dark-800/60 border border-dark-600 hover:border-slate-500 rounded-2xl p-5 flex flex-col justify-between transition-colors">
+              <div>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-dark-700 px-2 py-0.5 rounded-full border border-dark-600">
+                      Offre d&apos;essai unique
+                    </span>
+                    <h3 className="text-lg font-bold text-white mt-2">DÉCOUVERTE</h3>
+                    <p className="text-[11px] text-slate-400">Paiement unique - 1 fois seulement</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-2xl font-extrabold text-white">1 €</span>
+                    <span className="text-[10px] text-slate-400 block font-medium text-amber-400">Non renouvelable</span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-2xl font-extrabold text-white">1 €</span>
-                  <span className="text-[10px] text-slate-400 block">Paiement unique</span>
+
+                <div className="bg-dark-700/50 rounded-xl p-2.5 my-3 border border-dark-600/50 text-[11px] text-slate-300 flex items-center justify-between">
+                  <span>Volume inclus :</span>
+                  <span className="font-bold font-mono text-cyan">3 prospects qualifiés</span>
                 </div>
+
+                <ul className="space-y-2 text-xs text-slate-300 mb-5">
+                  <li className="flex items-center gap-2">
+                    <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
+                    <span><strong>3 Prospects Qualifiés</strong> complets</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
+                    <span>Messages d&apos;accroche IA sur-mesure</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
+                    <span>Accès à 1 canal au choix (Google Maps)</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
+                    <span>Gestion CRM de base des 3 fiches</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-slate-500 text-[11px]">
+                    <span className="w-3.5 h-3.5 text-center">✕</span>
+                    <span>Offre unique, sans reconduction</span>
+                  </li>
+                </ul>
               </div>
 
-              <div className="bg-dark-700/50 rounded-xl p-2.5 my-3 border border-dark-600/50 text-[11px] text-slate-300 flex items-center justify-between">
-                <span>Volume inclus :</span>
-                <span className="font-bold font-mono text-cyan">3 prospects qualifiés</span>
-              </div>
-
-              <ul className="space-y-2 text-xs text-slate-300 mb-5">
-                <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                  <span><strong>3 Prospects Qualifiés</strong> complets</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                  <span>Messages d&apos;accroche IA sur-mesure</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                  <span>Accès à 1 canal au choix (Google Maps)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                  <span>Gestion CRM de base des fiches</span>
-                </li>
-              </ul>
+              <button
+                onClick={() => handleCheckout('DECOUVERTE')}
+                disabled={loadingPlan !== null || subscription.plan_type === 'DECOUVERTE'}
+                className="w-full py-2.5 px-3 rounded-xl font-bold text-xs bg-dark-700 hover:bg-dark-600 text-slate-200 border border-dark-500 flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
+              >
+                {loadingPlan === 'DECOUVERTE' ? (
+                  <span>Activation...</span>
+                ) : subscription.plan_type === 'DECOUVERTE' ? (
+                  <span>Déjà utilisé</span>
+                ) : (
+                  <>
+                    <span>Tester Découverte (1 €)</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </>
+                )}
+              </button>
             </div>
-
-            <button
-              onClick={() => handleCheckout('DECOUVERTE')}
-              disabled={loadingPlan !== null || subscription.plan_type === 'DECOUVERTE'}
-              className="w-full py-2.5 px-3 rounded-xl font-bold text-xs bg-dark-700 hover:bg-dark-600 text-slate-200 border border-dark-500 flex items-center justify-center gap-1.5 transition-all"
-            >
-              {loadingPlan === 'DECOUVERTE' ? (
-                <span>Activation...</span>
-              ) : (
-                <>
-                  <span>Choisir Découverte (1 €)</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
-              )}
-            </button>
-          </div>
+          )}
 
           {/* Plan PRO (29 €) */}
           <div className="bg-dark-800/90 border-2 border-cyan rounded-2xl p-5 relative flex flex-col justify-between shadow-cyan-border">

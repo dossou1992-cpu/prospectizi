@@ -96,7 +96,7 @@ export default function PricingPage() {
             <h3 className="text-xl font-bold text-white">DÉCOUVERTE</h3>
             <div className="my-4">
               <span className="text-3xl font-black text-white">1 €</span>
-              <span className="text-xs text-slate-400 block mt-0.5">Paiement unique, sans abonnement</span>
+              <span className="text-xs text-amber-400 block mt-0.5 font-medium">Paiement unique (1 seule fois - Non renouvelable)</span>
             </div>
 
             <p className="text-xs text-slate-400 mb-5 leading-relaxed">
@@ -126,17 +126,21 @@ export default function PricingPage() {
               </li>
               <li className="flex items-center gap-2 text-slate-500">
                 <span className="w-4 h-4 text-center">✕</span>
-                <span>Pas d&apos;export CSV ni d&apos;Audit Mensuel IA</span>
+                <span>Offre d&apos;essai unique, pas de reconduction</span>
               </li>
             </ul>
           </div>
 
           <button
             onClick={() => handleSelectPlan('DECOUVERTE')}
-            disabled={subscription.plan_type === 'DECOUVERTE'}
+            disabled={subscription.plan_type === 'DECOUVERTE' || subscription.plan_type === 'PRO' || subscription.plan_type === 'AGENCE'}
             className="w-full py-2.5 px-4 rounded-xl text-xs font-bold bg-dark-800 hover:bg-dark-700 text-slate-300 border border-dark-600 disabled:opacity-50 transition-all"
           >
-            {subscription.plan_type === 'DECOUVERTE' ? "Plan Actuel" : "Choisir l'offre Découverte (1 €)"}
+            {subscription.plan_type === 'DECOUVERTE' 
+              ? "Plan Découverte Utilisé" 
+              : (subscription.plan_type === 'PRO' || subscription.plan_type === 'AGENCE')
+                ? "Formule supérieure active"
+                : "Choisir l'offre Découverte (1 €)"}
           </button>
         </div>
 
