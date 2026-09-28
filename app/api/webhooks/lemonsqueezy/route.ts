@@ -26,13 +26,15 @@ export async function POST(request: Request) {
     if (eventName === 'order_created' || eventName === 'subscription_created') {
       const userEmail = data?.user_email;
       const variantName = data?.first_order_item?.variant_name || '';
+      const productName = data?.first_order_item?.product_name || '';
+      const combined = `${variantName} ${productName}`.toLowerCase();
 
       let plan = 'PRO';
       let quota = 90;
-      if (variantName.toLowerCase().includes('agence')) {
+      if (combined.includes('agence')) {
         plan = 'AGENCE';
         quota = 450;
-      } else if (variantName.toLowerCase().includes('decouverte')) {
+      } else if (combined.includes('decouverte')) {
         plan = 'DECOUVERTE';
         quota = 3;
       }

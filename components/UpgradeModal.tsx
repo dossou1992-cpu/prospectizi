@@ -6,7 +6,7 @@ import { X, Check, Zap, ArrowRight, Shield, Globe, Smartphone, RotateCcw } from 
 import { PlanType } from '@/lib/types';
 
 export default function UpgradeModal() {
-  const { showUpgradeModal, setShowUpgradeModal, upgradePlan, isSubscriptionExpired, subscription } = useStore();
+  const { showUpgradeModal, setShowUpgradeModal, upgradePlan, isSubscriptionExpired, subscription, user } = useStore();
   const [gateway, setGateway] = useState<'flutterwave' | 'lemonsqueezy'>('flutterwave');
   const [loadingPlan, setLoadingPlan] = useState<PlanType | null>(null);
 
@@ -17,10 +17,16 @@ export default function UpgradeModal() {
 
     // 1. Redirection vers Lemon Squeezy si URL configurée
     if (gateway === 'lemonsqueezy') {
-      const lemonUrl = plan === 'AGENCE' 
+      let lemonUrl = plan === 'AGENCE' 
         ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_AGENCE_URL 
-        : process.env.NEXT_PUBLIC_LEMONSQUEEZY_PRO_URL;
+        : plan === 'PRO'
+          ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_PRO_URL
+          : process.env.NEXT_PUBLIC_LEMONSQUEEZY_DECOUVERTE_URL;
       if (lemonUrl) {
+        if (user?.email) {
+          const sep = lemonUrl.includes('?') ? '&' : '?';
+          lemonUrl = `${lemonUrl}${sep}checkout[email]=${encodeURIComponent(user.email)}`;
+        }
         window.location.href = lemonUrl;
         return;
       }

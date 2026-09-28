@@ -46,17 +46,75 @@ Ce guide pas-à-pas est spécialement rédigé pour vous permettre de connecter 
 
 ## 3. 💳 MOYENS DE PAIEMENT (Lemon Squeezy & Flutterwave)
 
-### A. Carte Bancaire Internationale (Lemon Squeezy)
-1. Créez un compte sur [https://lemonsqueezy.com](https://lemonsqueezy.com) (Merchant of Record officiel qui gère la TVA pour vous).
-2. Créez 2 produits dans votre boutique :
-   - **Plan PRO (29 € / mois)**
-   - **Plan AGENCE (59 € / mois)**
-3. Copiez le lien de partage (Checkout URL) de chaque produit :
-   - `NEXT_PUBLIC_LEMONSQUEEZY_PRO_URL=https://prospectizi.lemonsqueezy.com/buy/xxxx`
-   - `NEXT_PUBLIC_LEMONSQUEEZY_AGENCE_URL=https://prospectizi.lemonsqueezy.com/buy/yyyy`
-4. Dans **Settings** ➡️ **Webhooks**, ajoutez l'URL de votre site :
-   - URL : `https://prospectizi.vercel.app/api/webhooks/lemonsqueezy`
-   - Secret : `LEMONSQUEEZY_WEBHOOK_SECRET=votre_secret_choisi`
+### A. Carte Bancaire Internationale & Facturation TVA (Lemon Squeezy)
+
+Lemon Squeezy agit comme **« Merchant of Record »** (commerçant officiel) :
+- Ils encaissent légalement les paiements par Carte Bancaire (Visa, MasterCard, Amex), Apple Pay et Google Pay.
+- Ils calculent, collectent et reversent automatiquement la TVA dans toute l'Union Européenne et à l'international.
+- Ils émettent des factures légales avec mention de TVA pour vos clients professionnels sans aucune démarche fiscale complexe de votre part.
+
+#### Étape 1 : Créer votre compte Lemon Squeezy
+1. Rendez-vous sur [https://lemonsqueezy.com](https://lemonsqueezy.com) et cliquez sur **« Get Started »** ou **« Sign Up »** (l'inscription est 100% gratuite).
+2. Renseignez votre adresse email, mot de passe et nommez votre boutique (ex: **`Prospectizi`**).
+3. Par défaut, votre compte démarre en **« Test Mode »** (interrupteur en haut du tableau de bord), ce qui vous permet de créer vos produits et tester les paiements avec de faux numéros de carte avant de demander l'activation en direct.
+
+#### Étape 2 : Créer vos Produits / Abonnements
+Dans le menu de gauche de Lemon Squeezy, cliquez sur **« Store »** ➡️ **« Products »** ➡️ cliquez sur le bouton vert **« + New product »**.
+
+1. **Créer le Produit PRO (29 € / mois) :**
+   - **Product Name** : `Prospectizi PRO`
+   - **Description** : `90 prospects qualifiés/mois, IA multi-canaux, scoring 3 piliers, exports CSV & CRM.`
+   - **Pricing model** : Choisissez **« Subscription »** (Abonnement récurrent).
+   - **Billing frequency** : `Every month` (Tous les mois).
+   - **Price** : `29` EUR (ou USD selon votre devise).
+   - Cliquez sur **« Publish product »**.
+
+2. **Créer le Produit AGENCE (59 € / mois) :**
+   - **Product Name** : `Prospectizi AGENCE`
+   - **Description** : `450 prospects qualifiés/mois, multi-avatars, accès équipe 5 collaborateurs, support dédié.`
+   - **Pricing model** : Choisissez **« Subscription »** (Abonnement récurrent).
+   - **Billing frequency** : `Every month` (Tous les mois).
+   - **Price** : `59` EUR.
+   - Cliquez sur **« Publish product »**.
+
+3. *(Optionnel)* **Créer le Produit DÉCOUVERTE (1 € paiement unique) :**
+   - **Product Name** : `Prospectizi DÉCOUVERTE`
+   - **Pricing model** : **« Single payment »** (Paiement unique).
+   - **Price** : `1` EUR.
+   - Cliquez sur **« Publish product »**.
+
+#### Étape 3 : Récupérer vos Liens de Paiement (Checkout URLs)
+1. Dans la liste de vos produits (**Store** ➡️ **Products**), cliquez sur les trois petits points `...` ou sur le bouton **« Share »** en face de chaque produit.
+2. Cliquez sur **« Copy checkout link »** (ou copiez l'URL de la page de paiement).
+3. L'URL ressemble à ceci :
+   - Pour PRO : `https://prospectizi.lemonsqueezy.com/buy/a1b2c3d4-xxxx-xxxx`
+   - Pour AGENCE : `https://prospectizi.lemonsqueezy.com/buy/e5f6g7h8-yyyy-yyyy`
+
+#### Étape 4 : Configurer le Webhook (Synchronisation automatique en direct)
+Le webhook permet à Lemon Squeezy d'avertir Prospectizi instantanément dès qu'un paiement réussit, afin d'augmenter le quota du client à 90 ou 450 prospects sans aucune action manuelle de votre part :
+
+1. Dans le menu de gauche de Lemon Squeezy, cliquez sur **« Settings »** (icône d'engrenage en bas) ➡️ **« Webhooks »**.
+2. Cliquez sur le bouton vert **« + New webhook »**.
+3. Remplissez les champs comme suit :
+   - **Callback URL** : `https://prospectizi.vercel.app/api/webhooks/lemonsqueezy` *(ou l'URL de votre déploiement)*
+   - **Signing Secret** : Inventez un mot de passe secret de votre choix (ex: `prospectizi_secret_lemon_2026`). *Gardez-le sous la main !*
+   - **Events to send** : Cochez ces 2 événements essentiels :
+     - `order_created` (Création de commande / paiement validé)
+     - `subscription_created` (Création d'abonnement actif)
+4. Cliquez sur **« Save webhook »**.
+
+#### Étape 5 : Les éléments à coller dans Prospectizi
+Donnez simplement ces éléments à l'assistant dans le chat pour qu'il les intègre directement dans le projet :
+- `NEXT_PUBLIC_LEMONSQUEEZY_PRO_URL` = Le lien de checkout copié pour le plan PRO
+- `NEXT_PUBLIC_LEMONSQUEEZY_AGENCE_URL` = Le lien de checkout copié pour le plan AGENCE
+- `LEMONSQUEEZY_WEBHOOK_SECRET` = Le signing secret que vous avez inventé à l'étape 4
+
+#### Étape 6 : Tester en mode Test
+Lemon Squeezy fournit une carte bancaire fictive pour tester :
+- Numéro de carte : `4242 4242 4242 4242`
+- Date d'expiration : N'importe quelle date future (ex: `12/28`)
+- CVC : `123`
+- Code postal : `75001`
 
 ### B. Mobile Money Afrique (Flutterwave)
 1. Créez un compte sur [https://flutterwave.com](https://flutterwave.com) (supporte T-Money Togo, Moov, Wave, MTN, Orange).

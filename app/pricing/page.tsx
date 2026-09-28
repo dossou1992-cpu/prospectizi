@@ -15,12 +15,44 @@ import {
 import { PlanType } from '@/lib/types';
 
 export default function PricingPage() {
-  const { subscription, upgradePlan } = useStore();
+  const { subscription, upgradePlan, user } = useStore();
   const [gateway, setGateway] = useState<'flutterwave' | 'lemonsqueezy'>('flutterwave');
   const [loadingPlan, setLoadingPlan] = useState<PlanType | null>(null);
 
   const handleSelectPlan = (plan: PlanType) => {
     setLoadingPlan(plan);
+
+    // 1. Redirection vers Lemon Squeezy si URL configurée
+    if (gateway === 'lemonsqueezy') {
+      let lemonUrl = plan === 'AGENCE'
+        ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_AGENCE_URL
+        : plan === 'PRO'
+          ? process.env.NEXT_PUBLIC_LEMONSQUEEZY_PRO_URL
+          : process.env.NEXT_PUBLIC_LEMONSQUEEZY_DECOUVERTE_URL;
+      if (lemonUrl) {
+        if (user?.email) {
+          const sep = lemonUrl.includes('?') ? '&' : '?';
+          lemonUrl = `${lemonUrl}${sep}checkout[email]=${encodeURIComponent(user.email)}`;
+        }
+        window.location.href = lemonUrl;
+        return;
+      }
+    }
+
+    // 2. Redirection vers Flutterwave si URL configurée
+    if (gateway === 'flutterwave') {
+      const flwUrl = plan === 'AGENCE'
+        ? process.env.NEXT_PUBLIC_FLUTTERWAVE_AGENCE_URL
+        : plan === 'PRO'
+          ? process.env.NEXT_PUBLIC_FLUTTERWAVE_PRO_URL
+          : process.env.NEXT_PUBLIC_FLUTTERWAVE_DECOUVERTE_URL;
+      if (flwUrl) {
+        window.location.href = flwUrl;
+        return;
+      }
+    }
+
+    // 3. Fallback Bêta-Test / Démonstration : activation instantanée
     setTimeout(() => {
       upgradePlan(plan);
       setLoadingPlan(null);
