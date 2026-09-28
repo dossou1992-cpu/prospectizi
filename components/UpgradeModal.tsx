@@ -39,7 +39,7 @@ export default function UpgradeModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-      <div className="bg-dark-900 border border-cyan/40 rounded-2xl max-w-4xl w-full p-4 sm:p-6 md:p-8 relative shadow-cyan-glow-lg max-h-[92vh] overflow-y-auto">
+      <div className="bg-dark-900 border border-cyan/40 rounded-2xl max-w-5xl w-full p-4 sm:p-6 md:p-8 relative shadow-cyan-glow-lg max-h-[92vh] overflow-y-auto">
         {/* Close button */}
         <button
           onClick={() => setShowUpgradeModal(false)}
@@ -49,7 +49,7 @@ export default function UpgradeModal() {
         </button>
 
         {/* Modal Header */}
-        <div className="text-center max-w-xl mx-auto mb-6 sm:mb-8">
+        <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
           <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3 border ${
             isSubscriptionExpired
               ? 'bg-rose-500/15 border-rose-500/40 text-rose-400'
@@ -66,7 +66,7 @@ export default function UpgradeModal() {
           <p className="text-slate-400 text-xs sm:text-sm">
             {isSubscriptionExpired
               ? "Votre période de 30 jours est échue. Validez votre renouvellement pour continuer à générer des prospects sans interruption."
-              : "Vous avez épuisé vos 3 prospects d'essai ! Passez au plan PRO à 29 €/mois pour débloquer 90 prospects par mois ou au plan AGENCE à 59 €/mois pour débloquer 450 prospects par mois."}
+              : "Choisissez l'offre adaptée à vos besoins : testez avec le plan Découverte à 1 €, passez au plan PRO (29 € / 90 prospects) ou débloquez le plein potentiel avec AGENCE (59 € / 450 prospects)."}
           </p>
         </div>
 
@@ -88,55 +88,113 @@ export default function UpgradeModal() {
           </div>
         </div>
 
-        {/* Offer Cards Comparison */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Plan PRO */}
-          <div className="bg-dark-800/90 border-2 border-cyan rounded-2xl p-6 relative flex flex-col justify-between shadow-cyan-border">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-cyan text-dark-950 text-[11px] font-black uppercase px-3 py-0.5 rounded-full shadow-cyan-glow">
-              ★ RECOMMANDÉ / PLUS POPULAIRE ★
+        {/* 3 Offer Cards Comparison */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 items-stretch">
+          
+          {/* Plan DÉCOUVERTE (1 €) */}
+          <div className="bg-dark-800/60 border border-dark-600 hover:border-slate-500 rounded-2xl p-5 flex flex-col justify-between transition-colors">
+            <div>
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-dark-700 px-2 py-0.5 rounded-full border border-dark-600">
+                    Test &amp; Prise en main
+                  </span>
+                  <h3 className="text-lg font-bold text-white mt-2">DÉCOUVERTE</h3>
+                  <p className="text-[11px] text-slate-400">Pour tester l&apos;outil</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-2xl font-extrabold text-white">1 €</span>
+                  <span className="text-[10px] text-slate-400 block">Paiement unique</span>
+                </div>
+              </div>
+
+              <div className="bg-dark-700/50 rounded-xl p-2.5 my-3 border border-dark-600/50 text-[11px] text-slate-300 flex items-center justify-between">
+                <span>Volume inclus :</span>
+                <span className="font-bold font-mono text-cyan">3 prospects qualifiés</span>
+              </div>
+
+              <ul className="space-y-2 text-xs text-slate-300 mb-5">
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
+                  <span><strong>3 Prospects Qualifiés</strong> complets</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
+                  <span>Messages d&apos;accroche IA sur-mesure</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
+                  <span>Accès à 1 canal au choix (Google Maps)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
+                  <span>Gestion CRM de base des fiches</span>
+                </li>
+              </ul>
+            </div>
+
+            <button
+              onClick={() => handleCheckout('DECOUVERTE')}
+              disabled={loadingPlan !== null || subscription.plan_type === 'DECOUVERTE'}
+              className="w-full py-2.5 px-3 rounded-xl font-bold text-xs bg-dark-700 hover:bg-dark-600 text-slate-200 border border-dark-500 flex items-center justify-center gap-1.5 transition-all"
+            >
+              {loadingPlan === 'DECOUVERTE' ? (
+                <span>Activation...</span>
+              ) : (
+                <>
+                  <span>Choisir Découverte (1 €)</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Plan PRO (29 €) */}
+          <div className="bg-dark-800/90 border-2 border-cyan rounded-2xl p-5 relative flex flex-col justify-between shadow-cyan-border">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-cyan text-dark-950 text-[10px] font-black uppercase px-3 py-0.5 rounded-full shadow-cyan-glow">
+              ★ PLUS POPULAIRE ★
             </div>
 
             <div>
-              <div className="flex justify-between items-start mb-3">
+              <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="text-xl font-bold text-white">Plan PRO</h3>
-                  <p className="text-xs text-slate-400">Pour indépendants &amp; freelances</p>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-cyan bg-cyan/15 px-2 py-0.5 rounded-full border border-cyan/40">
+                    Freelances &amp; Pros
+                  </span>
+                  <h3 className="text-lg font-bold text-white mt-2">Plan PRO</h3>
+                  <p className="text-[11px] text-slate-400">Pour indépendants réguliers</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-3xl font-extrabold text-cyan">29 €</span>
-                  <span className="text-xs text-slate-400 block">/ mois sans engagement</span>
+                  <span className="text-2xl font-extrabold text-cyan">29 €</span>
+                  <span className="text-[10px] text-slate-400 block">/ mois sans engagement</span>
                 </div>
               </div>
 
-              <div className="bg-dark-700/60 rounded-xl p-3 my-4 border border-dark-600/60 text-xs text-cyan flex items-center justify-between">
-                <span>Coût par prospect qualifié :</span>
+              <div className="bg-dark-700/60 rounded-xl p-2.5 my-3 border border-dark-600/60 text-[11px] text-cyan flex items-center justify-between">
+                <span>Coût unitaire :</span>
                 <span className="font-bold font-mono">0,32 € / prospect</span>
               </div>
 
-              <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
+              <ul className="space-y-2 text-xs text-slate-300 mb-5">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan shrink-0" />
-                  <span><strong>90 Prospects Qualifiés / mois</strong> (3 / jour ouvré)</span>
+                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
+                  <span><strong>90 Prospects Qualifiés / mois</strong></span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
                   <span>Recherche Multi-Canaux complète (5 canaux)</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan shrink-0" />
-                  <span>IA Avatar Avancée &amp; messages personnalisés</span>
+                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
+                  <span>IA Avatar Avancée &amp; accroches</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
                   <span><strong>Export CSV &amp; Excel</strong> en 1 clic</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan shrink-0" />
+                  <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
                   <span>Module <strong>Audit Mensuel IA</strong> inclus</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-cyan shrink-0" />
-                  <span>Support Prioritaire WhatsApp direct</span>
                 </li>
               </ul>
             </div>
@@ -144,66 +202,65 @@ export default function UpgradeModal() {
             <button
               onClick={() => handleCheckout('PRO')}
               disabled={loadingPlan !== null}
-              className="w-full py-3 px-4 rounded-xl font-extrabold text-sm bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-2 shadow-cyan-glow transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-2.5 px-3 rounded-xl font-extrabold text-xs bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-1.5 shadow-cyan-glow transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               {loadingPlan === 'PRO' ? (
-                <span>Activation instantanée...</span>
+                <span>Activation...</span>
               ) : (
                 <>
-                  <span>{isSubscriptionExpired ? "Renouveler le Plan PRO (29 €)" : "Débloquer 90 prospects pour 29 €"}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>{isSubscriptionExpired ? "Renouveler PRO (29 €)" : "Passer sur PRO (29 €)"}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}
             </button>
           </div>
 
-          {/* Plan AGENCE */}
-          <div className="bg-dark-800/60 border border-dark-600 hover:border-cyan/50 rounded-2xl p-6 relative flex flex-col justify-between transition-colors">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-amber-500 text-dark-950 text-[11px] font-black uppercase px-3 py-0.5 rounded-full">
-              ⚡ RENDEMENT &amp; VOLUME MAXIMUM
+          {/* Plan AGENCE (59 €) */}
+          <div className="bg-dark-800/60 border border-amber-500/50 hover:border-amber-400 rounded-2xl p-5 relative flex flex-col justify-between transition-colors">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-dark-950 text-[10px] font-black uppercase px-3 py-0.5 rounded-full">
+              ⚡ VOLUME MAX
             </div>
 
             <div>
-              <div className="flex justify-between items-start mb-3">
+              <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="text-xl font-bold text-white">Plan AGENCE</h3>
-                  <p className="text-xs text-slate-400">Pour agences, équipes &amp; multi-projets</p>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/15 px-2 py-0.5 rounded-full border border-amber-500/40">
+                    Agences &amp; Équipes
+                  </span>
+                  <h3 className="text-lg font-bold text-white mt-2">Plan AGENCE</h3>
+                  <p className="text-[11px] text-slate-400">Pour agences &amp; multi-cibles</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-3xl font-extrabold text-white">59 €</span>
-                  <span className="text-xs text-slate-400 block">/ mois sans engagement</span>
+                  <span className="text-2xl font-extrabold text-white">59 €</span>
+                  <span className="text-[10px] text-slate-400 block">/ mois sans engagement</span>
                 </div>
               </div>
 
-              <div className="bg-dark-700/60 rounded-xl p-3 my-4 border border-dark-600/60 text-xs text-amber-400 flex items-center justify-between">
-                <span>Coût record par prospect :</span>
+              <div className="bg-dark-700/60 rounded-xl p-2.5 my-3 border border-dark-600/60 text-[11px] text-amber-400 flex items-center justify-between">
+                <span>Coût record :</span>
                 <span className="font-bold font-mono">0,13 € / prospect (5x plus)</span>
               </div>
 
-              <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
+              <ul className="space-y-2 text-xs text-slate-300 mb-5">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span><strong>450 Prospects Qualifiés / mois</strong> (15 / jour)</span>
+                  <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span><strong>450 Prospects Qualifiés / mois</strong></span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Gestion <strong>Multi-Avatars</strong> (jusqu&apos;à 5 cibles)</span>
+                  <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Multi-Avatars (jusqu&apos;à 5 cibles)</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Accès <strong>Équipe &amp; Sous-comptes</strong> (jusqu&apos;à 5 collaborateurs)</span>
+                  <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Accès Équipe (5 sous-comptes)</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Moteur de recherche Haute Vitesse prioritaire</span>
+                  <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Recherche Haute Vitesse prioritaire</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Export CSV / Excel illimité &amp; Audit Mensuel IA</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Onboarding VIP + Support dédié</span>
+                  <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>Audit Mensuel IA &amp; Exports illimités</span>
                 </li>
               </ul>
             </div>
@@ -211,14 +268,14 @@ export default function UpgradeModal() {
             <button
               onClick={() => handleCheckout('AGENCE')}
               disabled={loadingPlan !== null}
-              className="w-full py-3 px-4 rounded-xl font-extrabold text-sm bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-dark-950 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-2.5 px-3 rounded-xl font-extrabold text-xs bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-dark-950 flex items-center justify-center gap-1.5 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               {loadingPlan === 'AGENCE' ? (
-                <span>Activation instantanée...</span>
+                <span>Activation...</span>
               ) : (
                 <>
-                  <span>{isSubscriptionExpired ? "Renouveler le Plan AGENCE (59 €)" : "Passer sur AGENCE pour 59 €"}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>{isSubscriptionExpired ? "Renouveler AGENCE (59 €)" : "Passer sur AGENCE (59 €)"}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}
             </button>
