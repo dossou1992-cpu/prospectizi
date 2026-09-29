@@ -20,30 +20,30 @@ export default function RefundPage() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Politique de Remboursement &amp; Rétractation</h1>
-            <p className="text-xs text-slate-400">Prospectizi - Service SaaS B2B</p>
+            <p className="text-xs text-slate-400">Prospectizi - Logiciel SaaS B2B d&apos;Audit Commercial &amp; IA</p>
           </div>
         </div>
 
         <div className="space-y-6 text-sm text-slate-300 leading-relaxed font-sans">
           <section className="bg-dark-900 border border-dark-700 p-5 rounded-2xl space-y-2">
-            <h2 className="text-base font-bold text-white">Garantie Anti-Gaspillage &amp; Recrédit</h2>
+            <h2 className="text-base font-bold text-white">Garantie Diagnostic Conforme &amp; Recrédit</h2>
             <p className="text-xs leading-relaxed text-slate-300">
-              Si un prospect généré s&apos;avère comporter une coordonnée erronée (numéro non attribué ou e-mail en échec de remise), vous pouvez le signaler depuis l&apos;interface sous 72h. Un nouveau prospect qualifié est automatiquement et gratuitement recrédité sur votre compte.
+              Si un audit commercial ou diagnostic technique présente une anomalie manifeste sur l&apos;établissement analysé (site web inaccessible ou établissement définitivement fermé), vous pouvez le signaler depuis votre tableau de bord sous 72h. Un nouveau crédit d&apos;audit complet est automatiquement et gratuitement recrédité sur votre compte.
             </p>
           </section>
 
           <section className="bg-dark-900 border border-dark-700 p-5 rounded-2xl space-y-2">
             <h2 className="text-base font-bold text-white">Résiliation des Abonnements (PRO et AGENCE)</h2>
             <p className="text-xs leading-relaxed text-slate-300">
-              Nos abonnements mensuels sont sans engagement de durée. Vous pouvez annuler votre renouvellement à tout moment en 1 clic depuis votre espace utilisateur ou en contactant notre support. L&apos;accès reste actif jusqu&apos;à la fin de la période mensuelle déjà réglée.
+              Nos abonnements mensuels sont sans engagement de durée. Vous pouvez annuler votre renouvellement à tout moment en 1 clic depuis votre espace utilisateur (menu Paramètres) ou par simple demande à notre support. L&apos;accès à vos fonctionnalités et à votre historique reste actif jusqu&apos;à la fin de la période mensuelle déjà réglée.
             </p>
           </section>
 
           <section className="bg-dark-900 border border-dark-700 p-5 rounded-2xl space-y-2">
             <h2 className="text-base font-bold text-white">Contact &amp; Assistance Réclamation</h2>
             <p className="text-xs text-slate-300">
-              Pour toute demande de remboursement ou d&apos;assistance commerciale :
-              <span className="text-cyan font-mono block mt-1">billing@prospectizi.com</span>
+              Pour toute demande de remboursement, d&apos;annulation ou d&apos;assistance commerciale :
+              <span className="text-cyan font-mono block mt-1">contact@prospectizi.com</span>
             </p>
           </section>
         </div>

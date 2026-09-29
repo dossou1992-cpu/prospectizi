@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Lock } from 'lucide-react';
+import { ArrowLeft, Lock, ShieldCheck } from 'lucide-react';
 
 export default function PrivacyPage() {
   return (
@@ -20,31 +20,38 @@ export default function PrivacyPage() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Politique de Confidentialité &amp; RGPD B2B</h1>
-            <p className="text-xs text-slate-400">Dernière mise à jour : 28 Septembre 2026</p>
+            <p className="text-xs text-slate-400">Dernière mise à jour : 29 Septembre 2026</p>
           </div>
         </div>
 
         <div className="space-y-6 text-sm text-slate-300 leading-relaxed font-sans">
-          <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">1. Données collectées</h2>
-            <p>
-              Prospectizi collecte uniquement des informations publiques professionnelles relatives aux entreprises : dénomination, site web, numéro de téléphone professionnel, adresse postale d&apos;établissement et contacts publics d&apos;entreprise.
+          <section className="bg-dark-900 border border-dark-700 p-5 rounded-2xl space-y-2">
+            <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-cyan" />
+              1. Nature du Service &amp; Données traitées
+            </h2>
+            <p className="text-xs leading-relaxed text-slate-300">
+              Prospectizi est un outil logiciel d&apos;analyse technique et de diagnostic de présence numérique d&apos;entreprises, associé à un assistant de rédaction de propositions commerciales assisté par IA.
+              Prospectizi ne commercialise aucune base d&apos;adresses e-mails, ne loue aucun fichier de diffusion marketing et n&apos;envoie aucun message automatisé non sollicité.
+            </p>
+            <p className="text-xs leading-relaxed text-slate-300">
+              Les données traitées dans le cadre des audits techniques sont limitées aux informations professionnelles publiques d&apos;établissements (dénomination sociale, site internet public, note d&apos;avis publics, coordonnées professionnelles d&apos;accueil d&apos;entreprises).
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">2. Base légale du traitement</h2>
-            <p>
-              Les traitements sont fondés sur l&apos;Intérêt Légitime (Article 6.1.f du RGPD) pour la facilitation des relations interentreprises (B2B) et l&apos;exécution du contrat de service souscrit par l&apos;utilisateur.
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Les traitements d&apos;audit technique sont fondés sur l&apos;Intérêt Légitime (Article 6.1.f du RGPD) pour l&apos;évaluation professionnelle et le diagnostic de performance numérique des entreprises (B2B), ainsi que l&apos;exécution du contrat de service souscrit par l&apos;utilisateur.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-white">3. Droit d&apos;opposition et suppression (Droit à l&apos;oubli)</h2>
-            <p>
-              Toute personne ou entreprise souhaitant rectifier ou supprimer ses coordonnées de nos index peut en faire la demande immédiate et sans frais à :
-              <span className="text-cyan font-mono block mt-1">privacy@prospectizi.com</span>
-              Toute demande est exécutée sous 48 heures ouvrées.
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Toute entreprise ou professionnel souhaitant rectifier ou demander le retrait de ses informations professionnelles de nos index d&apos;audit technique peut en faire la demande immédiate et sans frais à :
+              <span className="text-cyan font-mono block mt-1">contact@prospectizi.com</span>
+              Toute demande est traitée sous 48 heures ouvrées conformément aux exigences du RGPD.
             </p>
           </section>
         </div>

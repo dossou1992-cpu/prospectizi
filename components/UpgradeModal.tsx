@@ -127,21 +127,21 @@ export default function UpgradeModal() {
 
                 <div className="bg-dark-700/50 rounded-xl p-2.5 my-3 border border-dark-600/50 text-[11px] text-slate-300 flex items-center justify-between">
                   <span>Volume inclus :</span>
-                  <span className="font-bold font-mono text-cyan">3 prospects qualifiés</span>
+                  <span className="font-bold font-mono text-cyan">3 audits commerciaux</span>
                 </div>
 
                 <ul className="space-y-2 text-xs text-slate-300 mb-5">
                   <li className="flex items-center gap-2">
                     <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                    <span><strong>3 Prospects Qualifiés</strong> complets</span>
+                    <span><strong>3 Audits Commerciaux</strong> complets</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                    <span>Messages d&apos;accroche IA sur-mesure</span>
+                    <span>Propositions &amp; Messages IA sur-mesure</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                    <span>Accès à 1 canal au choix (Google Maps)</span>
+                    <span>Diagnostics de présence web</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
@@ -196,25 +196,25 @@ export default function UpgradeModal() {
 
               <div className="bg-dark-700/60 rounded-xl p-2.5 my-3 border border-dark-600/60 text-[11px] text-cyan flex items-center justify-between">
                 <span>Coût unitaire :</span>
-                <span className="font-bold font-mono">0,32 € / prospect</span>
+                <span className="font-bold font-mono">0,32 € / audit</span>
               </div>
 
               <ul className="space-y-2 text-xs text-slate-300 mb-5">
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                  <span><strong>90 Prospects Qualifiés / mois</strong></span>
+                  <span><strong>90 Audits Commerciaux &amp; Propositions / mois</strong></span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                  <span>Recherche Multi-Canaux complète (5 canaux)</span>
+                  <span>Diagnostics de sites web (5 canaux)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                  <span>IA Avatar Avancée &amp; accroches</span>
+                  <span>Assistant IA &amp; A/B Testing d&apos;argumentaires</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
-                  <span><strong>Export CSV &amp; Excel</strong> en 1 clic</span>
+                  <span><strong>Export CSV &amp; Excel</strong> des diagnostics</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-cyan shrink-0" />
@@ -262,17 +262,17 @@ export default function UpgradeModal() {
 
               <div className="bg-dark-700/60 rounded-xl p-2.5 my-3 border border-dark-600/60 text-[11px] text-amber-400 flex items-center justify-between">
                 <span>Coût record :</span>
-                <span className="font-bold font-mono">0,13 € / prospect (5x plus)</span>
+                <span className="font-bold font-mono">0,13 € / audit (5x plus)</span>
               </div>
 
               <ul className="space-y-2 text-xs text-slate-300 mb-5">
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span><strong>450 Prospects Qualifiés / mois</strong></span>
+                  <span><strong>450 Audits Commerciaux &amp; Propositions / mois</strong></span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>Multi-Avatars (jusqu&apos;à 5 cibles)</span>
+                  <span>Multi-Avatars (jusqu&apos;à 5 secteurs)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -280,7 +280,7 @@ export default function UpgradeModal() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>Recherche Haute Vitesse prioritaire</span>
+                  <span>Moteur de diagnostic prioritaire</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -310,10 +310,10 @@ export default function UpgradeModal() {
         <div className="text-center text-[11px] text-slate-400 border-t border-dark-700/80 pt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span className="flex items-center gap-1">
             <Shield className="w-3.5 h-3.5 text-cyan" />
-            Paiement 100% sécurisé et chiffré. Résiliable à tout moment en 1 clic.
+            Paiement 100% sécurisé et chiffré par Paddle. Résiliable à tout moment en 1 clic.
           </span>
           <span>
-            Garantie anti-gaspillage : prospects inexploitables recrédités automatiquement.
+            Garantie conformité : crédits d&apos;audit de remplacement sur simple signalement.
           </span>
         </div>
       </div>
