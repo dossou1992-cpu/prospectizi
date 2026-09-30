@@ -70,7 +70,7 @@ export default function PricingPage() {
           Des formules adaptées à votre croissance commerciale
         </h1>
         <p className="text-slate-400 text-xs md:text-sm">
-          Choisissez l&apos;offre qui correspond à votre volume de prospection. Annulable à tout moment en 1 clic.
+          Choisissez l&apos;offre qui correspond à votre volume d&apos;audits commerciaux. Annulable à tout moment en 1 clic.
         </p>
 
         {/* Universal Payment Reassurance Banner */}
@@ -321,9 +321,9 @@ export default function PricingPage() {
             <Video className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-white">Envie de prospects gratuits ?</h4>
+            <h4 className="text-sm font-bold text-white">Envie d&apos;audits gratuits offerts ?</h4>
             <p className="text-xs text-slate-400">
-              Enregistrez un rapide avis vidéo Loom de 60 secondes et débloquez automatiquement <strong>+3 prospects offerts</strong> sur votre compte !
+              Enregistrez un rapide avis vidéo Loom de 60 secondes et débloquez automatiquement <strong>+3 crédits d&apos;audits offerts</strong> sur votre compte !
             </p>
           </div>
         </div>

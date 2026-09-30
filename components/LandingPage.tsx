@@ -92,7 +92,7 @@ export default function LandingPage() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.15]">
-            Trouvez les bons prospects. <br className="hidden sm:inline" />
+            Auditez les bonnes entreprises. <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan via-cyan-intense to-white">
               Contactez-les mieux !
             </span>
