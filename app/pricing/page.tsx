@@ -70,7 +70,7 @@ export default function PricingPage() {
           Des formules adaptées à votre croissance commerciale
         </h1>
         <p className="text-slate-400 text-xs md:text-sm">
-          Choisissez l&apos;offre qui correspond à votre volume d&apos;audits commerciaux. Annulable à tout moment en 1 clic.
+          Choisissez l&apos;offre qui correspond à votre volume de prospection. Annulable à tout moment en 1 clic.
         </p>
 
         {/* Universal Payment Reassurance Banner */}
@@ -114,21 +114,21 @@ export default function PricingPage() {
             </div>
 
             <p className="text-xs text-slate-400 mb-5 leading-relaxed">
-              Idéal pour réaliser vos 3 premiers audits commerciaux complets et tester la pertinence de nos propositions IA.
+              Idéal pour générer vos 3 premiers prospects ultra-qualifiés et tester l&apos;efficacité de nos messages personnalisés.
             </p>
 
             <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span><strong>3 Audits Commerciaux Complets</strong> (Fiche diagnostic)</span>
+                <span><strong>3 Prospects Qualifiés</strong> (Fiche complète)</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span>Messages &amp; Propositions IA personnalisées</span>
+                <span>Messages IA personnalisés complets</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span>Diagnostics de présence web</span>
+                <span>Accès à 1 canal au choix (ex: Google Maps)</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
@@ -136,7 +136,7 @@ export default function PricingPage() {
               </li>
               <li className="flex items-center gap-2 text-cyan">
                 <Gift className="w-4 h-4 shrink-0" />
-                <span>Possibilité d&apos;obtenir +3 crédits d&apos;audits bonus (Loom)</span>
+                <span>Possibilité d&apos;obtenir +3 prospects bonus (Loom)</span>
               </li>
               <li className="flex items-center gap-2 text-slate-500">
                 <span className="w-4 h-4 text-center">✕</span>
@@ -181,30 +181,30 @@ export default function PricingPage() {
             </div>
 
             <div className="bg-dark-800 rounded-lg p-2.5 mb-4 text-[11px] text-cyan font-mono flex items-center justify-between border border-cyan/20">
-              <span>Coût par analyse &amp; proposition :</span>
-              <strong>0,32 € / audit</strong>
+              <span>Coût par prospect qualifié :</span>
+              <strong>0,32 € / prospect</strong>
             </div>
 
             <p className="text-xs text-slate-300 mb-5 leading-relaxed">
-              Signez 1 à 3 nouveaux clients par mois grâce à un flux régulier d&apos;audits et de propositions percutantes sans y passer vos journées.
+              Signez 1 à 3 nouveaux clients par mois grâce à un flux régulier et automatique de prospects sans y passer vos journées.
             </p>
 
             <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span><strong>90 Audits Commerciaux &amp; Propositions / mois</strong></span>
+                <span><strong>90 Prospects Qualifiés / mois</strong> (3 / jour ouvré)</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span>Diagnostics techniques de sites web</span>
+                <span>Recherche Multi-Canaux illimitée (5 canaux)</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span>Assistant IA &amp; A/B Testing d&apos;argumentaires</span>
+                <span>IA Avatar Avancée &amp; messages sur-mesure</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
-                <span><strong>Export CSV &amp; Excel</strong> des audits</span>
+                <span><strong>Export CSV &amp; Excel</strong> en 1 clic</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-cyan shrink-0" />
@@ -259,21 +259,21 @@ export default function PricingPage() {
 
             <div className="bg-dark-800 rounded-lg p-2.5 mb-4 text-[11px] text-amber-400 font-mono flex items-center justify-between border border-amber-500/20">
               <span>Coût record :</span>
-              <strong>0,13 € / audit (5x plus de volume)</strong>
+              <strong>0,13 € / prospect (5x plus)</strong>
             </div>
 
             <p className="text-xs text-slate-300 mb-5 leading-relaxed">
-              Pour seulement 30 € de plus que le plan PRO, obtenez 5 fois plus de volume d&apos;analyses et partagez les accès avec votre équipe.
+              Pour seulement 30 € de plus que le plan PRO, obtenez 5 fois plus de volume et partagez les accès avec votre équipe.
             </p>
 
             <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                <span><strong>450 Audits Commerciaux &amp; Propositions / mois</strong></span>
+                <span><strong>450 Prospects Qualifiés / mois</strong> (15 / jour)</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Gestion <strong>Multi-Avatars</strong> (jusqu&apos;à 5 secteurs)</span>
+                <span>Gestion <strong>Multi-Avatars</strong> (jusqu&apos;à 5 cibles)</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-amber-400 shrink-0" />
@@ -281,7 +281,7 @@ export default function PricingPage() {
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Moteur de diagnostic prioritaire Haute Vitesse</span>
+                <span>Moteur de détection prioritaire Haute Vitesse</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-amber-400 shrink-0" />
@@ -321,9 +321,9 @@ export default function PricingPage() {
             <Video className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-white">Envie d&apos;audits gratuits offerts ?</h4>
+            <h4 className="text-sm font-bold text-white">Envie de prospects gratuits ?</h4>
             <p className="text-xs text-slate-400">
-              Enregistrez un rapide avis vidéo Loom de 60 secondes et débloquez automatiquement <strong>+3 crédits d&apos;audits offerts</strong> sur votre compte !
+              Enregistrez un rapide avis vidéo Loom de 60 secondes et débloquez automatiquement <strong>+3 prospects offerts</strong> sur votre compte !
             </p>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ShieldCheck, Scale, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Scale } from 'lucide-react';
 
 export default function TermsPage() {
   return (
@@ -20,7 +20,7 @@ export default function TermsPage() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Conditions Générales d&apos;Utilisation &amp; de Vente (CGU / CGV)</h1>
-            <p className="text-xs text-slate-400">Dernière mise à jour : 29 Septembre 2026</p>
+            <p className="text-xs text-slate-400">Dernière mise à jour : 28 Septembre 2026</p>
           </div>
         </div>
 
@@ -31,52 +31,39 @@ export default function TermsPage() {
               Politique de Remboursement &amp; Rétractation
             </h2>
             <p className="text-xs leading-relaxed text-slate-200">
-              Conformément à l&apos;article L. 221-28 13° du Code de la consommation pour les contenus numériques et services logiciels en ligne d&apos;accès immédiat, l&apos;accès aux outils d&apos;audit et fonctionnalités logicielles démarre dès validation du paiement.
-              <strong> Garantie satisfaction :</strong> si un diagnostic technique ou audit présente une incohérence manifeste, un crédit d&apos;audit de remplacement est attribué immédiatement sur simple signalement sous 72h. Tout abonnement mensuel (PRO ou AGENCE) peut être résilié à tout moment en 1 clic sans frais ni préavis depuis votre espace client.
+              Conformément à l&apos;article L. 221-28 13° du Code de la consommation pour les contenus numériques d&apos;accès immédiat, l&apos;accès aux prospects et fonctionnalités démarre dès validation du paiement.
+              <strong> Garantie contact inexploitable :</strong> si un prospect comporte un e-mail ou téléphone non fonctionnel, il est recrédité immédiatement sur simple signalement sous 72h. Tout abonnement mensuel (PRO ou AGENCE) peut être résilié à tout moment en 1 clic sans frais ni préavis.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">1. Objet du Service &amp; Nature du Logiciel</h2>
+            <h2 className="text-lg font-bold text-white">1. Objet du Service</h2>
             <p>
-              Prospectizi est une plateforme logicielle en mode SaaS d&apos;audit technique, de diagnostic commercial et d&apos;assistance rédactionnelle par Intelligence Artificielle pour les professionnels, agences et consultants B2B. Le service permet d&apos;analyser la présence numérique d&apos;entreprises (responsivité mobile, performance, formulaires de conversion, visibilité locale) et de générer des propositions d&apos;amélioration et argumentaires commerciaux sur mesure.
-            </p>
-          </section>
-
-          <section className="bg-dark-900 border border-dark-700 p-5 rounded-2xl space-y-3">
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-cyan" />
-              2. Politique Anti-Spam &amp; Non-Fourniture de Listes Marketing
-            </h2>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              <strong>Engagement strict :</strong> Prospectizi ne vend, ne loue, n&apos;enrichit, ni ne met à disposition aucune liste de diffusion marketing, base d&apos;adresses e-mails ou fichier de prospection de masse. Prospectizi n&apos;intègre aucun moteur d&apos;envoi automatisé d&apos;e-mails, de publipostage de masse ou de marketing sortant non sollicité (cold spam).
-            </p>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              L&apos;utilisateur utilise Prospectizi exclusivement comme outil d&apos;analyse technique et d&apos;aide à la rédaction de propositions personnalisées pour ses propres relations d&apos;affaires individuelles. L&apos;utilisateur demeure seul responsable de ses communications et s&apos;engage à respecter scrupuleusement la législation applicable (notamment le RGPD, la directive e-Privacy et les règles relatives aux communications B2B).
+              Prospectizi est une solution logicielle SaaS d&apos;aide à la prospection commerciale B2B. Elle permet d&apos;identifier des entreprises cibles, de générer des analyses d&apos;opportunités et de personnaliser des messages commerciaux.
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">3. Tarifs et Formules d&apos;Abonnement</h2>
+            <h2 className="text-lg font-bold text-white">2. Tarifs et Formules</h2>
             <ul className="list-disc list-inside space-y-1 pl-2 text-xs">
-              <li><strong>Formule Découverte (1 €) :</strong> Paiement unique d&apos;essai donnant accès à 3 audits commerciaux et diagnostics techniques complets, sans renouvellement automatique.</li>
-              <li><strong>Formule PRO (29 € / mois) :</strong> Accès mensuel à 90 audits commerciaux d&apos;entreprises, assistant de rédaction IA et A/B testing d&apos;argumentaires, exports des diagnostics. Sans engagement, résiliable à tout moment.</li>
-              <li><strong>Formule AGENCE (59 € / mois) :</strong> Accès mensuel à 450 audits commerciaux, multi-secteurs (jusqu&apos;à 5 avatars métiers), accès équipe multi-utilisateurs (5 comptes). Résiliable en 1 clic.</li>
+              <li><strong>Formule Découverte (1 €) :</strong> Paiement unique d&apos;essai donnant accès à 3 prospects qualifiés complets, sans renouvellement automatique.</li>
+              <li><strong>Formule PRO (29 € / mois) :</strong> Accès mensuel à 90 prospects qualifiés, scoring 3 piliers, exports CSV &amp; CRM. Sans engagement, résiliable à tout moment.</li>
+              <li><strong>Formule AGENCE (59 € / mois) :</strong> Accès mensuel à 450 prospects qualifiés, multi-avatars, accès équipe 5 collaborateurs. Résiliable en 1 clic.</li>
             </ul>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">4. Traitement des Paiements</h2>
-            <p className="text-xs text-slate-300">
-              Les transactions financières et abonnements sont traités de manière sécurisée par notre partenaire Merchant of Record agréé (Paddle.com Market Ltd). Vos informations de paiement sont chiffrées selon les normes bancaires PCI-DSS de niveau 1.
+            <h2 className="text-lg font-bold text-white">3. Responsabilité &amp; Utilisation Conforme</h2>
+            <p>
+              L&apos;utilisateur s&apos;engage à utiliser les coordonnées professionnelles conformément aux règles de sollicitation interentreprises (B2B), en respectant le lien avec l&apos;activité de la personne contactée et en fournissant un moyen clair d&apos;opposition (opt-out).
             </p>
           </section>
 
           <section className="space-y-3">
-            <h2 className="text-lg font-bold text-white">5. Contact &amp; Support</h2>
-            <p className="text-xs text-slate-300">
-              Pour toute question relative aux présentes conditions, à l&apos;utilisation du logiciel ou à une commande : 
-              <span className="text-cyan font-mono block mt-1">contact@prospectizi.com</span>
+            <h2 className="text-lg font-bold text-white">4. Contact &amp; Support</h2>
+            <p>
+              Pour toute question relative aux présentes conditions ou à une commande : 
+              <span className="text-cyan font-mono block mt-1">support@prospectizi.com</span>
             </p>
           </section>
         </div>

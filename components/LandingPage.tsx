@@ -88,18 +88,18 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto space-y-6 relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan/15 border border-cyan/40 text-cyan text-xs font-bold uppercase tracking-wider shadow-cyan-border">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Audit Commercial B2B &amp; Assistant Copywriting IA</span>
+            <span>Moteur d&apos;Acquisition B2B &amp; Messages IA Personnalisés</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.15]">
-            Auditez les bonnes entreprises. <br className="hidden sm:inline" />
+            Trouvez les bons prospects. <br className="hidden sm:inline" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan via-cyan-intense to-white">
               Contactez-les mieux !
             </span>
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Fini le démarchage à l&apos;aveugle. Prospectizi audite pour vous les entreprises de votre secteur, identifie leurs points faibles digitaux et génère des propositions commerciales sur mesure pour capter l&apos;attention de vos futurs clients.
+            Fini les heures perdues à prospecter dans le vide. Prospectizi détecte pour vous des entreprises ciblées, identifie leurs failles réelles et rédige le message parfait pour décrocher une réponse en moins de 2 minutes.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
@@ -107,7 +107,7 @@ export default function LandingPage() {
               onClick={() => openAuthModal('register')}
               className="w-full sm:w-auto py-3.5 px-8 rounded-xl font-black text-sm bg-cyan hover:bg-cyan-intense text-dark-950 flex items-center justify-center gap-2 shadow-cyan-glow transition-all hover:scale-105 active:scale-95"
             >
-              <span>Tester pour 1 € seulement (3 Audits Complets)</span>
+              <span>Tester pour 1 € seulement (3 Leads Complets)</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
@@ -124,11 +124,11 @@ export default function LandingPage() {
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 pt-6">
             <span className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-400" />
-              Audits techniques &amp; scores de maturité
+              Contacts directs 100% vérifiés
             </span>
             <span className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-400" />
-              Assistant de rédaction IA &amp; A/B testing
+              Mobile Money &amp; Cartes Locales
             </span>
             <span className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-emerald-400" />
@@ -218,7 +218,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-lg font-bold text-white">Avatar Client &amp; Offre</h3>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Définissez votre cible, vos compétences et votre promesse. L&apos;IA calibre en temps réel vos angles d&apos;approche pour répondre avec précision aux besoins des décideurs.
+              Définissez votre cible, votre bénéfice garanti et votre ton. L&apos;IA calibre en temps réel vos angles d&apos;attaque pour toucher directement les points sensibles des décideurs.
             </p>
           </div>
 
@@ -227,9 +227,9 @@ export default function LandingPage() {
             <div className="w-12 h-12 rounded-xl bg-cyan/15 text-cyan flex items-center justify-center font-black text-lg">
               2
             </div>
-            <h3 className="text-lg font-bold text-white">Audit &amp; Diagnostic B2B</h3>
+            <h3 className="text-lg font-bold text-white">Moteur d&apos;Acquisition B2B</h3>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Diagnostic automatique de la présence en ligne des entreprises : conformité mobile, absence de formulaire, avis Google et calcul d&apos;un score de maturité digitale.
+              Détection multi-sources (Google Maps, Annuaire local, LinkedIn). Chaque prospect est vérifié avec son téléphone actif, son email et une note de pertinence de 60 à 100 points.
             </p>
           </div>
 
@@ -238,9 +238,9 @@ export default function LandingPage() {
             <div className="w-12 h-12 rounded-xl bg-cyan text-dark-950 flex items-center justify-center font-black text-lg shadow-cyan-glow">
               3
             </div>
-            <h3 className="text-lg font-bold text-white">Assistant Rédactionnel &amp; A/B Testing</h3>
+            <h3 className="text-lg font-bold text-white">Messages Courts &amp; WhatsApp Direct</h3>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Générez instantanément des argumentaires personnalisés basés sur les failles constatées. Comparez deux variantes pour maximiser l&apos;impact de vos propositions commerciales.
+              5 messages pré-rédigés de moins de 75 mots, sans jargon. Un clic sur le bouton WhatsApp et votre message est prêt à partir. Fini le syndrome de la page blanche !
             </p>
           </div>
         </div>
@@ -277,15 +277,15 @@ export default function LandingPage() {
                 <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-cyan" />
-                    <span><strong>3 Audits Commerciaux</strong> complets</span>
+                    <span><strong>3 Prospects Qualifiés</strong> complets</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-cyan" />
-                    <span>Propositions &amp; Messages IA sur mesure</span>
+                    <span>Messages IA personnalisés complets</span>
                   </li>
                   <li className="flex items-center gap-2 text-cyan">
                     <Gift className="w-4 h-4" />
-                    <span>+3 crédits d&apos;audit offerts via avis Loom</span>
+                    <span>+3 prospects offerts via avis Loom</span>
                   </li>
                 </ul>
               </div>
@@ -313,16 +313,16 @@ export default function LandingPage() {
                   <span className="text-xs text-slate-400 block mt-0.5">/ mois sans engagement</span>
                 </div>
                 <div className="bg-dark-800 p-2 rounded-lg text-[11px] text-cyan font-mono mb-4 border border-cyan/20">
-                  0,32 € par audit &amp; proposition IA
+                  0,32 € par prospect qualifié
                 </div>
                 <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-cyan" />
-                    <span><strong>90 Audits Commerciaux &amp; Propositions / mois</strong></span>
+                    <span><strong>90 Prospects Qualifiés / mois</strong></span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-cyan" />
-                    <span>Exports CSV / Excel des diagnostics</span>
+                    <span>Exports CSV / Excel illimités</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-cyan" />
@@ -330,7 +330,7 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-cyan" />
-                    <span>A/B Testing d&apos;argumentaires illimité</span>
+                    <span>Support direct WhatsApp prioritaire</span>
                   </li>
                 </ul>
               </div>
@@ -355,12 +355,12 @@ export default function LandingPage() {
                   <span className="text-xs text-slate-400 block mt-0.5">/ mois sans engagement</span>
                 </div>
                 <div className="bg-dark-800 p-2 rounded-lg text-[11px] text-amber-400 font-mono mb-4 border border-amber-500/20">
-                  0,13 € par audit (5x plus de volume)
+                  0,13 € par prospect (5x plus de volume)
                 </div>
                 <ul className="space-y-2.5 text-xs text-slate-300 mb-6">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-amber-400" />
-                    <span><strong>450 Audits Commerciaux &amp; Propositions / mois</strong></span>
+                    <span><strong>450 Prospects Qualifiés / mois</strong></span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-amber-400" />
@@ -368,11 +368,11 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-amber-400" />
-                    <span>Multi-Avatars (jusqu&apos;à 5 secteurs d&apos;activité)</span>
+                    <span>Multi-Avatars (jusqu&apos;à 5 offres)</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-amber-400" />
-                    <span>Diagnostics approfondis &amp; support VIP</span>
+                    <span>Audit Mensuel IA &amp; support VIP</span>
                   </li>
                 </ul>
               </div>
@@ -396,9 +396,9 @@ export default function LandingPage() {
               <Gift className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Envie de crédits d&apos;audits offerts ?</h3>
+              <h3 className="text-base font-bold text-white">Envie de prospects offerts ?</h3>
               <p className="text-xs text-slate-400 mt-0.5 max-w-md">
-                Partagez un rapide retour d&apos;expérience vidéo de 60 secondes sur Loom et débloquez automatiquement <strong>+3 audits commerciaux gratuits</strong> sur votre compte !
+                Partagez un rapide retour d&apos;expérience vidéo de 60 secondes sur Loom et débloquez automatiquement <strong>+3 prospects qualifiés gratuits</strong> sur votre compte !
               </p>
             </div>
           </div>
@@ -438,9 +438,6 @@ export default function LandingPage() {
           <div className="text-slate-500">
             © 2026 Prospectizi SAS. Tous droits réservés.
           </div>
-        </div>
-        <div className="max-w-4xl mx-auto text-center mt-4 pt-4 border-t border-dark-900 text-[10px] text-slate-500 leading-relaxed">
-          Prospectizi est une plateforme logicielle SaaS d&apos;audit commercial et d&apos;assistance rédactionnelle par IA pour professionnels. Prospectizi ne vend aucune liste de diffusion marketing, ne loue aucune base d&apos;adresses e-mails et n&apos;envoie aucun message non sollicité.
         </div>
       </footer>
 
