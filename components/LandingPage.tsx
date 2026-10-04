@@ -424,6 +424,9 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4 flex-wrap justify-center text-xs">
+            <Link href="/legal" className="hover:text-cyan transition-colors underline">
+              Mentions Légales
+            </Link>
             <Link href="/terms" className="hover:text-cyan transition-colors underline">
               Conditions Générales (CGU / CGV)
             </Link>
