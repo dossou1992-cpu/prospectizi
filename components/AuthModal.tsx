@@ -54,7 +54,7 @@ export default function AuthModal() {
         {/* Brand & Title */}
         <div className="text-center mb-6">
           <div className="w-12 h-12 rounded-2xl bg-cyan/15 text-cyan border border-cyan/40 flex items-center justify-center mx-auto mb-3 shadow-cyan-glow">
-            <Zap className="w-6 h-6 fill-cyan" />
+            <span className="font-black text-cyan text-2xl">P</span>
           </div>
           <h2 className="text-xl md:text-2xl font-black text-white">
             {isRegister ? (

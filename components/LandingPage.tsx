@@ -41,17 +41,14 @@ export default function LandingPage() {
     <div className="min-h-screen bg-dark-950 text-slate-100 flex flex-col font-sans selection:bg-cyan selection:text-dark-950">
       {/* 1. PUBLIC NAVBAR */}
       <header className="h-16 md:h-20 border-b border-dark-750 bg-dark-900/80 backdrop-blur-md sticky top-0 z-40 px-4 md:px-8 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-cyan to-cyan-intense flex items-center justify-center text-dark-950 font-black shadow-cyan-glow">
-            <Zap className="w-5 h-5 fill-dark-950" />
-          </div>
-          <div>
-            <span className="text-xl font-black tracking-tight">
-              <span className="text-white">Pros</span>
-              <span className="text-cyan">pectizi</span>
-            </span>
-            <span className="text-[10px] text-cyan font-semibold block leading-none">Trouvez &amp; contactez mieux !</span>
-          </div>
+        <Link href="/" className="flex flex-col group">
+          <span className="text-2xl md:text-3xl font-black tracking-tight leading-none group-hover:opacity-95 transition-opacity">
+            <span className="text-white">Pros</span>
+            <span className="text-cyan">pectizi</span>
+          </span>
+          <span className="text-[10px] md:text-xs text-cyan font-semibold tracking-wide mt-1">
+            {"Trouvez & contactez mieux !"}
+          </span>
         </Link>
 
         {/* Desktop links */}
@@ -413,33 +410,33 @@ export default function LandingPage() {
       </section>
 
       {/* 7. FOOTER */}
-      <footer className="mt-auto border-t border-dark-800 bg-dark-950 py-8 px-4 text-xs text-slate-400">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-black tracking-tight text-sm">
+      <footer className="mt-auto border-t border-dark-800 bg-dark-950 py-6 px-4 text-xs text-slate-400">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-1.5">
+            <Link href="/" className="font-black tracking-tight text-sm hover:opacity-90 transition-opacity">
               <span className="text-white">Pros</span>
               <span className="text-cyan">pectizi</span>
-            </span>
-            <span className="text-slate-400">- Trouvez &amp; contactez mieux !</span>
+            </Link>
+            <span className="text-slate-400 text-xs">{" - Trouvez & contactez mieux !"}</span>
           </div>
 
-          <div className="flex items-center gap-4 flex-wrap justify-center text-xs">
-            <Link href="/legal" className="hover:text-cyan transition-colors underline">
+          <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-center text-xs">
+            <Link href="/legal" className="hover:text-cyan transition-colors text-slate-400 hover:underline">
               Mentions Légales
             </Link>
-            <Link href="/terms" className="hover:text-cyan transition-colors underline">
-              Conditions Générales (CGU / CGV)
+            <Link href="/terms" className="hover:text-cyan transition-colors text-slate-400 hover:underline">
+              Conditions Générales
             </Link>
-            <Link href="/privacy" className="hover:text-cyan transition-colors underline">
-              Politique de Confidentialité (RGPD)
+            <Link href="/privacy" className="hover:text-cyan transition-colors text-slate-400 hover:underline">
+              Politique de Confidentialité
             </Link>
-            <Link href="/refund" className="hover:text-cyan transition-colors underline">
+            <Link href="/refund" className="hover:text-cyan transition-colors text-slate-400 hover:underline">
               Politique de Remboursement
             </Link>
           </div>
 
-          <div className="text-slate-500">
-            © 2026 Prospectizi SAS. Tous droits réservés.
+          <div className="text-slate-500 text-xs whitespace-nowrap">
+            © 2026 Prospectizi. Tous droits réservés.
           </div>
         </div>
       </footer>

@@ -100,9 +100,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="dark scroll-smooth">
-      <head>
-        <Script src="https://cdn.paddle.com/paddle/v2/paddle.js" strategy="afterInteractive" />
-      </head>
       <body className="bg-dark-950 text-slate-100 antialiased selection:bg-cyan selection:text-dark-950 font-sans">
         <ProspectiziProvider>
           <LayoutContent>{children}</LayoutContent>
