@@ -100,6 +100,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="dark scroll-smooth">
+      <head>
+        <title>Prospectizi — Trouvez &amp; contactez mieux !</title>
+        <link rel="icon" type="image/png" sizes="32x32" href="/icon.png" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icon.png" />
+      </head>
       <body className="bg-dark-950 text-slate-100 antialiased selection:bg-cyan selection:text-dark-950 font-sans">
         <ProspectiziProvider>
           <LayoutContent>{children}</LayoutContent>
