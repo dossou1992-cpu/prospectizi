@@ -475,7 +475,7 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
                 )}
 
                 {/* Website */}
-                {prospect.website_url && (
+                {prospect.website_url ? (
                   <div className="p-2.5 bg-dark-800 rounded-lg border border-dark-600 flex items-center justify-between">
                     <span className="text-slate-400 flex items-center gap-1.5">
                       <Globe className="w-3.5 h-3.5 text-cyan" />
@@ -490,6 +490,16 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
                       <span>Visiter le site</span>
                       <ExternalLink className="w-2.5 h-2.5" />
                     </a>
+                  </div>
+                ) : (
+                  <div className="p-2.5 bg-dark-800/80 rounded-lg border border-amber-500/30 flex items-center justify-between text-xs">
+                    <span className="text-slate-400 flex items-center gap-1.5">
+                      <Globe className="w-3.5 h-3.5 text-amber-400" />
+                      Site Web :
+                    </span>
+                    <span className="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                      Aucun site (Opportunité !)
+                    </span>
                   </div>
                 )}
               </div>
