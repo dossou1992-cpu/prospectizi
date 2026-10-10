@@ -37,7 +37,7 @@ export default function LegalPage() {
               <p>• <strong>Nature de l&apos;activité :</strong> Édition de logiciels SaaS, solutions d&apos;aide à la prospection B2B et outils d&apos;analyse commerciale</p>
               <p>• <strong>Directrice de la publication &amp; Fondatrice :</strong> Doris DOSSOU</p>
               <p>• <strong>Statut :</strong> Entrepreneure Individuelle / Professionnelle Indépendante</p>
-              <p>• <strong>Adresse &amp; Siège d&apos;exploitation :</strong> Carré 98, Akpakpa Ciné Concorde, Cotonou, Bénin / Lomé, Togo</p>
+              <p>• <strong>Adresse &amp; Siège d&apos;exploitation :</strong> Carré 98, Akpakpa Ciné Concorde, Cotonou, Bénin</p>
               <p>• <strong>E-mails de contact officiel :</strong> <span className="text-cyan font-mono">contact@prospectizi.com</span> • <span className="text-slate-300 font-mono">dossou1992@gmail.com</span></p>
               <p>• <strong>Slogan officiel :</strong> « Trouvez &amp; contactez mieux ! »</p>
             </div>
@@ -79,7 +79,7 @@ export default function LegalPage() {
               <h2>4. Données Personnelles, Confidentialité &amp; Cookies</h2>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Prospectizi traite les données de ses utilisateurs dans le respect des dispositions de la loi togolaise n° 2019-014 relative à la protection des données à caractère personnel, de la Convention de l&apos;Union Africaine sur la cybersécurité et la protection des données personnelles, ainsi que du Règlement Général sur la Protection des Données (RGPD 2016/679) pour ses utilisateurs et prospects internationaux.
+              Prospectizi traite les données de ses utilisateurs dans le respect des dispositions de la loi n° 2017-20 du 20 avril 2018 portant code du numérique en République du Bénin relative à la protection des données à caractère personnel, de la Convention de l&apos;Union Africaine sur la cybersécurité et la protection des données personnelles, ainsi que du Règlement Général sur la Protection des Données (RGPD 2016/679) pour ses utilisateurs et prospects internationaux.
             </p>
             <p className="text-xs text-slate-300 leading-relaxed">
               Chaque utilisateur dispose d&apos;un droit d&apos;accès, de rectification, de portabilité et d&apos;effacement de ses données personnelles, qu&apos;il peut exercer à tout moment en adressant un e-mail à : <span className="text-cyan font-mono">contact@prospectizi.com</span>.

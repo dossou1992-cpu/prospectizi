@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useStore } from '@/lib/store';
-import { Crown, User, Plus, Video, Gift, Menu, Calendar, AlertCircle, Star } from 'lucide-react';
+import { Crown, User, Plus, Video, Gift, Menu, Calendar, AlertCircle, Star, Bell } from 'lucide-react';
 import Link from 'next/link';
 
 interface TopbarProps {

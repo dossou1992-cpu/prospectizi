@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { keyword, location, channel, userId, userEmail, maxItems = 3 } = body;
+    const { keyword, location, channel = 'google_maps', userId, userEmail, maxItems = 3 } = body;
 
     // 2. Validation & Sanitization strictes (Anti-Injection)
     if (!keyword || !location) {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     const searchId = `search_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
-    // 3. Routage dynamique selon le canal choisi (5 canaux 100% couverts)
+    // 3. Routage dynamique selon les 4 canaux dédiés (Zéro Google Search SERP générique)
     let actorId = "compass~crawler-google-places";
     let runInput: any = {};
 
@@ -44,44 +44,35 @@ export async function POST(request: Request) {
       : "https://prospectizi.vercel.app/api/webhooks/apify";
 
     if (channel === 'google_maps') {
+      // Acteur strict Google Places Crawler
       actorId = process.env.APIFY_MAPS_ACTOR_ID || "compass~crawler-google-places";
       runInput = {
         searchStringsArray: [`${cleanKeyword} ${cleanLocation}`],
         maxCrawledPlacesPerSearch: targetCount,
-        language: "fr"
-      };
-    } else if (channel === 'linkedin') {
-      actorId = process.env.APIFY_SEARCH_ACTOR_ID || "apify~google-search-scraper";
-      runInput = {
-        queries: `site:linkedin.com/company "${cleanKeyword}" "${cleanLocation}"`,
-        maxPagesPerQuery: 1,
-        resultsPerPage: targetCount,
-        countryCode: "fr"
-      };
-    } else if (channel === 'facebook') {
-      actorId = process.env.APIFY_SEARCH_ACTOR_ID || "apify~google-search-scraper";
-      runInput = {
-        queries: `site:facebook.com "${cleanKeyword}" "${cleanLocation}"`,
-        maxPagesPerQuery: 1,
-        resultsPerPage: targetCount,
-        countryCode: "fr"
+        language: "fr",
+        skipClosedPlaces: true
       };
     } else if (channel === 'instagram') {
-      actorId = process.env.APIFY_SEARCH_ACTOR_ID || "apify~google-search-scraper";
+      // Acteur dédié Instagram Profiles
+      actorId = process.env.APIFY_INSTAGRAM_ACTOR_ID || "apify~instagram-scraper";
       runInput = {
-        queries: `site:instagram.com "${cleanKeyword}" "${cleanLocation}"`,
-        maxPagesPerQuery: 1,
-        resultsPerPage: targetCount,
-        countryCode: "fr"
+        search: `${cleanKeyword} ${cleanLocation}`,
+        searchType: "user",
+        searchLimit: targetCount
       };
-    } else {
-      // Canal 'google' standard
-      actorId = process.env.APIFY_SEARCH_ACTOR_ID || "apify~google-search-scraper";
+    } else if (channel === 'linkedin') {
+      // Acteur dédié LinkedIn Company
+      actorId = process.env.APIFY_LINKEDIN_ACTOR_ID || "curious_coder~linkedin-company-scraper";
       runInput = {
-        queries: `"${cleanKeyword}" "${cleanLocation}" email contact telephone`,
-        maxPagesPerQuery: 1,
-        resultsPerPage: targetCount,
-        countryCode: "fr"
+        queries: [`${cleanKeyword} ${cleanLocation}`],
+        maxResults: targetCount
+      };
+    } else if (channel === 'facebook') {
+      // Acteur dédié Facebook Pages
+      actorId = process.env.APIFY_FACEBOOK_ACTOR_ID || "apify~facebook-pages-scraper";
+      runInput = {
+        queries: [`${cleanKeyword} ${cleanLocation}`],
+        maxResults: targetCount
       };
     }
 

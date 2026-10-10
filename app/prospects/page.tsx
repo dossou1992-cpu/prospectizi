@@ -30,7 +30,7 @@ export default function ProspectsPage() {
   } = useStore();
 
   const [keyword, setKeyword] = useState('Architecte & Décoration');
-  const [location, setLocation] = useState('Lomé');
+  const [location, setLocation] = useState('Cotonou');
   const [channel, setChannel] = useState<Channel>('google_maps');
   const [searchCount] = useState<number>(3);
   const [isSearching, setIsSearching] = useState(false);
@@ -169,7 +169,7 @@ export default function ProspectsPage() {
                 required
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="Ex: Lomé, Paris, Abidjan..."
+                placeholder="Ex: Cotonou, Paris, Abidjan..."
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan text-xs text-white pl-9 pr-3 py-2.5 rounded-xl focus:outline-none"
               />
             </div>
@@ -188,10 +188,9 @@ export default function ProspectsPage() {
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan text-xs text-white pl-9 pr-3 py-2.5 rounded-xl focus:outline-none appearance-none"
               >
                 <option value="google_maps">Google Maps (Local &amp; WhatsApp vérifiés)</option>
+                <option value="instagram">Instagram (Profils Pros, Bio &amp; E-mail direct)</option>
                 <option value="linkedin">LinkedIn B2B (Décideurs &amp; Dirigeants)</option>
-                <option value="google">Recherche Web Google (Sites officiels)</option>
                 <option value="facebook">Pages Entreprises Facebook</option>
-                <option value="instagram">Comptes Professionnels Instagram</option>
               </select>
             </div>
           </div>
@@ -235,10 +234,9 @@ export default function ProspectsPage() {
           >
             <option value="all">Tous les canaux</option>
             <option value="google_maps">Google Maps</option>
-            <option value="linkedin">LinkedIn</option>
             <option value="instagram">Instagram</option>
+            <option value="linkedin">LinkedIn</option>
             <option value="facebook">Facebook</option>
-            <option value="google">Google</option>
           </select>
 
           {/* Filtre Statut */}
