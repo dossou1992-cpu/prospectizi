@@ -35,10 +35,10 @@ export default function LegalPage() {
             <div className="text-xs text-slate-300 space-y-1.5 pl-1 leading-relaxed">
               <p>• <strong>Nom commercial :</strong> Prospectizi</p>
               <p>• <strong>Nature de l&apos;activité :</strong> Édition de logiciels SaaS, solutions d&apos;aide à la prospection B2B et outils d&apos;analyse commerciale</p>
-              <p>• <strong>Directeur de la publication &amp; Fondateur :</strong> Doris DOSSOU</p>
-              <p>• <strong>Statut :</strong> Entrepreneur Individuel / Professionnel Indépendant</p>
-              <p>• <strong>Siège d&apos;exploitation :</strong> Agbavi, Lomé, Région Maritime, Togo</p>
-              <p>• <strong>E-mail de contact officiel :</strong> <span className="text-cyan font-mono">contact@prospectizi.com</span></p>
+              <p>• <strong>Directrice de la publication &amp; Fondatrice :</strong> Doris DOSSOU</p>
+              <p>• <strong>Statut :</strong> Entrepreneure Individuelle / Professionnelle Indépendante</p>
+              <p>• <strong>Adresse &amp; Siège d&apos;exploitation :</strong> Carré 98, Akpakpa Ciné Concorde, Cotonou, Bénin / Lomé, Togo</p>
+              <p>• <strong>E-mails de contact officiel :</strong> <span className="text-cyan font-mono">contact@prospectizi.com</span> • <span className="text-slate-300 font-mono">dossou1992@gmail.com</span></p>
               <p>• <strong>Slogan officiel :</strong> « Trouvez &amp; contactez mieux ! »</p>
             </div>
           </section>
