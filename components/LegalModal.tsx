@@ -100,34 +100,35 @@ export default function LegalModal({ isOpen, onClose }: LegalModalProps) {
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700">
                 <h3 className="font-bold text-white text-sm mb-2">1. Éditeur de la Plateforme</h3>
                 <p>
-                  Le service SaaS <strong>Prospectizi</strong> (accessible via le domaine prospectizi.com et ses sous-domaines) est édité par la société :
+                  Le service SaaS <strong>Prospectizi</strong> (accessible via le domaine https://prospectizi.vercel.app et ses sous-domaines) est édité par :
                 </p>
-                <ul className="list-disc list-inside mt-2 space-y-1 text-slate-300">
-                  <li><strong>Dénomination sociale :</strong> PROSPECTIZI SAS</li>
-                  <li><strong>Capital social :</strong> 10 000 €</li>
-                  <li><strong>Siège social :</strong> 10 Rue de la Paix, 75002 Paris, France</li>
-                  <li><strong>RCS Paris :</strong> B 912 345 678 | N° TVA Intracommunautaire : FR 32 912345678</li>
-                  <li><strong>Directeur de la publication :</strong> Direction Générale Prospectizi</li>
-                  <li><strong>Contact Support :</strong> contact@prospectizi.com</li>
-                  <li><strong>Délégué à la Protection des Données (DPO) :</strong> dpo@prospectizi.com</li>
+                <ul className="list-disc list-inside mt-2 space-y-1.5 text-slate-300">
+                  <li><strong>Nom commercial :</strong> Prospectizi</li>
+                  <li><strong>Forme juridique :</strong> Entreprise Individuelle / Professionnelle Indépendante (Personne physique)</li>
+                  <li><strong>Directrice de la publication &amp; Fondatrice :</strong> Doris DOSSOU (DOSSOU Emmanuella Jaya Adodo Doris)</li>
+                  <li><strong>Identifiant Fiscal Unique (IFU) :</strong> 0202667536249</li>
+                  <li><strong>Adresse &amp; Siège d&apos;exploitation :</strong> Carré 98, Akpakpa Ciné Concorde, Cotonou, Bénin</li>
+                  <li><strong>Contact Support officiel :</strong> <span className="text-cyan font-mono">contact@prospectizi.com</span> • <span className="text-slate-300 font-mono">dossou1992@gmail.com</span></li>
+                  <li><strong>Déléguée à la Protection des Données (DPO) :</strong> <span className="text-cyan font-mono">contact@prospectizi.com</span></li>
+                  <li><strong>Slogan officiel :</strong> « Trouvez &amp; contactez mieux ! »</li>
                 </ul>
               </div>
 
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700">
                 <h3 className="font-bold text-white text-sm mb-2">2. Hébergement de l&apos;Application</h3>
                 <p>
-                  L&apos;infrastructure logicielle et les bases de données sont hébergées sur des centres de données sécurisés conformes aux normes ISO 27001 et RGPD :
+                  L&apos;infrastructure logicielle et les bases de données sont hébergées sur des centres de données sécurisés conformes aux normes ISO 27001 et aux réglementations sur la protection des données :
                 </p>
                 <ul className="list-disc list-inside mt-2 space-y-1 text-slate-300">
-                  <li><strong>Hébergement Frontend &amp; CDN :</strong> Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA. Serveurs edge en Europe.</li>
-                  <li><strong>Base de Données &amp; Authentification :</strong> Supabase Inc., data centers localisés dans l&apos;Union Européenne (Frankfurt, Allemagne / AWS eu-central-1).</li>
+                  <li><strong>Hébergement Frontend &amp; CDN :</strong> Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA.</li>
+                  <li><strong>Base de Données &amp; Authentification :</strong> Supabase Inc., 970 Toa Payoh North #07-04, Singapour 318992.</li>
                 </ul>
               </div>
 
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700">
                 <h3 className="font-bold text-white text-sm mb-2">3. Propriété Intellectuelle</h3>
                 <p>
-                  L&apos;ensemble des éléments constituant la plateforme Prospectizi (textes, graphismes, interfaces, algorithmes de calcul de pertinence, modèles d&apos;IA de scoring, bases de données) est la propriété exclusive de Prospectizi SAS. Toute reproduction, extraction substantielle ou représentation intégrale ou partielle sans accord préalable écrit est formellement interdite.
+                  L&apos;ensemble des éléments constituant la plateforme Prospectizi (textes, graphismes, interfaces, algorithmes de calcul de pertinence, modèles d&apos;IA de scoring, bases de données) est la propriété exclusive de Doris DOSSOU / Prospectizi. Toute reproduction, extraction substantielle ou représentation intégrale ou partielle sans accord préalable écrit est formellement interdite.
                 </p>
               </div>
             </div>
@@ -142,7 +143,7 @@ export default function LegalModal({ isOpen, onClose }: LegalModalProps) {
                   Clause Essentielle : Renonciation Expresse au Droit de Rétractation
                 </div>
                 <p className="text-white text-xs">
-                  Conformément aux dispositions de l&apos;<strong>article L. 221-28, 13° du Code de la consommation français</strong> et aux directives européennes applicables aux contenus numériques fournis sans support matériel :
+                  Conformément aux dispositions applicables aux contenus numériques fournis en ligne sans support matériel :
                 </p>
                 <p className="mt-2 text-slate-300 text-xs italic">
                   En souscrivant à l&apos;un de nos forfaits (DÉCOUVERTE, PRO ou AGENCE) et en activant la génération de données de prospects qualifiés immédiatement accessibles depuis l&apos;interface, l&apos;Utilisateur donne son accord préalable exprès pour l&apos;exécution immédiate du service et <strong>renonce expressément à son droit de rétractation de 14 jours</strong>, les crédits et données générés étant consommés dès leur mise à disposition.
@@ -152,16 +153,16 @@ export default function LegalModal({ isOpen, onClose }: LegalModalProps) {
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-2">
                 <h3 className="font-bold text-white text-sm">Article 1 - Objet &amp; Champ d&apos;Application</h3>
                 <p>
-                  Les présentes Conditions Générales régissent l&apos;ensemble des relations contractuelles entre Prospectizi SAS et tout professionnel abonné au service. Le service est strictement réservé à une utilisation professionnelle (B2B).
+                  Les présentes Conditions Générales régissent l&apos;ensemble des relations contractuelles entre Prospectizi / Doris DOSSOU et tout professionnel abonné au service. Le service est strictement réservé à une utilisation professionnelle (B2B).
                 </p>
               </div>
 
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-2">
                 <h3 className="font-bold text-white text-sm">Article 2 - Modalités d&apos;Abonnement &amp; Facturation</h3>
                 <ul className="list-disc list-inside space-y-1.5 text-slate-300">
-                  <li><strong>Formule Découverte (1 €) :</strong> Achat ponctuel donnant accès à 3 prospects qualifiés et aux fonctionnalités de base, sans renouvellement automatique.</li>
-                  <li><strong>Formule PRO (29 € HT/mois) :</strong> Abonnement mensuel à tacite reconduction, fournissant un quota de 90 prospects qualifiés mensuels (3 par jour ouvré).</li>
-                  <li><strong>Formule AGENCE (59 € HT/mois) :</strong> Abonnement mensuel fournissant 450 prospects qualifiés mensuels, gestion de 5 sous-comptes et multi-avatars.</li>
+                  <li><strong>Formule Découverte (1 € / 650 XOF) :</strong> Achat ponctuel donnant accès à 3 prospects qualifiés et aux fonctionnalités de base, sans renouvellement automatique.</li>
+                  <li><strong>Formule PRO (29 € / 19 000 XOF par mois) :</strong> Abonnement mensuel à tacite reconduction, fournissant un quota de 90 prospects qualifiés mensuels.</li>
+                  <li><strong>Formule AGENCE (59 € / 39 000 XOF par mois) :</strong> Abonnement mensuel fournissant 450 prospects qualifiés mensuels, gestion de sous-comptes et multi-avatars.</li>
                   <li><strong>Résiliation :</strong> Tout abonnement mensuel peut être résilié à tout moment depuis les paramètres de facturation en un clic, sans frais ni préavis. La résiliation prend effet à l&apos;issue de la période mensuelle en cours.</li>
                 </ul>
               </div>
@@ -169,7 +170,7 @@ export default function LegalModal({ isOpen, onClose }: LegalModalProps) {
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-2">
                 <h3 className="font-bold text-white text-sm">Article 3 - Garantie &quot;Contact Inexploitable&quot; (Anti-Gaspillage)</h3>
                 <p>
-                  Prospectizi intègre un mécanisme automatique de remboursement de quota : si un prospect qualifié comporte un numéro de téléphone invalide ou un e-mail professionnel provoquant un rejet technique (Hard Bounce vérifié par nos sondes SMTP/HLR), l&apos;Utilisateur peut le signaler via l&apos;interface sous 72 heures. Après vérification technique instantanée, un nouveau crédit de prospect est recrédité immédiatement sur le compte de l&apos;Utilisateur.
+                  Prospectizi intègre un mécanisme automatique de remboursement de quota : si un prospect qualifié comporte un numéro de téléphone invalide ou un contact inexploitable, l&apos;Utilisateur peut le signaler via l&apos;interface sous 72 heures. Après vérification, un nouveau crédit de prospect est recrédité immédiatement sur le compte de l&apos;Utilisateur.
                 </p>
               </div>
 
@@ -188,20 +189,20 @@ export default function LegalModal({ isOpen, onClose }: LegalModalProps) {
               <div className="bg-dark-800 p-4 rounded-xl border border-cyan/30 space-y-2">
                 <h3 className="font-bold text-white text-sm flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-cyan" />
-                  Cadre Légal de la Prospection B2B (Doctrine CNIL &amp; RGPD)
+                  Cadre Réglementaire &amp; Protection des Données Personnelles
                 </h3>
                 <p>
-                  Prospectizi opère en conformité stricte avec le Règlement Général sur la Protection des Données (UE 2016/679 - RGPD) et les recommandations de la <strong>Commission Nationale de l&apos;Informatique et des Libertés (CNIL)</strong> concernant la prospection commerciale interentreprises (B2B).
+                  Prospectizi opère en conformité avec la loi n° 2017-20 du 20 avril 2018 portant Code du numérique en République du Bénin, la Convention de l&apos;Union Africaine sur la cybersécurité et la protection des données personnelles, ainsi que le Règlement Général sur la Protection des Données (RGPD UE 2016/679) pour ses utilisateurs et partenaires internationaux.
                 </p>
                 <div className="p-3 bg-dark-900 rounded-lg text-slate-300 space-y-1.5 border border-dark-700">
-                  <p><strong>Base Légale :</strong> L&apos;Intérêt Légitime (Article 6.1.f du RGPD).</p>
+                  <p><strong>Base Légale :</strong> L&apos;Intérêt Légitime pour la prospection interentreprises (B2B).</p>
                   <p>
-                    En B2B, la réglementation européenne n&apos;exige pas de consentement préalable (opt-in) à condition que :
+                    En prospection B2B, la réglementation permet la prise de contact professionnelle à condition que :
                   </p>
                   <ol className="list-decimal list-inside space-y-1 pl-2 text-slate-400">
                     <li>La sollicitation s&apos;adresse à la personne en sa qualité professionnelle.</li>
-                    <li>L&apos;objet de la sollicitation présente un lien direct avec l&apos;activité professionnelle ou la fonction de la personne ciblée.</li>
-                    <li>Le destinataire soit informé de ses droits et dispose d&apos;un moyen simple et gratuit de s&apos;opposer à toute future communication (droit d&apos;opposition / opt-out).</li>
+                    <li>L&apos;objet présente un lien direct avec l&apos;activité professionnelle ou la fonction ciblée.</li>
+                    <li>Le destinataire dispose d&apos;un moyen simple et gratuit de s&apos;opposer à toute future communication (opt-out).</li>
                   </ol>
                 </div>
               </div>
@@ -210,9 +211,8 @@ export default function LegalModal({ isOpen, onClose }: LegalModalProps) {
                 <h3 className="font-bold text-white text-sm">1. Nature des Données Traitées</h3>
                 <p>Prospectizi traite exclusivement des données à caractère professionnel publiquement accessibles :</p>
                 <ul className="list-disc list-inside space-y-1 text-slate-300">
-                  <li>Identité professionnelle : Nom, prénom, civilité, intitulé du poste/fonction.</li>
-                  <li>Coordonnées de l&apos;entreprise : Raison sociale, numéro SIREN/SIRET, code NAF/APE, adresse du siège, site web.</li>
-                  <li>Coordonnées de contact professionnel : Adresse e-mail professionnelle nominative, téléphone professionnel d&apos;entreprise, profil public LinkedIn pro.</li>
+                  <li>Identité professionnelle : Nom, prénom, civilité, fonction.</li>
+                  <li>Coordonnées d&apos;entreprise : Dénomination sociale, adresse, téléphone professionnel, site web officiel, réseaux professionnels.</li>
                   <li><strong>Exclusion formelle :</strong> Aucune donnée sensible (santé, opinions politiques, croyances, données bancaires privées des prospects) n&apos;est collectée ni traitée.</li>
                 </ul>
               </div>
@@ -220,25 +220,25 @@ export default function LegalModal({ isOpen, onClose }: LegalModalProps) {
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-2">
                 <h3 className="font-bold text-white text-sm">2. Origine des Données (Sources Publiques)</h3>
                 <p>
-                  Les données indexées proviennent exclusivement de registres légaux publics (INPI, Registre du Commerce, bases Sirene ouvertes), d&apos;annuaires professionnels publics, des sites web officiels des entreprises concernées et des réseaux sociaux professionnels publics.
+                  Les données indexées proviennent exclusivement de registres légaux publics, d&apos;annuaires professionnels publics, des sites web officiels des entreprises concernées et des fiches locales publiques (Google Maps, Instagram, LinkedIn, Facebook).
                 </p>
               </div>
 
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-2">
                 <h3 className="font-bold text-white text-sm">3. Durée de Conservation des Données</h3>
                 <p>
-                  Les données de contact associées à un compte sont conservées pendant toute la durée active de l&apos;abonnement. À compter de la résiliation du compte, elles sont purgées définitivement sous un délai maximal de 90 jours calendaires, sauf obligation comptable légale (factures conservées 10 ans).
+                  Les données de contact associées à un compte sont conservées pendant toute la durée active de l&apos;abonnement. À compter de la résiliation du compte, elles sont purgées définitivement sous un délai maximal de 90 jours calendaires.
                 </p>
               </div>
 
               <div className="bg-dark-800 p-4 rounded-xl border border-dark-700 space-y-2">
-                <h3 className="font-bold text-white text-sm">4. Vos Droits &amp; Droit à l&apos;Oubli (Exercice Simplifié)</h3>
+                <h3 className="font-bold text-white text-sm">4. Vos Droits &amp; Droit d&apos;Opposition</h3>
                 <p>
-                  Toute personne physique dont les coordonnées professionnelles figurent dans nos bases dispose d&apos;un droit d&apos;accès, de rectification, d&apos;opposition et d&apos;effacement immédiat (droit à l&apos;oubli) conformément aux articles 15 à 21 du RGPD.
+                  Toute personne physique dont les coordonnées professionnelles figurent dans nos répertoires dispose d&apos;un droit d&apos;accès, de rectification, d&apos;opposition et d&apos;effacement immédiat.
                 </p>
                 <div className="p-3 bg-dark-900 rounded-lg border border-dark-700 text-xs">
                   <p className="text-white font-semibold">Pour exercer votre droit de suppression sans délai :</p>
-                  <p className="text-cyan font-mono mt-1">E-mail dédié DPO : privacy@prospectizi.com</p>
+                  <p className="text-cyan font-mono mt-1">E-mail dédié : contact@prospectizi.com</p>
                   <p className="text-slate-400 mt-1">
                     Toute demande motivée par e-mail est traitée dans un délai inférieur à 48 heures ouvrées avec confirmation écrite et inscription en liste d&apos;exclusion définitive.
                   </p>
@@ -251,7 +251,7 @@ export default function LegalModal({ isOpen, onClose }: LegalModalProps) {
 
         {/* Modal Footer */}
         <div className="border-t border-dark-700 pt-4 mt-4 flex items-center justify-between text-xs text-slate-400">
-          <span>Dernière mise à jour légale : Septembre 2026</span>
+          <span>Dernière mise à jour légale : Octobre 2026</span>
           <button
             onClick={handleClose}
             className="py-2 px-5 rounded-xl font-bold bg-cyan hover:bg-cyan-intense text-dark-950 transition-all shadow-cyan-glow hover:scale-105"
