@@ -148,6 +148,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   });
   const [avatar, setAvatar] = useState<AvatarProfile>(initialAvatar);
   const [prospects, setProspects] = useState<Prospect[]>(initialProspects);
+  const [deliveredHistory, setDeliveredHistory] = useState<string[]>([]);
   const [auditReport, setAuditReport] = useState<AuditReport>({
     ...initialAuditReport,
     ab_test_active: false,
@@ -235,6 +236,14 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
 
       const savedFeedbackActive = localStorage.getItem('prospectizi_feedback_active');
       if (savedFeedbackActive !== null) setIsFeedbackCollectionActive(JSON.parse(savedFeedbackActive));
+
+      const savedDelivered = localStorage.getItem('prospectizi_delivered_history');
+      if (savedDelivered) {
+        try {
+          const parsedHistory = JSON.parse(savedDelivered);
+          if (Array.isArray(parsedHistory)) setDeliveredHistory(parsedHistory);
+        } catch (e) {}
+      }
     } catch (e) {
       console.error("LocalStorage load error:", e);
     }
@@ -256,6 +265,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       localStorage.setItem('prospectizi_team', JSON.stringify(teamMembers));
       localStorage.setItem('prospectizi_kb', JSON.stringify(knowledgeBase));
       localStorage.setItem('prospectizi_feedback_active', JSON.stringify(isFeedbackCollectionActive));
+      localStorage.setItem('prospectizi_delivered_history', JSON.stringify(deliveredHistory));
     } catch (e) {
       console.error("LocalStorage save error:", e);
     }
@@ -596,8 +606,12 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   // Detects the user's specific digital trade (Web Developer, Community Manager, Ads Expert, Copywriter, Designer, Closer, etc.)
   // and tailors flaws, offers, and messages with precision!
   const deleteProspect = (id: string) => {
+    const toDelete = prospects.find(p => p.id === id);
+    if (toDelete) {
+      setDeliveredHistory(prev => Array.from(new Set([...prev, toDelete.company_name])));
+    }
     setProspects(prev => prev.filter(p => p.id !== id));
-    showNotification("Prospect supprimé de votre liste.");
+    showNotification("Prospect retiré de votre pipeline (conservé dans l'historique anti-doublon).");
   };
 
   const cleanDuplicates = (): number => {
@@ -616,8 +630,16 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       }
       return unique;
     });
+
     if (removedCount > 0) {
-      showNotification(`🧹 ${removedCount} doublon(s) supprimé(s) de votre base !`);
+      // Remboursement automatique des crédits perdus à cause des doublons
+      if (!user.isSuperadminMode) {
+        setSubscription(prev => ({
+          ...prev,
+          prospects_used: Math.max(0, prev.prospects_used - removedCount),
+        }));
+      }
+      showNotification(`🧹 ${removedCount} doublon(s) supprimé(s) et ${removedCount} crédit(s) recrédité(s) sur votre compte !`);
     } else {
       showNotification("✨ Aucun doublon détecté dans votre base !");
     }
@@ -625,8 +647,11 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   };
 
   const clearAllProspects = () => {
+    // Préservation permanente de l'historique de livraison : ces entreprises ne seront JAMAIS réinjectées plus tard
+    const allNames = prospects.map(p => p.company_name);
+    setDeliveredHistory(prev => Array.from(new Set([...prev, ...allNames])));
     setProspects([]);
-    showNotification("🗑️ Votre liste de prospects a été entièrement réinitialisée.");
+    showNotification("🗑️ Votre vue active a été vidée (votre historique anti-doublons est conservé à vie).");
   };
 
   const searchProspects = async (params: { 
@@ -659,8 +684,11 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       return { success: false, added: 0, error: "Quota insuffisant" };
     }
 
-    // Récupération de tous les noms d'entreprises déjà présents dans le CRM pour éviter tout doublon
-    const existingNames = prospects.map(p => p.company_name);
+    // Récupération de l'historique complet (pipeline actif + historique permanent de livraison)
+    const existingNames = Array.from(new Set([
+      ...prospects.map(p => p.company_name),
+      ...deliveredHistory
+    ]));
 
     try {
       showNotification("🔍 Recherche des prospects en direct & qualification des coordonnées...");
@@ -694,6 +722,11 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
             const seen = new Set(prev.map(p => (p.company_name || "").toLowerCase().trim()));
             const uniqueIncoming = (data.prospects as Prospect[]).filter(p => !seen.has((p.company_name || "").toLowerCase().trim()));
             actuallyAdded = uniqueIncoming.length;
+            // Enregistrement permanent dans l'historique
+            if (actuallyAdded > 0) {
+              const newNames = uniqueIncoming.map(p => p.company_name);
+              setDeliveredHistory(hist => Array.from(new Set([...hist, ...newNames])));
+            }
             return [...uniqueIncoming, ...prev];
           });
 
@@ -733,6 +766,10 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       const seen = new Set(prev.map(p => (p.company_name || "").toLowerCase().trim()));
       const uniqueIncoming = dynamicFallback.filter(p => !seen.has((p.company_name || "").toLowerCase().trim()));
       actuallyAdded = uniqueIncoming.length;
+      if (actuallyAdded > 0) {
+        const newNames = uniqueIncoming.map(p => p.company_name);
+        setDeliveredHistory(hist => Array.from(new Set([...hist, ...newNames])));
+      }
       return [...uniqueIncoming, ...prev];
     });
 
