@@ -12,7 +12,8 @@ import {
   Channel, 
   PlanType, 
   UserSettings,
-  KnowledgeBaseData 
+  KnowledgeBaseData,
+  FaultyReport 
 } from './types';
 import { initialAvatar, initialSubscription, initialProspects, initialTestimonials, initialTeamMembers, initialAuditReport } from './mockData';
 import confetti from 'canvas-confetti';
@@ -71,6 +72,10 @@ interface StoreContextType {
   markFollowupDone: (id: string) => void;
   recordSentVariant: (id: string, variant: 'A' | 'B') => void;
   reportFaultyContact: (id: string, reason: string) => { success: boolean; message: string };
+  faultyReports: FaultyReport[];
+  submitFaultyReport: (prospectId: string, reason: 'bounce' | 'invalid_phone' | 'wrong_company', details?: string) => { success: boolean; message: string };
+  approveFaultyReport: (reportId: string) => void;
+  rejectFaultyReport: (reportId: string) => void;
   deleteProspect: (id: string) => void;
   cleanDuplicates: () => number;
   clearAllProspects: () => void;
@@ -149,6 +154,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   const [avatar, setAvatar] = useState<AvatarProfile>(initialAvatar);
   const [prospects, setProspects] = useState<Prospect[]>(initialProspects);
   const [deliveredHistory, setDeliveredHistory] = useState<string[]>([]);
+  const [faultyReports, setFaultyReports] = useState<FaultyReport[]>([]);
   const [auditReport, setAuditReport] = useState<AuditReport>({
     ...initialAuditReport,
     ab_test_active: false,
@@ -244,6 +250,14 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
           if (Array.isArray(parsedHistory)) setDeliveredHistory(parsedHistory);
         } catch (e) {}
       }
+
+      const savedFaulty = localStorage.getItem('prospectizi_faulty_reports');
+      if (savedFaulty) {
+        try {
+          const parsedFaulty = JSON.parse(savedFaulty);
+          if (Array.isArray(parsedFaulty)) setFaultyReports(parsedFaulty);
+        } catch (e) {}
+      }
     } catch (e) {
       console.error("LocalStorage load error:", e);
     }
@@ -266,6 +280,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       localStorage.setItem('prospectizi_kb', JSON.stringify(knowledgeBase));
       localStorage.setItem('prospectizi_feedback_active', JSON.stringify(isFeedbackCollectionActive));
       localStorage.setItem('prospectizi_delivered_history', JSON.stringify(deliveredHistory));
+      localStorage.setItem('prospectizi_faulty_reports', JSON.stringify(faultyReports));
     } catch (e) {
       console.error("LocalStorage save error:", e);
     }
@@ -592,14 +607,82 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     showNotification("⚡ Simulation : 34 envois enregistrés ! L'analyse de la variante gagnante est désormais disponible.");
   };
 
+  const submitFaultyReport = (prospectId: string, reason: 'bounce' | 'invalid_phone' | 'wrong_company', details?: string) => {
+    const prospect = prospects.find(p => p.id === prospectId);
+    if (!prospect) return { success: false, message: "Prospect introuvable" };
+
+    const newReport: FaultyReport = {
+      id: "report-" + Date.now() + "-" + Math.random().toString(36).substring(7),
+      prospect_id: prospectId,
+      company_name: prospect.company_name,
+      phone: prospect.phone,
+      email: prospect.email,
+      city: prospect.city,
+      user_email: user.email,
+      reason,
+      details,
+      status: 'pending',
+      created_at: new Date().toISOString(),
+    };
+
+    setFaultyReports(prev => [newReport, ...prev]);
+
+    // Marquer le prospect comme étant sous analyse technique
+    setProspects(prev => prev.map(p => p.id === prospectId ? {
+      ...p,
+      is_faulty_reported: true,
+      faulty_report_status: 'pending' as const,
+    } : p));
+
+    showNotification("📋 Signalement enregistré pour audit. Notre équipe vérifie la validité du contact sous 24h.");
+    return { 
+      success: true, 
+      message: "Signalement transmis à l'équipe technique pour analyse réelle. Le crédit sera restitué après validation." 
+    };
+  };
+
   const reportFaultyContact = (id: string, reason: string) => {
-    setProspects(prev => prev.filter(p => p.id !== id));
+    const validReason = (reason === 'invalid_phone' || reason === 'wrong_company') ? reason : 'bounce';
+    return submitFaultyReport(id, validReason);
+  };
+
+  const approveFaultyReport = (reportId: string) => {
+    const report = faultyReports.find(r => r.id === reportId);
+    if (!report) return;
+
+    setFaultyReports(prev => prev.map(r => r.id === reportId ? {
+      ...r,
+      status: 'approved' as const,
+      reviewed_at: new Date().toISOString(),
+    } : r));
+
+    // Remboursement sécurisé du crédit après validation Superadmin
     setSubscription(prev => ({
       ...prev,
       prospects_used: Math.max(0, prev.prospects_used - 1),
     }));
-    showNotification("✅ Contact vérifié comme erroné. 1 crédit de prospect vous a été recrédité immédiatement !");
-    return { success: true, message: "1 crédit remboursé automatiquement" };
+
+    // Retirer la fiche erronée du CRM
+    setProspects(prev => prev.filter(p => p.id !== report.prospect_id));
+    showNotification(`✅ Signalement validé pour "${report.company_name}". 1 crédit restitué.`);
+  };
+
+  const rejectFaultyReport = (reportId: string) => {
+    const report = faultyReports.find(r => r.id === reportId);
+    if (!report) return;
+
+    setFaultyReports(prev => prev.map(r => r.id === reportId ? {
+      ...r,
+      status: 'rejected' as const,
+      reviewed_at: new Date().toISOString(),
+    } : r));
+
+    setProspects(prev => prev.map(p => p.id === report.prospect_id ? {
+      ...p,
+      faulty_report_status: 'rejected' as const,
+    } : p));
+
+    showNotification(`❌ Signalement rejeté pour "${report.company_name}" : le contact a été audité comme valide.`);
   };
 
   // DYNAMIC INTELLIGENCE ENGINE FOR ALL DIGITAL TRADES:
@@ -715,6 +798,10 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
 
       if (res.ok) {
         const data = await res.json();
+        if (data.exhausted) {
+          showNotification(`🎯 Zone entièrement couverte : tous les acteurs répertoriés pour "${params.keyword}" à "${params.location}" ont déjà été qualifiés. Aucun crédit n'a été déduit.`);
+          return { success: true, added: 0, error: "Zone couverte" };
+        }
         if (data.prospects && data.prospects.length > 0) {
           // Filtrage strict anti-doublons avant insertion
           let actuallyAdded = 0;
@@ -736,7 +823,11 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
               prospects_used: prev.prospects_used + actuallyAdded,
             }));
           }
-          showNotification(`🎯 ${actuallyAdded} nouveaux prospects qualifiés sans doublon !`);
+          if (actuallyAdded > 0) {
+            showNotification(`🎯 ${actuallyAdded} nouveaux prospects qualifiés sans doublon !`);
+          } else {
+            showNotification(`💡 Aucun nouveau prospect : tous les résultats obtenus figurent déjà dans votre historique.`);
+          }
           return { success: true, added: actuallyAdded };
         }
       }
@@ -760,6 +851,11 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         target_audience: avatar.target_audience
       }
     });
+
+    if (dynamicFallback.length === 0) {
+      showNotification(`🎯 Zone entièrement couverte : vous avez déjà qualifié l'ensemble des acteurs répertoriés pour "${params.keyword}" à "${params.location}". Aucun crédit n'a été déduit.`);
+      return { success: true, added: 0, error: "Zone couverte" };
+    }
 
     let actuallyAdded = 0;
     setProspects(prev => {
@@ -976,6 +1072,10 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       markFollowupDone,
       recordSentVariant,
       reportFaultyContact,
+      faultyReports,
+      submitFaultyReport,
+      approveFaultyReport,
+      rejectFaultyReport,
       deleteProspect,
       cleanDuplicates,
       clearAllProspects,

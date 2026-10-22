@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useStore } from '@/lib/store';
-import { X, ShieldAlert, CheckCircle2, Loader2 } from 'lucide-react';
+import { X, ShieldAlert, CheckCircle2, Loader2, Clock } from 'lucide-react';
 import { Prospect } from '@/lib/types';
 
 interface FaultyContactModalProps {
@@ -11,27 +11,27 @@ interface FaultyContactModalProps {
 }
 
 export default function FaultyContactModal({ prospect, onClose }: FaultyContactModalProps) {
-  const { reportFaultyContact } = useStore();
+  const { submitFaultyReport } = useStore();
   const [reason, setReason] = useState<'bounce' | 'invalid_phone' | 'wrong_company'>('bounce');
-  const [isVerifying, setIsVerifying] = useState(false);
+  const [details, setDetails] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
 
   if (!prospect) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsVerifying(true);
+    setIsSubmitting(true);
 
-    // Simulate backend verification (Ping SMTP / HLR lookup)
     setTimeout(() => {
-      const res = reportFaultyContact(prospect.id, reason);
-      setIsVerifying(false);
+      const res = submitFaultyReport(prospect.id, reason, details);
+      setIsSubmitting(false);
       setResult(res);
       setTimeout(() => {
         onClose();
         setResult(null);
-      }, 1800);
-    }, 1200);
+      }, 2500);
+    }, 600);
   };
 
   return (
@@ -55,19 +55,24 @@ export default function FaultyContactModal({ prospect, onClose }: FaultyContactM
         </div>
 
         {result ? (
-          <div className="p-4 bg-emerald-500/15 border border-emerald-500/30 rounded-xl text-center space-y-2">
+          <div className="p-5 bg-emerald-500/15 border border-emerald-500/30 rounded-xl text-center space-y-2.5">
             <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
-            <p className="text-sm font-bold text-emerald-300">{result.message}</p>
-            <p className="text-xs text-slate-400">Votre solde de prospect a été re-crédité avec succès.</p>
+            <p className="text-sm font-bold text-white">Signalement transmis pour analyse</p>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              {result.message}
+            </p>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-medium border border-amber-500/30">
+              <Clock className="w-3 h-3" /> Traitement et validation sous 24h
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="text-xs text-slate-300">
-              Notre garantie anti-gaspillage vous recrédite immédiatement si le contact est avéré inexploitable par notre vérification automatique (Ping SMTP / HLR).
+            <div className="p-3 rounded-xl bg-dark-800/80 border border-dark-700 text-xs text-slate-300 leading-relaxed">
+              <span className="font-semibold text-amber-300">Procédure de contrôle qualité :</span> Afin de garantir la fiabilité du réseau et prévenir les abus, chaque signalement fait l&apos;objet d&apos;une vérification technique manuelle ou automatisée approfondie avant le recrédit effectif de votre compte.
             </div>
 
             <div className="space-y-2">
-              <label className="flex items-center gap-2.5 p-3 rounded-xl bg-dark-800 border border-dark-600 cursor-pointer hover:border-amber-500/40">
+              <label className="flex items-center gap-2.5 p-3 rounded-xl bg-dark-800 border border-dark-600 cursor-pointer hover:border-amber-500/40 transition">
                 <input
                   type="radio"
                   name="reason"
@@ -76,11 +81,11 @@ export default function FaultyContactModal({ prospect, onClose }: FaultyContactM
                   className="accent-amber-400"
                 />
                 <span className="text-xs text-slate-200">
-                  ❌ Email invalide / Non distribué (Hard Bounce)
+                  ❌ Email introuvable ou non distribué (Hard Bounce)
                 </span>
               </label>
 
-              <label className="flex items-center gap-2.5 p-3 rounded-xl bg-dark-800 border border-dark-600 cursor-pointer hover:border-amber-500/40">
+              <label className="flex items-center gap-2.5 p-3 rounded-xl bg-dark-800 border border-dark-600 cursor-pointer hover:border-amber-500/40 transition">
                 <input
                   type="radio"
                   name="reason"
@@ -89,11 +94,11 @@ export default function FaultyContactModal({ prospect, onClose }: FaultyContactM
                   className="accent-amber-400"
                 />
                 <span className="text-xs text-slate-200">
-                  ❌ Numéro de téléphone non attribué / Invalide
+                  ❌ Numéro de téléphone non attribué / Inexistant
                 </span>
               </label>
 
-              <label className="flex items-center gap-2.5 p-3 rounded-xl bg-dark-800 border border-dark-600 cursor-pointer hover:border-amber-500/40">
+              <label className="flex items-center gap-2.5 p-3 rounded-xl bg-dark-800 border border-dark-600 cursor-pointer hover:border-amber-500/40 transition">
                 <input
                   type="radio"
                   name="reason"
@@ -102,35 +107,48 @@ export default function FaultyContactModal({ prospect, onClose }: FaultyContactM
                   className="accent-amber-400"
                 />
                 <span className="text-xs text-slate-200">
-                  ❌ Coordonnées ne correspondent pas à l&apos;entreprise
+                  ❌ Coordonnées erronées ou mauvaise entreprise
                 </span>
               </label>
             </div>
 
+            <div>
+              <label className="block text-[11px] font-medium text-slate-400 mb-1">
+                Détails complémentaires (facultatif)
+              </label>
+              <textarea
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                placeholder="Ex : Réponse du serveur mail 550 User unknown, ou sonnerie occupée en continu..."
+                rows={2}
+                className="w-full px-3 py-2 rounded-xl bg-dark-800 border border-dark-700 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-400 resize-none"
+              />
+            </div>
+
             <div className="text-[11px] text-slate-400 italic">
-              * Limité à un maximum de 10% de vos prospects totaux pour éviter les abus.
+              * Dès que notre audit confirme l&apos;erreur technique, 1 crédit de prospect vous est immédiatement restitué.
             </div>
 
             <div className="flex gap-3 pt-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="w-1/3 py-2.5 rounded-xl text-xs font-semibold bg-dark-800 hover:bg-dark-700 text-slate-300"
+                className="w-1/3 py-2.5 rounded-xl text-xs font-semibold bg-dark-800 hover:bg-dark-700 text-slate-300 transition"
               >
                 Annuler
               </button>
               <button
                 type="submit"
-                disabled={isVerifying}
-                className="w-2/3 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-dark-950 flex items-center justify-center gap-2"
+                disabled={isSubmitting}
+                className="w-2/3 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-dark-950 flex items-center justify-center gap-2 transition"
               >
-                {isVerifying ? (
+                {isSubmitting ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Vérification SMTP en cours...</span>
+                    <span>Enregistrement du ticket...</span>
                   </>
                 ) : (
-                  <span>Lancer la vérification & Recrédit</span>
+                  <span>Transmettre pour analyse</span>
                 )}
               </button>
             </div>

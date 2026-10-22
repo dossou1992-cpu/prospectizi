@@ -46,6 +46,11 @@ export default function ProspectsPage() {
   const [searchCount] = useState<number>(3);
   const [isSearching, setIsSearching] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [exhaustionNotice, setExhaustionNotice] = useState<{
+    keyword: string;
+    location: string;
+    channel: Channel;
+  } | null>(null);
 
   // Filters for displaying CRM cards
   const [filterChannel, setFilterChannel] = useState<string>('all');
@@ -130,7 +135,7 @@ export default function ProspectsPage() {
     }
 
     setIsSearching(true);
-    await searchProspects({
+    const result = await searchProspects({
       keyword,
       location,
       channel,
@@ -139,6 +144,16 @@ export default function ProspectsPage() {
       offerAngle: offerAngle === 'auto' ? undefined : offerAngle
     });
     setIsSearching(false);
+
+    if (result.added === 0 && (result.error === "Zone couverte" || result.error === "Zone épuisée")) {
+      setExhaustionNotice({
+        keyword,
+        location,
+        channel
+      });
+    } else {
+      setExhaustionNotice(null);
+    }
   };
 
   const handleCleanDuplicates = () => {
@@ -346,6 +361,34 @@ export default function ProspectsPage() {
           </div>
         </form>
       </div>
+
+      {/* Alerte intelligente d'épuisement de zone avec recommandations de prospection */}
+      {exhaustionNotice && (
+        <div className="bg-dark-900 border border-amber-500/40 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-fadeIn shadow-xl">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                <span>🎯 Zone entièrement qualifiée pour &quot;{exhaustionNotice.keyword}&quot; à {exhaustionNotice.location} !</span>
+              </h4>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Vous avez déjà découvert et intégré à votre base l&apos;ensemble des établissements répertoriés pour ce métier sur ce canal. <strong>Aucun crédit n&apos;a été déduit de votre quota.</strong>
+              </p>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                💡 <strong>Conseils d&apos;expansion :</strong> Élargissez votre ciblage aux villes voisines, testez un canal alternatif (LinkedIn, Instagram ou Facebook), ou affinez l&apos;intitulé de métier.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setExhaustionNotice(null)}
+            className="text-xs font-semibold px-4 py-2 rounded-xl bg-dark-800 hover:bg-dark-700 text-slate-200 border border-dark-600 transition flex-shrink-0 self-end md:self-center"
+          >
+            Fermer l&apos;avis
+          </button>
+        </div>
+      )}
 
       {/* Barre de Filtres & Actions CRM (Dédoublonnage & Nettoyage) */}
       <div className="bg-dark-900 border border-dark-700 rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4 text-xs">

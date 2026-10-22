@@ -51,6 +51,8 @@ export interface Prospect {
   last_followup_done_date?: string;
   sent_variant?: 'A' | 'B';
   estimated_deal_value?: number;
+  is_faulty_reported?: boolean;
+  faulty_report_status?: 'pending' | 'approved' | 'rejected';
 }
 
 export interface AvatarProfile {
@@ -137,4 +139,19 @@ export interface TeamMember {
   role: 'admin' | 'editor' | 'viewer';
   status: 'invited' | 'active' | 'revoked';
   created_at: string;
+}
+
+export interface FaultyReport {
+  id: string;
+  prospect_id: string;
+  company_name: string;
+  phone: string;
+  email: string;
+  city: string;
+  user_email: string;
+  reason: 'bounce' | 'invalid_phone' | 'wrong_company';
+  details?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+  reviewed_at?: string;
 }

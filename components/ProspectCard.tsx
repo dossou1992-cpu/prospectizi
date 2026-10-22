@@ -23,7 +23,8 @@ import {
   HelpCircle,
   FlaskConical,
   Award,
-  Trash2
+  Trash2,
+  Clock
 } from 'lucide-react';
 
 interface ProspectCardProps {
@@ -600,19 +601,30 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
 
           {/* Bottom Faulty Contact Action */}
           <div className="pt-3 border-t border-dark-700 flex items-center justify-between">
-            <button
-              onClick={() => onReportFaulty(prospect)}
-              className="text-[11px] text-slate-400 hover:text-amber-400 flex items-center gap-1 transition-colors"
-              title="Signaler un hard bounce email ou un numéro non attribué pour récupérer votre crédit"
-            >
-              <Flag className="w-3 h-3 text-amber-500" />
-              <span>Signaler contact erroné</span>
-            </button>
+            {prospect.is_faulty_reported ? (
+              <span className="text-[11px] text-amber-400/90 flex items-center gap-1.5 font-medium bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/20">
+                <Clock className="w-3 h-3 text-amber-400 animate-pulse" />
+                <span>Signalement en cours d&apos;analyse</span>
+              </span>
+            ) : (
+              <button
+                onClick={() => onReportFaulty(prospect)}
+                className="text-[11px] text-slate-400 hover:text-amber-400 flex items-center gap-1 transition-colors"
+                title="Signaler un hard bounce email ou un numéro non attribué pour analyse et recrédit"
+              >
+                <Flag className="w-3 h-3 text-amber-500" />
+                <span>Signaler contact erroné</span>
+              </button>
+            )}
 
-            <span className="text-[10px] text-emerald-400 flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3" />
-              100% Qualifié
-            </span>
+            <button
+              onClick={() => deleteProspect(prospect.id)}
+              className="text-[11px] text-slate-500 hover:text-rose-400 flex items-center gap-1 transition-colors"
+              title="Supprimer cette fiche du CRM (aucun remboursement)"
+            >
+              <Trash2 className="w-3 h-3" />
+              <span>Retirer du CRM</span>
+            </button>
           </div>
         </div>
 

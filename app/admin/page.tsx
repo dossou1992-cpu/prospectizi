@@ -25,7 +25,10 @@ import {
   ToggleRight,
   Star,
   Lock,
-  Smartphone
+  Smartphone,
+  ShieldAlert,
+  Clock,
+  Flag
 } from 'lucide-react';
 import { PlanType } from '@/lib/types';
 
@@ -43,7 +46,10 @@ export default function AdminPage() {
     reactivateSubscription,
     exportProspectsCSV,
     isFeedbackCollectionActive,
-    toggleFeedbackCollection
+    toggleFeedbackCollection,
+    faultyReports,
+    approveFaultyReport,
+    rejectFaultyReport
   } = useStore();
 
   const [searchUser, setSearchUser] = useState('');
@@ -377,6 +383,103 @@ export default function AdminPage() {
               )}
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* SECTION 2 TER : FILE DE MODÉRATION & AUDIT DES SIGNALEMENTS (GARANTIE ANTI-ABUS) */}
+      <div className="bg-dark-900 border border-amber-500/40 rounded-2xl p-6 space-y-4 shadow-xl">
+        <div className="border-b border-dark-700 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5 text-amber-400" />
+            <h2 className="text-base font-bold text-white">File d&apos;Audit des Contacts Erronés (Contrôle Manuel &amp; Anti-Abus)</h2>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              {faultyReports.filter(r => r.status === 'pending').length} en attente
+            </span>
+          </div>
+        </div>
+
+        <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-slate-300 space-y-1">
+          <p className="font-semibold text-amber-300">
+            🛡️ Règle stricte Prospectizi : Aucun remboursement automatique sur simple clic !
+          </p>
+          <p className="text-slate-400">
+            Pour empêcher les abus ou le gaspillage de données, chaque signalement d&apos;un utilisateur (bounce email, téléphone non attribué) est placé en attente. Vous auditez ici la légitimité du problème avant de valider (+1 crédit restitué) ou de rejeter le ticket.
+          </p>
+        </div>
+
+        <div className="divide-y divide-dark-700/60">
+          {faultyReports.length === 0 ? (
+            <div className="py-6 text-center text-xs text-slate-500">
+              Aucun contact signalé pour le moment. Votre base de prospection est propre et saine.
+            </div>
+          ) : (
+            faultyReports.map((report) => (
+              <div key={report.id} className="py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1.5 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-sm text-white">{report.company_name}</span>
+                    <span className="text-xs text-slate-400">({report.city})</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                      report.status === 'pending'
+                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                        : report.status === 'approved'
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                        : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+                    }`}>
+                      {report.status === 'pending' ? '⏳ En attente d\'audit' : report.status === 'approved' ? '✅ Validé (+1 crédit)' : '❌ Rejeté'}
+                    </span>
+                  </div>
+
+                  <div className="text-xs text-slate-300 flex items-center gap-4 flex-wrap">
+                    <span><strong>Signalé par :</strong> {report.user_email}</span>
+                    <span><strong>Motif :</strong> {
+                      report.reason === 'bounce' 
+                        ? 'Email Hard Bounce' 
+                        : report.reason === 'invalid_phone' 
+                        ? 'Téléphone Invalide / Non attribué' 
+                        : 'Mauvaise Entreprise'
+                    }</span>
+                    {report.phone && <span><strong>Tél :</strong> {report.phone}</span>}
+                    {report.email && <span><strong>Email :</strong> {report.email}</span>}
+                  </div>
+
+                  {report.details && (
+                    <div className="text-xs text-slate-400 italic bg-dark-800/60 p-2 rounded-lg border border-dark-700">
+                      &quot;{report.details}&quot;
+                    </div>
+                  )}
+
+                  <div className="text-[11px] text-slate-500">
+                    Déposé le {new Date(report.created_at).toLocaleDateString('fr-FR')} à {new Date(report.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                    {report.reviewed_at && ` • Audité le ${new Date(report.reviewed_at).toLocaleDateString('fr-FR')}`}
+                  </div>
+                </div>
+
+                {report.status === 'pending' && (
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => approveFaultyReport(report.id)}
+                      className="py-1.5 px-3 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-1.5 shadow-sm transition"
+                      title="Valider l'erreur et créditer 1 prospect à l'utilisateur"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Valider &amp; Rembourser (+1)</span>
+                    </button>
+                    <button
+                      onClick={() => rejectFaultyReport(report.id)}
+                      className="py-1.5 px-3 rounded-lg text-xs font-semibold bg-dark-800 hover:bg-dark-700 text-rose-400 border border-dark-600 transition"
+                      title="Rejeter le signalement : le contact est fonctionnel"
+                    >
+                      <XCircle className="w-3.5 h-3.5" />
+                      <span>Rejeter</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </div>
 

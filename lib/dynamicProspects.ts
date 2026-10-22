@@ -226,26 +226,12 @@ function generateAuthenticCompanyNames(keyword: string, location: string, count:
   // Filtrer pour éliminer tout doublon déjà présent dans la base de l'utilisateur
   const available = pool.filter(name => !existingSet.has(name.toLowerCase().trim()));
 
-  // Si le pool filtré n'a pas assez d'éléments, ajouter des variantes numérotées distinctes avec patronymes
-  const result: string[] = [];
-  let nameIndex = 0;
-
-  for (let i = 0; i < count; i++) {
-    if (nameIndex < available.length) {
-      result.push(available[nameIndex]);
-      nameIndex++;
-    } else {
-      const surname = CORPORATE_SURNAME_LIST[(i + 7) % CORPORATE_SURNAME_LIST.length];
-      const fallbackName = `Cabinet ${surname} & Associés (${locTitle})`;
-      if (!existingSet.has(fallbackName.toLowerCase().trim()) && !result.includes(fallbackName)) {
-        result.push(fallbackName);
-      } else {
-        result.push(`Groupe ${keyword.trim()} & Solutions - Unité ${i + 1}`);
-      }
-    }
+  // Si l'ensemble des acteurs répertoriés pour cette zone ont déjà été qualifiés, signaler l'épuisement
+  if (available.length === 0) {
+    return [];
   }
 
-  return result.slice(0, count);
+  return available.slice(0, count);
 }
 
 // Détection de l'angle d'expertise du prospecteur (Avatar ou choix explicite)
@@ -324,12 +310,17 @@ export function generateDynamicProspects(params: DynamicProspectParams): Prospec
 
   const geo = getGeoConfig(cleanLocation);
   const companyNames = generateAuthenticCompanyNames(cleanKeyword, cleanLocation, targetCount, existingNames);
-  const offerCategory = resolveOfferCategory(offerAngle, avatar);
+  
+  // Si toutes les entreprises authentiques de cette zone ont déjà été délivrées, retourner une liste vide (épuisement propre)
+  if (!companyNames || companyNames.length === 0) {
+    return [];
+  }
 
+  const offerCategory = resolveOfferCategory(offerAngle, avatar);
   const prospects: Prospect[] = [];
 
-  for (let i = 0; i < targetCount; i++) {
-    const compName = companyNames[i] || `Établissement ${cleanKeyword} - ${i + 1}`;
+  for (let i = 0; i < companyNames.length; i++) {
+    const compName = companyNames[i];
     const district = geo.districts[i % geo.districts.length];
     const fullAddress = `${district}, ${cleanLocation}, ${geo.country}`;
     const phone = generatePhoneNumber(geo.phonePrefix, i, Date.now() % 100);
