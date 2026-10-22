@@ -1,7 +1,7 @@
 import { Prospect, AvatarProfile, Subscription, AuditReport, Testimonial, TeamMember } from './types';
 
 export const initialAvatar: AvatarProfile = {
-  full_name: "Edith Dossou",
+  full_name: "Doris DOSSOU",
   email: "dossou1992@gmail.com",
   profession: "Consultante en Acquisition Digitale & Systèmes CRM",
   company_name: "Growthizi Agency",

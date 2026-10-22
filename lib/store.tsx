@@ -119,7 +119,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     isSuperadminMode: boolean;
   }>({
     email: "dossou1992@gmail.com",
-    full_name: "Edith Dossou",
+    full_name: "Doris DOSSOU",
     role: "user",
     isSuperadminMode: false,
   });
@@ -241,7 +241,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       if (session?.user) {
         const email = session.user.email || 'dossou1992@gmail.com';
         const isSuperadmin = email === 'dossou1992@gmail.com';
-        const name = session.user.user_metadata?.full_name || (isSuperadmin ? 'Edith Dossou' : email.split('@')[0]);
+        const name = session.user.user_metadata?.full_name || (isSuperadmin ? 'Doris DOSSOU' : email.split('@')[0]);
 
         setUser({
           email,
@@ -259,7 +259,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         if (session?.user) {
           const email = session.user.email || 'dossou1992@gmail.com';
           const isSuperadmin = email === 'dossou1992@gmail.com';
-          const name = session.user.user_metadata?.full_name || (isSuperadmin ? 'Edith Dossou' : email.split('@')[0]);
+          const name = session.user.user_metadata?.full_name || (isSuperadmin ? 'Doris DOSSOU' : email.split('@')[0]);
 
           setUser({
             email,
@@ -348,7 +348,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     setUser(prev => ({
       ...prev,
       email: "dossou1992@gmail.com",
-      full_name: "Edith Dossou",
+      full_name: "Doris DOSSOU",
       role: "superadmin",
       isSuperadminMode: true,
     }));

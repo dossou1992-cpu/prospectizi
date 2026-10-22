@@ -128,16 +128,6 @@ export default function Topbar({ onOpenLoomModal, onOpenTutorialModal, onToggleM
           </button>
         )}
 
-        {/* Loom Bonus Direct Trigger */}
-        <button
-          onClick={onOpenLoomModal}
-          className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold py-1.5 px-2.5 rounded-lg bg-cyan/10 hover:bg-cyan/20 text-cyan border border-cyan/30 transition-all shadow-cyan-border"
-          title="Soumettre directement votre lien vidéo Loom"
-        >
-          <Video className="w-3.5 h-3.5" />
-          <span>+3 Bonus Loom</span>
-        </button>
-
         {/* Quota Status Box */}
         <div 
           onClick={() => { if (!isBypass) setShowUpgradeModal(true); }}

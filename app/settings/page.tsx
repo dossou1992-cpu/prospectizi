@@ -212,7 +212,7 @@ export default function SettingsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full bg-dark-950 border border-dark-600 focus:border-cyan rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none transition-colors"
-                placeholder="Ex: Edith Dossou"
+                placeholder="Ex: Doris DOSSOU"
               />
             </div>
 

@@ -19,7 +19,7 @@ export default function VideoTutorialModal({ isOpen, onClose }: VideoTutorialMod
       timing: "0:00 – 0:15",
       title: "Introduction & Accueil",
       visual: "Page d'accueil de Prospectizi (Dashboard) avec vue sur les priorités du jour.",
-      script: "« Salut ! Je suis Edith, créatrice de Prospectizi. Dans cette vidéo, je vais te montrer comment trouver tes premiers prospects ultra-qualifiés et les contacter en 2 minutes chrono. C'est parti ! »",
+      script: "« Salut ! Je suis Doris, créatrice de Prospectizi. Dans cette vidéo, je vais te montrer comment trouver tes premiers prospects ultra-qualifiés et les contacter en 2 minutes chrono. C'est parti ! »",
       tips: "Présentation dynamique, webcam dans le coin inférieur droit, sourire et promesse immédiate."
     },
     {

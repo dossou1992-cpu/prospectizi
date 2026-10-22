@@ -60,7 +60,7 @@ export default function AdminPage() {
     {
       id: "usr-1",
       email: "dossou1992@gmail.com",
-      name: "Edith Dossou",
+      name: "Doris DOSSOU",
       plan: subscription.plan_type,
       quotaUsed: subscription.prospects_used,
       quotaTotal: subscription.prospects_quota + subscription.bonus_prospects,
