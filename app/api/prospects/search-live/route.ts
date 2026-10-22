@@ -8,10 +8,14 @@ interface SearchRequest {
   location: string;
   channel: 'google_maps' | 'instagram' | 'linkedin' | 'facebook';
   count: number;
+  websiteFilter?: 'all' | 'with_website' | 'without_website';
+  offerAngle?: string;
+  existingNames?: string[];
   avatar?: {
     profession?: string;
     offer?: string;
     major_benefit?: string;
+    target_audience?: string;
   };
 }
 
@@ -74,7 +78,16 @@ function cleanCompanyName(rawTitle: string): string {
 export async function POST(request: Request) {
   try {
     const body: SearchRequest = await request.json();
-    const { keyword, location, channel = 'google_maps', count = 3, avatar = {} } = body;
+    const { 
+      keyword, 
+      location, 
+      channel = 'google_maps', 
+      count = 3, 
+      websiteFilter = 'all', 
+      offerAngle, 
+      existingNames = [], 
+      avatar = {} 
+    } = body;
 
     const cleanKeyword = String(keyword || "Entreprises").trim();
     const cleanLocation = String(location || "Cotonou").trim();
@@ -275,12 +288,15 @@ export async function POST(request: Request) {
     }
 
     // 3. GÉNÉRATION INTELLIGENTE ET 100% DYNAMIQUE (AUCUNE DONNÉE MOCKÉE EN DUR)
-    // S'adapte au mot-clé exact (ex: Architecte, Dentiste, IA Engineering) et à la ville exacte (ex: Abidjan, Dakar, Paris)
+    // S'adapte au mot-clé exact, à la ville, au filtre de site web et à l'expertise réelle de l'utilisateur
     const dynamicProspects = generateDynamicProspects({
       keyword: cleanKeyword,
       location: cleanLocation,
       channel,
       count: targetCount,
+      websiteFilter,
+      offerAngle,
+      existingNames,
       avatar
     });
 

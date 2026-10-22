@@ -71,7 +71,17 @@ interface StoreContextType {
   markFollowupDone: (id: string) => void;
   recordSentVariant: (id: string, variant: 'A' | 'B') => void;
   reportFaultyContact: (id: string, reason: string) => { success: boolean; message: string };
-  searchProspects: (params: { keyword: string; location: string; channel: Channel; count: number }) => Promise<{ success: boolean; added: number; error?: string }>;
+  deleteProspect: (id: string) => void;
+  cleanDuplicates: () => number;
+  clearAllProspects: () => void;
+  searchProspects: (params: { 
+    keyword: string; 
+    location: string; 
+    channel: Channel; 
+    count: number;
+    websiteFilter?: 'all' | 'with_website' | 'without_website';
+    offerAngle?: string;
+  }) => Promise<{ success: boolean; added: number; error?: string }>;
   
   // Modals & UI
   showUpgradeModal: boolean;
@@ -190,7 +200,26 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       if (savedAvatar) setAvatar(JSON.parse(savedAvatar));
 
       const savedProspects = localStorage.getItem('prospectizi_prospects');
-      if (savedProspects) setProspects(JSON.parse(savedProspects));
+      if (savedProspects) {
+        try {
+          const parsed: Prospect[] = JSON.parse(savedProspects);
+          if (Array.isArray(parsed)) {
+            // Nettoyage automatique des doublons existants au chargement
+            const seen = new Set<string>();
+            const deduped: Prospect[] = [];
+            for (const p of parsed) {
+              const nameKey = (p.company_name || "").toLowerCase().trim();
+              if (nameKey && !seen.has(nameKey)) {
+                seen.add(nameKey);
+                deduped.push(p);
+              }
+            }
+            setProspects(deduped);
+          }
+        } catch (e) {
+          console.warn("[Store] Erreur chargement prospects", e);
+        }
+      }
 
       const savedAudit = localStorage.getItem('prospectizi_audit');
       if (savedAudit) setAuditReport(JSON.parse(savedAudit));
@@ -566,7 +595,48 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
   // DYNAMIC INTELLIGENCE ENGINE FOR ALL DIGITAL TRADES:
   // Detects the user's specific digital trade (Web Developer, Community Manager, Ads Expert, Copywriter, Designer, Closer, etc.)
   // and tailors flaws, offers, and messages with precision!
-  const searchProspects = async (params: { keyword: string; location: string; channel: Channel; count: number }) => {
+  const deleteProspect = (id: string) => {
+    setProspects(prev => prev.filter(p => p.id !== id));
+    showNotification("Prospect supprimé de votre liste.");
+  };
+
+  const cleanDuplicates = (): number => {
+    let removedCount = 0;
+    setProspects(prev => {
+      const seen = new Set<string>();
+      const unique: Prospect[] = [];
+      for (const p of prev) {
+        const key = (p.company_name || "").toLowerCase().trim();
+        if (key && !seen.has(key)) {
+          seen.add(key);
+          unique.push(p);
+        } else {
+          removedCount++;
+        }
+      }
+      return unique;
+    });
+    if (removedCount > 0) {
+      showNotification(`🧹 ${removedCount} doublon(s) supprimé(s) de votre base !`);
+    } else {
+      showNotification("✨ Aucun doublon détecté dans votre base !");
+    }
+    return removedCount;
+  };
+
+  const clearAllProspects = () => {
+    setProspects([]);
+    showNotification("🗑️ Votre liste de prospects a été entièrement réinitialisée.");
+  };
+
+  const searchProspects = async (params: { 
+    keyword: string; 
+    location: string; 
+    channel: Channel; 
+    count: number;
+    websiteFilter?: 'all' | 'with_website' | 'without_website';
+    offerAngle?: string;
+  }) => {
     if (isSubscriptionExpired && !user.isSuperadminMode) {
       setShowUpgradeModal(true);
       showNotification("🔒 Votre abonnement est arrivé à échéance. Veuillez le renouveler pour prospecter.");
@@ -589,6 +659,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       return { success: false, added: 0, error: "Quota insuffisant" };
     }
 
+    // Récupération de tous les noms d'entreprises déjà présents dans le CRM pour éviter tout doublon
+    const existingNames = prospects.map(p => p.company_name);
+
     try {
       showNotification("🔍 Recherche des prospects en direct & qualification des coordonnées...");
       
@@ -600,10 +673,14 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
           location: params.location,
           channel: params.channel,
           count: toAddCount,
+          websiteFilter: params.websiteFilter || 'all',
+          offerAngle: params.offerAngle,
+          existingNames: existingNames,
           avatar: {
             profession: avatar.profession,
             offer: avatar.offer,
-            major_benefit: avatar.major_benefit
+            major_benefit: avatar.major_benefit,
+            target_audience: avatar.target_audience
           }
         })
       });
@@ -611,44 +688,63 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       if (res.ok) {
         const data = await res.json();
         if (data.prospects && data.prospects.length > 0) {
-          setProspects(prev => [...data.prospects, ...prev]);
-          if (!isBypass) {
+          // Filtrage strict anti-doublons avant insertion
+          let actuallyAdded = 0;
+          setProspects(prev => {
+            const seen = new Set(prev.map(p => (p.company_name || "").toLowerCase().trim()));
+            const uniqueIncoming = (data.prospects as Prospect[]).filter(p => !seen.has((p.company_name || "").toLowerCase().trim()));
+            actuallyAdded = uniqueIncoming.length;
+            return [...uniqueIncoming, ...prev];
+          });
+
+          if (!isBypass && actuallyAdded > 0) {
             setSubscription(prev => ({
               ...prev,
-              prospects_used: prev.prospects_used + data.prospects.length,
+              prospects_used: prev.prospects_used + actuallyAdded,
             }));
           }
-          showNotification(`🎯 ${data.prospects.length} prospects réels trouvés et qualifiés avec succès !`);
-          return { success: true, added: data.prospects.length };
+          showNotification(`🎯 ${actuallyAdded} nouveaux prospects qualifiés sans doublon !`);
+          return { success: true, added: actuallyAdded };
         }
       }
     } catch (apiErr) {
       console.warn("[Search Live] Bascule sur la génération dynamique intelligente", apiErr);
     }
 
-    // Génération 100% dynamique et adaptée au mot-clé et à la ville demandés (zéro mock figé)
+    // Génération 100% dynamique et adaptée au mot-clé, à la ville et à l'angle choisi (avec déduplication)
     const dynamicFallback = generateDynamicProspects({
       keyword: params.keyword,
       location: params.location,
       channel: params.channel,
       count: toAddCount,
+      websiteFilter: params.websiteFilter || 'all',
+      offerAngle: params.offerAngle,
+      existingNames: existingNames,
       avatar: {
         profession: avatar.profession,
         offer: avatar.offer,
-        major_benefit: avatar.major_benefit
+        major_benefit: avatar.major_benefit,
+        target_audience: avatar.target_audience
       }
     });
 
-    setProspects(prev => [...dynamicFallback, ...prev]);
-    if (!isBypass) {
+    let actuallyAdded = 0;
+    setProspects(prev => {
+      const seen = new Set(prev.map(p => (p.company_name || "").toLowerCase().trim()));
+      const uniqueIncoming = dynamicFallback.filter(p => !seen.has((p.company_name || "").toLowerCase().trim()));
+      actuallyAdded = uniqueIncoming.length;
+      return [...uniqueIncoming, ...prev];
+    });
+
+    if (!isBypass && actuallyAdded > 0) {
       setSubscription(prev => ({
         ...prev,
-        prospects_used: prev.prospects_used + dynamicFallback.length,
+        prospects_used: prev.prospects_used + actuallyAdded,
       }));
     }
 
-    showNotification(`🎯 ${dynamicFallback.length} nouveaux prospects réels qualifiés avec succès !`);
-    return { success: true, added: dynamicFallback.length };
+    showNotification(`🎯 ${actuallyAdded} nouveaux prospects qualifiés avec succès !`);
+    return { success: true, added: actuallyAdded };
   };
 
   const generateAuditReport = async () => {
@@ -843,6 +939,9 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
       markFollowupDone,
       recordSentVariant,
       reportFaultyContact,
+      deleteProspect,
+      cleanDuplicates,
+      clearAllProspects,
       searchProspects,
       showUpgradeModal,
       setShowUpgradeModal,

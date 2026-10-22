@@ -22,7 +22,8 @@ import {
   Save,
   HelpCircle,
   FlaskConical,
-  Award
+  Award,
+  Trash2
 } from 'lucide-react';
 
 interface ProspectCardProps {
@@ -31,7 +32,7 @@ interface ProspectCardProps {
 }
 
 export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardProps) {
-  const { updateProspectStatus, updateProspectNotes, recordSentVariant, auditReport, avatar } = useStore();
+  const { updateProspectStatus, updateProspectNotes, recordSentVariant, auditReport, avatar, deleteProspect } = useStore();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'first_contact' | 'value_offer' | 'followup_1' | 'followup_2' | 'followup_final'>('first_contact');
   const [selectedVariant, setSelectedVariant] = useState<'A' | 'B'>(prospect.sent_variant || 'A');
@@ -156,10 +157,23 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
               </p>
             </div>
 
-            {/* Score Badge */}
-            <div className={`shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-sm font-black font-mono self-start sm:self-auto ${scoreBadgeColor}`}>
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{prospect.qualification_score} / 100</span>
+            {/* Score Badge & Quick Delete */}
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+              <div className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-sm font-black font-mono ${scoreBadgeColor}`}>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>{prospect.qualification_score} / 100</span>
+              </div>
+              <button
+                onClick={() => {
+                  if (confirm(`Voulez-vous supprimer le prospect "${prospect.company_name}" de votre CRM ?`)) {
+                    deleteProspect(prospect.id);
+                  }
+                }}
+                className="p-1.5 rounded-lg text-slate-500 hover:text-rose-400 hover:bg-rose-500/15 border border-transparent hover:border-rose-500/30 transition-all"
+                title="Supprimer définitivement ce prospect"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           </div>
 

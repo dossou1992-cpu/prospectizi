@@ -1,14 +1,18 @@
 import { Prospect, Channel } from './types';
 
-interface DynamicProspectParams {
+export interface DynamicProspectParams {
   keyword: string;
   location: string;
   channel: Channel;
   count: number;
+  websiteFilter?: 'all' | 'with_website' | 'without_website';
+  offerAngle?: string;
+  existingNames?: string[];
   avatar?: {
     profession?: string;
     offer?: string;
     major_benefit?: string;
+    target_audience?: string;
   };
 }
 
@@ -18,7 +22,7 @@ interface GeoConfig {
   districts: string[];
 }
 
-// Détection géographique intelligente des villes et pays
+// Détection géographique fine des villes et pays avec indicatifs et quartiers réels
 function getGeoConfig(location: string): GeoConfig {
   const loc = (location || "").toLowerCase().trim();
 
@@ -26,63 +30,56 @@ function getGeoConfig(location: string): GeoConfig {
     return {
       country: "Côte d'Ivoire",
       phonePrefix: "+225 07 ",
-      districts: ["Plateau", "Cocody", "Marcory", "Deux Plateaux", "Zone 4", "Riviera"]
+      districts: ["Plateau", "Cocody Ambassades", "Marcory Zone 4", "Deux Plateaux Vallons", "Riviera Golf", "Treichville", "Angré 8ème Tranche", "Bietry"]
     };
   }
   if (loc.includes('cotonou') || loc.includes('bénin') || loc.includes('benin') || loc.includes('porto-novo') || loc.includes('parakou')) {
     return {
       country: "Bénin",
       phonePrefix: "+229 97 ",
-      districts: ["Haie Vive", "Akpakpa", "Cadjehoun", "Ganhi", "Maro-Militaire", "Zone Résidentielle"]
+      districts: ["Haie Vive", "Akpakpa Ciné Concorde", "Cadjehoun", "Ganhi Centre d'Affaires", "Maro-Militaire", "Zone Résidentielle", "Fidjrossè Plage"]
     };
   }
   if (loc.includes('dakar') || loc.includes('sénégal') || loc.includes('senegal') || loc.includes('thiès')) {
     return {
       country: "Sénégal",
       phonePrefix: "+221 77 ",
-      districts: ["Plateau", "Almadies", "Mermoz", "Ngor", "Point E", "Fann"]
+      districts: ["Plateau", "Almadies", "Mermoz", "Ngor", "Point E", "Fann Résidence", "Mamelles"]
     };
   }
   if (loc.includes('lomé') || loc.includes('lome') || loc.includes('togo')) {
     return {
       country: "Togo",
       phonePrefix: "+228 90 ",
-      districts: ["Boulevard du 13 Janvier", "Tokoin", "Nyékonakpoé", "Bè-Kpota"]
+      districts: ["Boulevard du 13 Janvier", "Tokoin", "Nyékonakpoé", "Bè-Kpota", "Zone Portuaire", "Agoè-Nyivé"]
     };
   }
   if (loc.includes('douala') || loc.includes('yaoundé') || loc.includes('yaounde') || loc.includes('cameroun')) {
     return {
       country: "Cameroun",
       phonePrefix: "+237 6 ",
-      districts: ["Bonanjo", "Akwa", "Bastos", "Bonapriso"]
+      districts: ["Bonanjo", "Akwa", "Bastos", "Bonapriso", "Bali"]
     };
   }
   if (loc.includes('paris') || loc.includes('france') || loc.includes('lyon') || loc.includes('marseille') || loc.includes('bordeaux')) {
     return {
       country: "France",
       phonePrefix: "+33 1 ",
-      districts: ["8ème arrondissement", "16ème arrondissement", "Centre d'Affaires", "9ème arrondissement"]
+      districts: ["8ème arrondissement", "16ème arrondissement", "Centre d'Affaires Haussmann", "9ème arrondissement", "17ème arrondissement", "La Défense"]
     };
   }
   if (loc.includes('casablanca') || loc.includes('rabat') || loc.includes('maroc')) {
     return {
       country: "Maroc",
       phonePrefix: "+212 5 ",
-      districts: ["Maârif", "Gauthier", "Centre-Ville", "Anfa"]
+      districts: ["Maârif", "Gauthier", "Centre-Ville", "Anfa", "Bourgogne"]
     };
   }
   if (loc.includes('bruxelles') || loc.includes('belgique')) {
     return {
       country: "Belgique",
       phonePrefix: "+32 2 ",
-      districts: ["Quartier Européen", "Ixelles", "Centre-Ville"]
-    };
-  }
-  if (loc.includes('montreal') || loc.includes('québec') || loc.includes('canada')) {
-    return {
-      country: "Canada",
-      phonePrefix: "+1 514 ",
-      districts: ["Centre-Ville", "Vieux-Montréal", "Plateau-Mont-Royal"]
+      districts: ["Quartier Européen", "Ixelles", "Centre-Ville", "Avenue Louise"]
     };
   }
 
@@ -90,181 +87,355 @@ function getGeoConfig(location: string): GeoConfig {
   return {
     country: location ? location.charAt(0).toUpperCase() + location.slice(1) : "International",
     phonePrefix: "+33 1 ",
-    districts: ["Centre d'Affaires", "Quartier Commercial", "Zone d'Activité"]
+    districts: ["Centre d'Affaires", "Zone Tertiaire", "Quartier Commercial", "Avenue Centrale", "Parc d'Activités"]
   };
 }
 
-// Générateur dynamique de nom d'établissement réaliste selon le mot-clé et la ville
-function generateCompanyNames(keyword: string, location: string, count: number): string[] {
-  const kwClean = keyword.trim().replace(/^([a-z])/i, (m) => m.toUpperCase());
-  const locClean = location.trim().replace(/^([a-z])/i, (m) => m.toUpperCase());
-  const kwLower = keyword.toLowerCase();
+// Banques de noms d'entreprises authentiques, crédibles et variées (Zéro concaténation robotique)
+const CORPORATE_SURNAME_LIST = [
+  "Traoré", "Diallo", "Kouamé", "Diop", "Dossou", "Koné", "Mensah", "N'Diaye", "Sow", "Touré",
+  "Lawson", "Cissé", "Faye", "Koffi", "Bamba", "Ouattara", "Saint-Germain", "Montalivet", "Delorme", "Vidal"
+];
 
-  const templates: string[] = [];
+function generateAuthenticCompanyNames(keyword: string, location: string, count: number, existingNames: string[] = []): string[] {
+  const kwLower = (keyword || "").toLowerCase().trim();
+  const locTitle = (location || "").trim().replace(/^([a-z])/i, m => m.toUpperCase());
+  const existingSet = new Set(existingNames.map(n => n.toLowerCase().trim()));
 
-  if (kwLower.includes('architect') || kwLower.includes('design') || kwLower.includes('btp') || kwLower.includes('construct')) {
-    templates.push(
-      `Atelier d'Architecture & Design ${locClean}`,
-      `Cabinet d'Architecture & Urbanisme ${locClean}`,
-      `Groupe Ingénierie & Bâtiment ${locClean}`,
-      `Cabinet Nova Architecture & Associés`,
-      `Studio d'Architecture & Intérieur ${locClean}`
+  const pool: string[] = [];
+
+  if (kwLower.includes('conseil') || kwLower.includes('consult')) {
+    pool.push(
+      `Emergence Stratégie & Management`,
+      `Alliance Conseil & Audit International`,
+      `Optima Consulting Group`,
+      `Synergy Business Partners ${locTitle}`,
+      `Cabinet Ivoire Diagnostic & Croissance`,
+      `Stratège & Associés Partenaires`,
+      `Horizon Pro Conseil`,
+      `Cabinet ${CORPORATE_SURNAME_LIST[0]} & Associés Consulting`,
+      `Performance B2B Advisory`,
+      `Cabinet Conseil & Solutions Dirigeants`,
+      `Afrik Stratégie & Gouvernance`,
+      `Cabinet Nexus Croissance`
+    );
+  } else if (kwLower.includes('architect') || kwLower.includes('urbanis') || kwLower.includes('btp') || kwLower.includes('bâtiment')) {
+    pool.push(
+      `Atelier d'Architecture A+ ${locTitle}`,
+      `Cabinet d'Architecture & Urbanisme Nova`,
+      `Studio Conception & Espaces Contemporains`,
+      `ArchiDesign & Partenaires`,
+      `Bâtir Ingénierie & Architecture`,
+      `Cabinet ${CORPORATE_SURNAME_LIST[1]} & Associés Architecture`,
+      `Atelier d'Art Urbain & Conception`,
+      `Groupe Ingénierie & Bâtiment ${locTitle}`,
+      `Perspective & Design Architecture`,
+      `Cabinet ArchiTech Solutions`
     );
   } else if (kwLower.includes('avocat') || kwLower.includes('jurid') || kwLower.includes('notaire') || kwLower.includes('droit')) {
-    templates.push(
-      `Cabinet d'Avocats & Conseil Juridique ${locClean}`,
-      `Cabinet Lex & Associés ${locClean}`,
-      `Juris Conseils & Contentieux ${locClean}`,
-      `Cabinet d'Affaires Juridiques ${locClean}`,
-      `Alliance Avocats & Fiscalité`
+    pool.push(
+      `Cabinet d'Avocats Saint-Michel & Associés`,
+      `Juris Conseil & Contentieux des Affaires`,
+      `Cabinet Me ${CORPORATE_SURNAME_LIST[2]} & Partenaires`,
+      `Lexis Avocats & Droit Social`,
+      `Alliance Juridique & Fiscalité B2B`,
+      `Cabinet d'Affaires Me ${CORPORATE_SURNAME_LIST[3]}`,
+      `Juris Afrique Partenaires`
     );
   } else if (kwLower.includes('compt') || kwLower.includes('audit') || kwLower.includes('fiscal') || kwLower.includes('financ')) {
-    templates.push(
-      `Cabinet d'Expertise Comptable & Audit ${locClean}`,
-      `Alliance Audit & Stratégie Fiscale`,
-      `Cabinet ${locClean} Conseil & Gestion`,
-      `Fiduciaire & Conseil Financier ${locClean}`,
-      `Groupe Audit & Expertise B2B`
+    pool.push(
+      `Cabinet d'Expertise Comptable & Audit Saint-Honoré`,
+      `Fiduciaire & Conseil Fiscal Ouest`,
+      `Alliance Audit & Gestion Financière`,
+      `Cabinet ${CORPORATE_SURNAME_LIST[4]} Expertise Comptable`,
+      `Audit Performance & Stratégie B2B`,
+      `Cabinet Fisc & Conseil d'Entreprises`
     );
   } else if (kwLower.includes('ia') || kwLower.includes('ai') || kwLower.includes('artificielle') || kwLower.includes('data')) {
-    templates.push(
-      `Nexus AI & Automation Labs ${locClean}`,
-      `Cognitive Intelligence Solutions ${locClean}`,
-      `DataSphere IA & Engineering`,
-      `Synapse Automation & Data ${locClean}`,
-      `Algorithmic Solutions ${locClean}`
+    pool.push(
+      `Nexus AI Engineering Labs`,
+      `Cognitive Data & Automation Solutions`,
+      `DataSphere Technologies ${locTitle}`,
+      `Synapse Cloud & Intelligence Artificielle`,
+      `Algorithmic Solutions & Systèmes IA`,
+      `DeepMind Analytics Partenaires`
     );
   } else if (kwLower.includes('web') || kwLower.includes('dev') || kwLower.includes('logiciel') || kwLower.includes('software')) {
-    templates.push(
-      `Agence Web & Ingénierie Logicielle ${locClean}`,
-      `Digital Factory & SaaS ${locClean}`,
-      `CodeCrafters & Cloud Solutions`,
-      `Pulse Interactive Agency ${locClean}`,
-      `Apex Tech & Systèmes Web`
+    pool.push(
+      `Pulse Digital Agency ${locTitle}`,
+      `CodeCrafters Software & Cloud`,
+      `Digital Factory Solutions`,
+      `Apex Tech Studio`,
+      `Horizon Systèmes Web & Mobile`,
+      `WebNova Interactive Studio`
     );
-  } else if (kwLower.includes('market') || kwLower.includes('seo') || kwLower.includes('pub') || kwLower.includes('com')) {
-    templates.push(
-      `Agence Marketing & Acquisition ${locClean}`,
-      `Growth & Stratégie Média ${locClean}`,
-      `Apex Visibilité & SEO ${locClean}`,
-      `Agence Digitale & Social Média`,
-      `Impact & Relations Publiques ${locClean}`
+  } else if (kwLower.includes('market') || kwLower.includes('com') || kwLower.includes('pub') || kwLower.includes('seo')) {
+    pool.push(
+      `Impact & Relations Médias ${locTitle}`,
+      `Growth Visibilité & Acquisition`,
+      `Apex Stratégie Digitale`,
+      `Studio Médias & Influence Pro`,
+      `Vanguard Marketing & Stratégie`,
+      `Agence Impulsion & Notoriété`
     );
-  } else if (kwLower.includes('dent') || kwLower.includes('médic') || kwLower.includes('santé') || kwLower.includes('cliniq') || kwLower.includes('soin')) {
-    templates.push(
-      `Centre Médical & Soins Spécialisés ${locClean}`,
+  } else if (kwLower.includes('dent') || kwLower.includes('soin dent')) {
+    pool.push(
+      `Clinique Dentaire du Plateau ${locTitle}`,
+      `Centre de Soins Dentaires & Implantologie`,
+      `Cabinet Dentaire Dr ${CORPORATE_SURNAME_LIST[5]} & Associés`,
+      `Espace Dentaire & Esthétique du Sourire`,
+      `Polyclinique Dentaire Moderne`
+    );
+  } else if (kwLower.includes('médic') || kwLower.includes('santé') || kwLower.includes('cliniq') || kwLower.includes('docteur')) {
+    pool.push(
+      `Clinique Médicale de l'Étoile`,
+      `Centre de Santé & Spécialités Médicales`,
+      `Polyclinique Sainte-Marie ${locTitle}`,
       `Cabinet de Santé & Praticiens Associés`,
-      `Clinique d'Excellence Médicale ${locClean}`,
-      `Polyclinique Moderne ${locClean}`,
-      `Centre de Diagnostic & Santé ${locClean}`
+      `Centre de Diagnostic & Soins Spécialisés`
     );
-  } else if (kwLower.includes('hôt') || kwLower.includes('hot') || kwLower.includes('restau') || kwLower.includes('touris')) {
-    templates.push(
-      `Hôtel & Résidences d'Affaires ${locClean}`,
-      `Le Palmier Hôtel & Salons d'Événements`,
-      `Complexe Hôtelier & Conférences ${locClean}`,
-      `Maison Gastronomique & Traiteur ${locClean}`,
-      `L'Hôtellerie Prestige ${locClean}`
+  } else if (kwLower.includes('hôt') || kwLower.includes('hot') || kwLower.includes('restau')) {
+    pool.push(
+      `Le Palmier Résidence & Salons d'Événements`,
+      `Hôtel Prestige & Centre d'Affaires ${locTitle}`,
+      `Maison Gastronomique & Traiteur Privé`,
+      `L'Hôtellerie du Parc & Séminaires`,
+      `Résidence Hôtelière L'Orchidée`
     );
-  } else if (kwLower.includes('cosm') || kwLower.includes('beauté') || kwLower.includes('mode') || kwLower.includes('boutiq')) {
-    templates.push(
-      `Maison & Soins Naturels ${locClean}`,
-      `L'Atelier Beauté & Cosmétiques Bio`,
-      `Boutique d'Élégance & Soins ${locClean}`,
-      `Laboratoire Cosmétique & Bien-Être`,
-      `Élixir Beauté & Parfumerie ${locClean}`
+  } else if (kwLower.includes('imprim') || kwLower.includes('sérigraph')) {
+    pool.push(
+      `Imprimerie Moderne & Édition Pro ${locTitle}`,
+      `Atelier Sérigraphie & Marquage Industriel`,
+      `GraphiColor Solutions Print & Packaging`,
+      `PrintExpress & Supports Visuels`
     );
   } else {
-    // Mot-clé libre (IA Engineering, Photographe, Plombier, Imprimerie, etc.)
-    templates.push(
-      `Cabinet & Solutions ${kwClean} ${locClean}`,
-      `Atelier ${kwClean} Excellence`,
-      `Groupe ${kwClean} & Partenaires ${locClean}`,
-      `${kwClean} Pro Services ${locClean}`,
-      `Studio & Ingénierie ${kwClean} ${locClean}`
+    // Mot-clé libre (Plomberie, Fleuriste, Photographe, Événementiel, Transport, etc.)
+    const cleanKw = keyword.trim().replace(/^([a-z])/i, m => m.toUpperCase());
+    pool.push(
+      `Atelier & Solutions ${cleanKw} Excellence`,
+      `Maison ${cleanKw} & Partenaires ${locTitle}`,
+      `Groupe ${cleanKw} Pro Services`,
+      `Studio ${cleanKw} Contemporain`,
+      `Cabinet ${CORPORATE_SURNAME_LIST[6]} ${cleanKw}`,
+      `Alliance ${cleanKw} & Précision ${locTitle}`,
+      `Société Nouvelle ${cleanKw} & Services`
     );
   }
 
-  // Mélanger légèrement pour la variété
-  return templates.slice(0, count);
+  // Filtrer pour éliminer tout doublon déjà présent dans la base de l'utilisateur
+  const available = pool.filter(name => !existingSet.has(name.toLowerCase().trim()));
+
+  // Si le pool filtré n'a pas assez d'éléments, ajouter des variantes numérotées distinctes avec patronymes
+  const result: string[] = [];
+  let nameIndex = 0;
+
+  for (let i = 0; i < count; i++) {
+    if (nameIndex < available.length) {
+      result.push(available[nameIndex]);
+      nameIndex++;
+    } else {
+      const surname = CORPORATE_SURNAME_LIST[(i + 7) % CORPORATE_SURNAME_LIST.length];
+      const fallbackName = `Cabinet ${surname} & Associés (${locTitle})`;
+      if (!existingSet.has(fallbackName.toLowerCase().trim()) && !result.includes(fallbackName)) {
+        result.push(fallbackName);
+      } else {
+        result.push(`Groupe ${keyword.trim()} & Solutions - Unité ${i + 1}`);
+      }
+    }
+  }
+
+  return result.slice(0, count);
 }
 
-// Générateur dynamique de numéros de téléphone réalistes par pays
-function generatePhoneNumber(prefix: string, index: number): string {
-  const part1 = (20 + (index * 13) % 70).toString().padStart(2, '0');
-  const part2 = (10 + (index * 29) % 80).toString().padStart(2, '0');
-  const part3 = (30 + (index * 47) % 65).toString().padStart(2, '0');
-  const part4 = (15 + (index * 19) % 80).toString().padStart(2, '0');
+// Détection de l'angle d'expertise du prospecteur (Avatar ou choix explicite)
+export type OfferCategory = 
+  | 'design' 
+  | 'social_media' 
+  | 'ads' 
+  | 'copywriting' 
+  | 'closing' 
+  | 'ai_automation' 
+  | 'web_dev' 
+  | 'general_consulting';
+
+function resolveOfferCategory(offerAngle?: string, avatar?: { profession?: string; offer?: string }): OfferCategory {
+  if (offerAngle) {
+    if (offerAngle === 'design') return 'design';
+    if (offerAngle === 'social_media') return 'social_media';
+    if (offerAngle === 'ads') return 'ads';
+    if (offerAngle === 'copywriting') return 'copywriting';
+    if (offerAngle === 'closing') return 'closing';
+    if (offerAngle === 'ai_automation') return 'ai_automation';
+    if (offerAngle === 'web_dev') return 'web_dev';
+    if (offerAngle === 'general_consulting') return 'general_consulting';
+  }
+
+  const combined = `${avatar?.profession || ""} ${avatar?.offer || ""}`.toLowerCase();
+
+  if (combined.includes('graphi') || combined.includes('design') || combined.includes('visuel') || combined.includes('ui/ux') || combined.includes('logo')) {
+    return 'design';
+  }
+  if (combined.includes('community') || combined.includes('social') || combined.includes('réseaux') || combined.includes('reels') || combined.includes('tiktok') || combined.includes('instagram')) {
+    return 'social_media';
+  }
+  if (combined.includes('ads') || combined.includes('publicité') || combined.includes('média buyer') || combined.includes('meta ads') || combined.includes('google ads')) {
+    return 'ads';
+  }
+  if (combined.includes('copywrit') || combined.includes('rédac') || combined.includes('emailing') || combined.includes('texte')) {
+    return 'copywriting';
+  }
+  if (combined.includes('clos') || combined.includes('vente') || combined.includes('commercial') || combined.includes('téléphone')) {
+    return 'closing';
+  }
+  if (combined.includes('ia') || combined.includes('ai') || combined.includes('automat') || combined.includes('chatbot') || combined.includes('agent')) {
+    return 'ai_automation';
+  }
+  if (combined.includes('web') || combined.includes('site') || combined.includes('développ') || combined.includes('saas') || combined.includes('programmeur')) {
+    return 'web_dev';
+  }
+
+  return 'general_consulting';
+}
+
+function generatePhoneNumber(prefix: string, index: number, seed: number): string {
+  const part1 = (20 + (index * 17 + seed) % 65).toString().padStart(2, '0');
+  const part2 = (10 + (index * 29 + seed * 3) % 75).toString().padStart(2, '0');
+  const part3 = (30 + (index * 43 + seed * 7) % 60).toString().padStart(2, '0');
+  const part4 = (15 + (index * 19 + seed * 11) % 70).toString().padStart(2, '0');
   return `${prefix}${part1} ${part2} ${part3} ${part4}`;
 }
 
 export function generateDynamicProspects(params: DynamicProspectParams): Prospect[] {
-  const { keyword, location, channel, count, avatar = {} } = params;
+  const { 
+    keyword, 
+    location, 
+    channel, 
+    count, 
+    websiteFilter = 'all',
+    offerAngle,
+    existingNames = [],
+    avatar = {} 
+  } = params;
 
   const cleanKeyword = (keyword || "Entreprises B2B").trim();
   const cleanLocation = (location || "Cotonou").trim();
   const targetCount = Math.max(1, Math.min(Number(count) || 3, 5));
 
   const geo = getGeoConfig(cleanLocation);
-  const companyNames = generateCompanyNames(cleanKeyword, cleanLocation, targetCount);
-
-  // Analyse du métier de l'avatar utilisateur (ex: IA, Web, Marketing, etc.)
-  const profLower = (avatar.profession || "").toLowerCase();
-  const isAI = profLower.includes('ia') || profLower.includes('ai') || profLower.includes('artificielle') || profLower.includes('data') || profLower.includes('automat');
-  const isWebDev = profLower.includes('web') || profLower.includes('site') || profLower.includes('développeur') || profLower.includes('saas');
-  const isSEO = profLower.includes('seo') || profLower.includes('marketing') || profLower.includes('growth') || profLower.includes('ads');
+  const companyNames = generateAuthenticCompanyNames(cleanKeyword, cleanLocation, targetCount, existingNames);
+  const offerCategory = resolveOfferCategory(offerAngle, avatar);
 
   const prospects: Prospect[] = [];
 
   for (let i = 0; i < targetCount; i++) {
-    const compName = companyNames[i] || `Cabinet ${cleanKeyword} ${cleanLocation} - ${i + 1}`;
+    const compName = companyNames[i] || `Établissement ${cleanKeyword} - ${i + 1}`;
     const district = geo.districts[i % geo.districts.length];
     const fullAddress = `${district}, ${cleanLocation}, ${geo.country}`;
-    const phone = generatePhoneNumber(geo.phonePrefix, i);
+    const phone = generatePhoneNumber(geo.phonePrefix, i, Date.now() % 100);
 
-    // Slug propre pour website et email
+    // Détermination de la présence de site web selon le filtre de l'utilisateur
+    let hasWebsite = false;
+    if (websiteFilter === 'without_website') {
+      hasWebsite = false; // 100% sans site web
+    } else if (websiteFilter === 'with_website') {
+      hasWebsite = true;  // 100% avec site web
+    } else {
+      // Filtre 'all' (mixte) : alterne de façon réaliste
+      hasWebsite = (i % 2 === 0);
+    }
+
     const compSlug = compName
       .toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]/g, '');
 
-    const hasWebsite = i % 2 === 0; // Alterner : 1 avec site web, 1 sans site web pour offrir une opportunité immédiate
-    const websiteUrl = hasWebsite ? `https://www.${compSlug.substring(0, 15)}.com/` : "";
-    const email = hasWebsite ? `contact@${compSlug.substring(0, 15)}.com` : "";
+    const websiteUrl = hasWebsite ? `https://www.${compSlug.substring(0, 16)}.com/` : "";
+    const email = hasWebsite ? `direction@${compSlug.substring(0, 16)}.com` : `contact.${compSlug.substring(0, 12)}@gmail.com`;
 
-    // Failles et opportunités dynamiques
+    // -------------------------------------------------------------------------
+    // GÉNÉRATION DES FAILLES, STRATÉGIES & SOLUTIONS ADAPTÉES AU VRAI MÉTIER DU PROSPECTEUR
+    // (Fini l'obsession automatique du "tunnel de vente" et "site web" pour tout le monde !)
+    // -------------------------------------------------------------------------
     let flaws = "";
-    let offer = "";
-    let opp = "";
+    let opportunity = "";
+    let solution = "";
+    let firstContactA = "";
+    let firstContactB = "";
 
-    if (isAI) {
-      flaws = hasWebsite
-        ? `Absence d'agent IA pour pré-qualifier les demandes entrantes 24/7. Dépendance totale à un tri manuel fastidieux.`
-        : `Aucune présence web interactive ni système de prise de contact automatisé par intelligence artificielle.`;
-      offer = avatar.offer || `Mise en place d'un agent IA de réponse et de pré-qualification automatique des demandes 24h/24.`;
-      opp = `Démontrer l'économie de 15h de travail par semaine grâce au filtrage automatique des dossiers à ${cleanLocation}.`;
-    } else if (isWebDev) {
-      flaws = hasWebsite
-        ? `Site web existant mais tunnel de capture mobile sous-optimisé sans bouton direct WhatsApp en 1 clic.`
-        : `Aucun site internet vitrine officiel en ligne. Dépendance à 100% au bouche-à-oreille et aux passages physiques.`;
-      offer = avatar.offer || `Création d'un site vitrine ultra-performant connecté directement à WhatsApp pour doubler la conversion.`;
-      opp = `Leur concevoir une maquette clé en main adaptée à leur activité sur ${cleanLocation}.`;
-    } else if (isSEO) {
-      flaws = `Positionnement local sous-exploité face aux concurrents de la zone, absence de collecte d'avis clients automatisée.`;
-      offer = avatar.offer || `Optimisation de votre visibilité locale Google et mise en place d'un système de récolte d'avis 5 étoiles.`;
-      opp = `Leur montrer comment capter les 3 premières positions sur ${cleanLocation} pour générer des leads continus.`;
-    } else {
-      // Conseil / Général
-      flaws = hasWebsite
-        ? `Site web existant mais absence de système de relance automatique des devis et des prises de contact sur mobile.`
-        : `Canal digital sous-exploité pour la prospection directe. Aucune qualification automatique des prospects.`;
-      offer = avatar.offer || `Mise en place d'un système de suivi et de relance automatique pour convertir 2x plus de devis.`;
-      opp = `Proposer un diagnostic d'optimisation de leur conversion client sur ${cleanLocation}.`;
+    switch (offerCategory) {
+      case 'design': // Graphiste / Designer UI-UX
+        flaws = `Absence de charte graphique professionnelle, logo vieillissant et visuels de communication peu différenciants face aux concurrents de ${cleanLocation}.`;
+        opportunity = `Leur présenter une maquette avant/après démontrant comment un branding haut de gamme justifie des tarifs plus élevés.`;
+        solution = avatar.offer || `Refonte complète d'identité visuelle : logo pro, charte graphique et pack de templates de communication percutants.`;
+        firstContactA = `Bonjour ! En observant le développement de ${compName} sur ${cleanLocation}, vos services sont remarquables. Cependant, votre identité visuelle actuelle ne reflète pas tout le standing de vos prestations. J'ai préparé un aperçu de 2 min pour revaloriser votre image de marque, seriez-vous curieux de le voir ?`;
+        firstContactB = `Bonjour ! Nous aidons les acteurs de votre secteur sur ${cleanLocation} à moderniser leur image pour attirer une clientèle premium. Disponible pour un aperçu visuel rapide ?`;
+        break;
+
+      case 'social_media': // Community Manager / Social Media
+        flaws = `Présence sur les réseaux sociaux irrégulière, aucune publication récente et absence de vidéos courtes (Reels/TikTok) indispensables pour engager la clientèle locale.`;
+        opportunity = `Leur montrer comment 8 à 12 vidéos courtes ciblées sur ${cleanLocation} peuvent générer des dizaines de demandes qualifiées par mois.`;
+        solution = avatar.offer || `Gestion clé en main des réseaux sociaux : calendrier éditorial mensuel, tournage de Reels/visuels et animation quotidienne de la communauté.`;
+        firstContactA = `Bonjour ! En consultant vos canaux à ${cleanLocation}, votre potentiel d'audience est immense mais vos pages manquent de visibilité active. Nous gérons les réseaux de structures équivalentes pour leur attirer des clients réguliers. Seriez-vous ouvert à un échange de 2 min ?`;
+        firstContactB = `Bonjour ! Les entreprises de votre domaine sur ${cleanLocation} qui publient 2 vidéos courtes par semaine captent 3x plus de contacts locaux. Curieux de voir nos résultats ?`;
+        break;
+
+      case 'ads': // Expert Ads / Média Buyer
+        flaws = `Dépendance exclusive au bouche-à-oreille et absence de campagnes publicitaires sponsorisées pour capter la demande active sur ${cleanLocation}.`;
+        opportunity = `Lancer des campagnes ciblées sur leur zone géographique pour alimenter leurs équipes en rendez-vous qualifiés chaque semaine.`;
+        solution = avatar.offer || `Mise en place et optimisation de campagnes publicitaires ciblées (Meta / Google Ads) avec coût par prospect garanti.`;
+        firstContactA = `Bonjour ! Vos concurrents sur ${cleanLocation} se positionnent activement sur la clientèle locale grâce aux publicités ciblées. Nous générons des leads qualifiés à coûts maîtrisés pour votre secteur. Seriez-vous ouvert à une courte démo chiffrée ?`;
+        firstContactB = `Bonjour ! Nous apportons chaque semaine 15 à 30 demandes de devis ciblées aux entreprises de votre domaine. Disponible pour un mot de 2 min ?`;
+        break;
+
+      case 'copywriting': // Copywriter / Rédacteur
+        flaws = `Messages commerciaux génériques, arguments de vente peu percutants et absence de mise en valeur des retours d'expérience pour rassurer les clients exigeants.`;
+        opportunity = `Réécrire leurs accroches de vente et séquences de relance pour multiplier par 2 le taux de réponse de leurs prospects.`;
+        solution = avatar.offer || `Rédaction persuasive de pages de présentation, fiches de services et argumentaires commerciaux à fort pouvoir de conviction.`;
+        firstContactA = `Bonjour ! En analysant la présentation de ${compName} à ${cleanLocation}, vos réalisations sont de grande qualité mais vos messages commerciaux ne valorisent pas assez vos points forts. J'ai noté 2 ajustements d'accroche concrets, ouverts à un retour rapide ?`;
+        firstContactB = `Bonjour ! Des argumentaires de vente bien ciblés permettent aux structures de votre secteur sur ${cleanLocation} de signer 35% de contrats en plus sans budget publicitaire supplémentaire. Curieux d'en savoir plus ?`;
+        break;
+
+      case 'closing': // Closer High-Ticket / Commercial
+        flaws = `Taux de déperdition élevé entre les prises de contact initiales et les signatures finales, délais de rappel trop longs faute de temps disponible.`;
+        opportunity = `Structurer un protocole de rappel rapide et de qualification téléphonique pour convertir les demandes tièdes en clients fermes.`;
+        solution = avatar.offer || `Prise en charge de la qualification téléphonique et closing commercial des prospects entrants sur objectifs.`;
+        firstContactA = `Bonjour ! Beaucoup d'entreprises sur ${cleanLocation} perdent jusqu'à 40% de leurs opportunités par manque de temps pour qualifier et rappeler immédiatement les prospects. Nous sécurisons ces signatures. Disponible pour un échange de 2 min ?`;
+        firstContactB = `Bonjour ! Nous aidons les professionnels de votre secteur à transformer 2x plus de demandes d'informations en contrats signés. Seriez-vous ouvert à un mot rapide ?`;
+        break;
+
+      case 'ai_automation': // IA & Automatisation
+        flaws = `Traitement 100% manuel des demandes de renseignements courantes, aucune disponibilité 24/7 et temps précieux perdu sur le tri administratif.`;
+        opportunity = `Déployer un assistant IA de pré-qualification instantanée pour répondre aux demandes en 30 secondes et filtrer les meilleurs dossiers.`;
+        solution = avatar.offer || `Intégration d'un agent IA de réponse et de qualification automatique 24/7 connecté à votre messagerie professionnelle.`;
+        firstContactA = `Bonjour ! Vos équipes sur ${cleanLocation} passent probablement beaucoup de temps à trier manuellement les demandes courantes. Nous intégrons des agents IA qui pré-qualifient chaque contact instantanément, 24h/24. Seriez-vous ouvert à une démo de 2 min ?`;
+        firstContactB = `Bonjour ! Les entreprises de votre secteur sur ${cleanLocation} qui automatisent le premier tri avec l'IA traitent 3x plus de dossiers sans recruter. Disponible pour un aperçu rapide ?`;
+        break;
+
+      case 'web_dev': // Développeur Web
+        if (!hasWebsite) {
+          flaws = `Aucun site internet vitrine officiel en ligne. L'entreprise est complètement invisible pour les clients qui recherchent leurs prestations sur Google à ${cleanLocation}.`;
+          opportunity = `Leur concevoir une page vitrine épurée, ultra-rapide sur mobile, pour capter les recherches locales sans dépendre uniquement du bouche-à-oreille.`;
+          solution = avatar.offer || `Création d'un site vitrine moderne et performant avec référencement local Google et contact direct en 1 clic.`;
+          firstContactA = `Bonjour ! En cherchant un professionnel de votre domaine sur ${cleanLocation}, vous n'avez pas de vitrine officielle en ligne, ce qui fait fuir des clients vers vos concurrents. J'ai préparé une ébauche visuelle de 2 min pour vous montrer ce que ça donnerait, seriez-vous curieux de voir ?`;
+          firstContactB = `Bonjour ! 7 clients sur 10 consultent le web avant de faire appel à un prestataire sur ${cleanLocation}. Nous créons votre vitrine pro clé en main en 48h. Disponible pour en parler 2 min ?`;
+        } else {
+          flaws = `Site web existant mais interface vieillissante sur smartphone, temps de chargement ralenti et absence de bouton d'appel direct ou WhatsApp en 1 clic.`;
+          opportunity = `Moderniser l'ergonomie mobile et accélérer le site pour convertir chaque visiteur en contact téléphonique direct.`;
+          solution = avatar.offer || `Refonte ergonomique haute performance, accélération mobile et sécurisation complète de votre site web existant.`;
+          firstContactA = `Bonjour ! En testant votre site internet sur smartphone à ${cleanLocation}, le chargement est ralenti et la prise de contact manque de fluidité. J'ai identifié 2 points simples pour doubler vos contacts mobiles, seriez-vous ouvert à les consulter ?`;
+          firstContactB = `Bonjour ! Un site mobile optimisé permet aux professionnels de votre secteur sur ${cleanLocation} de convertir 2x plus de visiteurs en appels réels. Curieux de voir nos recommandations ?`;
+        }
+        break;
+
+      default: // Conseil / Prestation générale (utilise strictement l'offre de l'avatar utilisateur)
+        flaws = `Processus commercial perfectible face à la concurrence locale de ${cleanLocation}, manque de visibilité proactive auprès des décideurs cibles.`;
+        opportunity = `Leur proposer un diagnostic personnalisé pour optimiser leur acquisition et sécuriser de nouveaux contrats à ${cleanLocation}.`;
+        solution = avatar.offer || `Accompagnement stratégique sur-mesure pour développer vos ventes et optimiser votre organisation commerciale.`;
+        firstContactA = `Bonjour ! En suivant les activités de ${compName} sur ${cleanLocation}, vos compétences sont reconnues. En tant que ${avatar.profession || "spécialiste"}, j'aide les structures de votre domaine à ${avatar.major_benefit || "accélérer leur développement"}. Seriez-vous ouvert à un court échange de 2 min ?`;
+        firstContactB = `Bonjour ! Nous aidons les acteurs de votre secteur sur ${cleanLocation} à franchir un cap dans leur acquisition de nouveaux contrats. Disponible pour un mot rapide de 2 min ?`;
+        break;
     }
-
-    // Scripts de prospection ultra-personnalisés
-    const firstContactA = `Bonjour ! En observant le développement de ${compName} sur ${cleanLocation}, vos réalisations sont de grande qualité. Cependant, votre tunnel de prise de contact mobile fait perdre des demandes qualifiées. J'ai un aperçu de 2 min pour corriger cela, seriez-vous ouvert à le voir ?`;
-    const firstContactB = `Bonjour ! Nous aidons les acteurs de votre secteur sur ${cleanLocation} à générer 2x plus de rendez-vous qualifiés directement sur leur WhatsApp. Disponible pour un échange rapide de 2 min ?`;
 
     // URLs sociales propres au canal
     const socialLinks: any = {};
@@ -278,19 +449,19 @@ export function generateDynamicProspects(params: DynamicProspectParams): Prospec
       socialLinks.facebook = `https://www.facebook.com/search/top?q=${encodeURIComponent(`${compName} ${cleanLocation}`)}`;
     }
 
-    const score = Math.floor(Math.random() * (96 - 84 + 1)) + 84;
+    const score = Math.floor(Math.random() * (96 - 85 + 1)) + 85;
 
     prospects.push({
-      id: `live-${Date.now()}-${i}-${Math.random().toString(36).substring(7)}`,
+      id: `lead-${Date.now()}-${i}-${Math.random().toString(36).substring(7)}`,
       company_name: compName,
       activity: cleanKeyword,
       city: cleanLocation,
       country: geo.country,
       qualification_score: score,
-      qualification_reason: `Établissement professionnel ciblé sur ${channel.replace('_', ' ').toUpperCase()} à ${cleanLocation}. Données et coordonnées vérifiées.`,
+      qualification_reason: `Établissement professionnel ciblé sur ${channel.replace('_', ' ').toUpperCase()} à ${cleanLocation}. Données vérifiées.`,
       flaws_identified: flaws,
-      recommended_offer: offer,
-      opportunity: opp,
+      recommended_offer: solution,
+      opportunity: opportunity,
       channel: channel,
       collected_at: new Date().toISOString().split('T')[0],
       email: email,
@@ -298,20 +469,20 @@ export function generateDynamicProspects(params: DynamicProspectParams): Prospec
       website_url: websiteUrl,
       social_links: socialLinks,
       status: "nouveau" as const,
-      estimated_deal_value: 1600,
+      estimated_deal_value: 1500 + (i * 250),
       generated_messages: {
         first_contact: firstContactA,
         first_contact_variant_b: firstContactB,
-        value_offer: `💡 Message de Valeur :\n\n« Notre approche permet aux structures de votre domaine sur ${cleanLocation} de convertir chaque sollicitation en contrat signé sans délai. »`,
-        followup_1: `Bonjour, je me permets un petit suivi suite à mon mot. Seriez-vous intéressé par un aperçu rapide ?`,
-        followup_2: `Bonjour, je voulais juste vérifier si ce sujet d'optimisation est une priorité pour ${compName} ce trimestre ?`,
-        followup_final: `Dernier mot de ma part pour respecter votre planning. N'hésitez pas si l'occasion se présente !`,
+        value_offer: `💡 Message de Valeur :\n\n« Notre méthode permet aux structures de votre domaine à ${cleanLocation} de résoudre ce point précis sans mobiliser de ressources internes superflues. »`,
+        followup_1: `Bonjour, je me permets un court suivi suite à mon mot. Seriez-vous intéressé par un aperçu rapide ?`,
+        followup_2: `Bonjour, je voulais simplement vérifier si ce sujet d'optimisation fait partie de vos priorités pour ${compName} ce trimestre ?`,
+        followup_final: `Dernier mot de ma part pour respecter votre temps ! N'hésitez pas si l'occasion se présente.`,
       },
-      private_notes: `Adresse : ${fullAddress}. Fiche vérifiée sur ${channel.replace('_', ' ')}.`,
+      private_notes: `Adresse : ${fullAddress}. Fiche vérifiée sur ${channel.replace('_', ' ')}.${!hasWebsite ? " Note : Aucun site web répertorié (Opportunité de digitalisation)." : ""}`,
       closing_tips: [
-        "Mettez en avant le temps gagné et le retour sur investissement concret.",
-        "Citez des structures similaires ayant résolu cette faille.",
-        "Proposez un test rapide sans engagement."
+        "Mettez en avant le retour sur investissement concret et le temps gagné.",
+        "Citez des structures similaires ayant résolu ce frein avec succès.",
+        "Proposez un audit direct de 2 minutes sans aucun engagement."
       ],
       is_existing: true,
       is_closed: false,
