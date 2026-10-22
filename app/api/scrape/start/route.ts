@@ -108,12 +108,12 @@ export async function POST(request: Request) {
     // Réponse asynchrone instantanée (< 200ms) pour parer au timeout de Vercel
     return NextResponse.json({
       success: true,
-      status: "PENDING",
+      status: "EN_COURS",
       searchId,
       keyword: cleanKeyword,
       location: cleanLocation,
       channel,
-      message: "Extraction asynchrone lancée. Statut initial : PENDING."
+      message: "Recherche en arrière-plan lancée avec succès. Statut : En cours."
     });
 
   } catch (error: any) {

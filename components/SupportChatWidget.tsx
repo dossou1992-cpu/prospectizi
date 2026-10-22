@@ -133,7 +133,7 @@ export default function SupportChatWidget() {
       q.includes('aide')
     ) {
       return {
-        text: "Prospectizi propulse votre prospection B2B en 3 étapes clés :\n\n1. **Avatar Client (`/avatar`)** : Vous configurez votre offre, votre bénéfice majeur et votre cible pour calibrer l'IA.\n2. **Recherche Ciblée (`/prospects`)** : Vous tapez le métier recherché (ex: Dentiste, Agence Web, IA Engineering) et la ville. L'IA extrait des entreprises réelles et détecte leurs failles concrètes.\n3. **Messages Prêts à l'Envoi** : L'IA rédige une séquence complète de 5 messages ultra-personnalisés (Premier contact, Offre de valeur, 3 relances) à envoyer en 1 clic par WhatsApp, Email ou LinkedIn !"
+        text: "Prospectizi propulse votre prospection B2B en 3 étapes clés :\n\n1. **Avatar Client (`/avatar`)** : Vous configurez votre offre, votre bénéfice majeur et votre cible pour calibrer l'IA.\n2. **Recherche Ciblée (`/prospects`)** : Vous tapez le métier recherché (ex: Dentiste, Agence Web, IA Engineering) et la ville. L'IA qualifie des entreprises réelles et détecte leurs failles concrètes.\n3. **Messages Prêts à l'Envoi** : L'IA rédige une séquence complète de 5 messages ultra-personnalisés (Premier contact, Offre de valeur, 3 relances) à envoyer en 1 clic par WhatsApp, Email ou LinkedIn !"
       };
     }
 
@@ -170,7 +170,7 @@ export default function SupportChatWidget() {
       q.includes('découverte')
     ) {
       return {
-        text: "1 prospect extrait = 1 crédit de prospection.\n\nNos formules disponibles sans engagement :\n• **Formule Découverte (1 €)** : 3 prospects qualifiés complets pour tester l'outil.\n• **Formule PRO (29 € HT/mois)** : 90 prospects qualifiés par mois (3/jour ouvré) + Séquences IA complètes.\n• **Formule AGENCE (59 € HT/mois)** : 450 prospects qualifiés par mois (15/jour ouvré) + Mode Multi-Comptes / Équipe.\n\nVos quotas sont renouvelés chaque mois à la date d'anniversaire."
+        text: "1 prospect qualifié = 1 crédit de prospection.\n\nNos formules disponibles sans engagement :\n• **Formule Découverte (1 €)** : 3 prospects qualifiés complets pour tester l'outil.\n• **Formule PRO (29 € HT/mois)** : 90 prospects qualifiés par mois (3/jour ouvré) + Séquences IA complètes.\n• **Formule AGENCE (59 € HT/mois)** : 450 prospects qualifiés par mois (15/jour ouvré) + Mode Multi-Comptes / Équipe.\n\nVos quotas sont renouvelés chaque mois à la date d'anniversaire."
       };
     }
 
@@ -224,7 +224,7 @@ export default function SupportChatWidget() {
       q.includes('faux')
     ) {
       return {
-        text: "Nos données de prospection sont 100% professionnelles, publiques et conformes au RGPD B2B (Google Maps et annuaires d'entreprises officiels).\n\n🛡️ **Garantie Anti-Gaspillage** : Si un numéro de téléphone ou un e-mail extrait s'avère non joignable, cliquez sur \"Signaler un contact erroné\" sur la fiche du prospect. Votre crédit vous est automatiquement recrédité sans formalité !"
+        text: "Nos données de prospection sont 100% professionnelles, publiques et conformes au RGPD B2B (Google Maps et annuaires d'entreprises officiels).\n\n🛡️ **Garantie Anti-Gaspillage** : Si un numéro de téléphone ou un e-mail s'avère non joignable, cliquez sur \"Signaler un contact erroné\" sur la fiche du prospect. Votre crédit vous est automatiquement recrédité sans formalité !"
       };
     }
 

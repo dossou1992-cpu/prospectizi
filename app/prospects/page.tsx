@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '@/lib/store';
 import ProspectCard from '@/components/ProspectCard';
 import FaultyContactModal from '@/components/FaultyContactModal';
@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { Channel, Prospect } from '@/lib/types';
 
+const STORAGE_KEY = 'prospectizi_search_form_state';
+
 export default function ProspectsPage() {
   const { 
     prospects, 
@@ -34,6 +36,7 @@ export default function ProspectsPage() {
   const [channel, setChannel] = useState<Channel>('google_maps');
   const [searchCount] = useState<number>(3);
   const [isSearching, setIsSearching] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Filters
   const [filterChannel, setFilterChannel] = useState<string>('all');
@@ -42,6 +45,57 @@ export default function ProspectsPage() {
 
   // Faulty modal
   const [faultyProspect, setFaultyProspect] = useState<Prospect | null>(null);
+
+  // Persistance de l'état : Chargement initial depuis localStorage ou URL
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem(STORAGE_KEY);
+      if (savedState) {
+        const parsed = JSON.parse(savedState);
+        if (parsed.keyword) setKeyword(parsed.keyword);
+        if (parsed.location) setLocation(parsed.location);
+        if (parsed.channel) setChannel(parsed.channel);
+        if (parsed.filterChannel) setFilterChannel(parsed.filterChannel);
+        if (parsed.filterStatus) setFilterStatus(parsed.filterStatus);
+        if (typeof parsed.onlyHot === 'boolean') setOnlyHot(parsed.onlyHot);
+      }
+
+      // Synchronisation avec les paramètres d'URL s'ils existent
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get('q') || params.get('keyword');
+        const loc = params.get('loc') || params.get('location');
+        const ch = params.get('ch') || params.get('channel');
+        if (q) setKeyword(q);
+        if (loc) setLocation(loc);
+        if (ch && ['google_maps', 'instagram', 'linkedin', 'facebook'].includes(ch)) {
+          setChannel(ch as Channel);
+        }
+      }
+    } catch (err) {
+      console.warn("[Prospects] Erreur de lecture du localStorage:", err);
+    } finally {
+      setIsHydrated(true);
+    }
+  }, []);
+
+  // Persistance automatique dans localStorage lors des modifications utilisateur
+  useEffect(() => {
+    if (!isHydrated) return;
+    try {
+      const stateToSave = {
+        keyword,
+        location,
+        channel,
+        filterChannel,
+        filterStatus,
+        onlyHot,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    } catch (err) {
+      // Ignorer si localStorage désactivé ou plein
+    }
+  }, [keyword, location, channel, filterChannel, filterStatus, onlyHot, isHydrated]);
 
   const isBypass = user.isSuperadminMode;
   const totalAllowed = subscription.prospects_quota + subscription.bonus_prospects;
@@ -111,7 +165,7 @@ export default function ProspectsPage() {
               Rechercher &amp; Qualifier vos Nouveaux Prospects
             </h1>
             <p className="text-slate-400 text-xs md:text-sm mt-1">
-              Chaque prospect extrait fait l&apos;objet d&apos;une analyse stricte : failles détectées, contact direct actif et message rédigé sur-mesure.
+              Chaque prospect analysé fait l&apos;objet d&apos;une qualification stricte : failles détectées, contact direct actif et message rédigé sur-mesure.
             </p>
           </div>
 
@@ -210,7 +264,7 @@ export default function ProspectsPage() {
               ) : (
                 <>
                   <Zap className="w-4 h-4 fill-dark-950" />
-                  <span>Extraire (3)</span>
+                  <span>Rechercher (3)</span>
                 </>
               )}
             </button>
@@ -283,7 +337,7 @@ export default function ProspectsPage() {
         </div>
       </div>
 
-      {/* Indicateur de Scraping en Arrière-plan (Asynchrone Apify & QStash) */}
+      {/* Indicateur de Recherche & Analyse en Arrière-plan */}
       {isSearching && (
         <div className="bg-dark-900 border-2 border-cyan/40 rounded-2xl p-6 shadow-cyan-glow space-y-4 animate-fadeIn">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-dark-700 pb-3">
@@ -293,24 +347,24 @@ export default function ProspectsPage() {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-extrabold text-white">Extraction en tâche de fond - Statut : PENDING</h3>
+                  <h3 className="text-sm font-extrabold text-white">Recherche en arrière-plan - Statut : En cours</h3>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan/15 text-cyan border border-cyan/30 font-bold uppercase tracking-wider animate-pulse">
-                    PENDING
+                    En cours
                   </span>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Robot d&apos;analyse multi-sources actif • Timeout strict de 120s max
+                  Moteur de détection multi-canaux actif • Qualification stricte des coordonnées
                 </p>
               </div>
             </div>
             <span className="text-xs font-mono text-cyan bg-dark-800 px-3 py-1.5 rounded-lg border border-dark-600">
-              Extraction 1 par 1 (File Sécurisée)
+              Recherche ciblée (File sécurisée)
             </span>
           </div>
 
           <div className="space-y-1.5">
             <div className="flex justify-between text-[11px] text-slate-400">
-              <span>Collecte des données publiques &amp; Détection des failles réelles...</span>
+              <span>Recherche des entreprises réelles &amp; Détection des failles...</span>
               <span className="text-cyan font-bold font-mono">En cours...</span>
             </div>
             <div className="w-full h-2 bg-dark-800 rounded-full overflow-hidden">

@@ -429,7 +429,7 @@ export default function AdminPage() {
           <div className="p-4 bg-dark-800 rounded-xl border border-dark-700 space-y-2 flex flex-col justify-between">
             <div className="space-y-1">
               <span className="text-[11px] font-bold text-cyan uppercase tracking-wider">
-                2. Signalement de Bug d&apos;Extraction
+                2. Signalement de Bug de Recherche
               </span>
               <p className="text-xs text-slate-200 italic bg-dark-900 p-2.5 rounded-lg border border-dark-700">
                 &quot;Bonjour ! Pouvez-vous m&apos;envoyer un court enregistrement d&apos;écran Loom (loom.com) montrant le souci ? Notre équipe technique règle ça tout de suite.&quot;

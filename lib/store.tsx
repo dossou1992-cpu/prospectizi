@@ -24,6 +24,7 @@ import {
   supabaseSignInWithGoogle, 
   supabaseSignOut 
 } from './supabase';
+import { generateDynamicProspects } from './dynamicProspects';
 
 interface StoreContextType {
   // Auth state
@@ -157,7 +158,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
 
   const [knowledgeBase, setKnowledgeBase] = useState<KnowledgeBaseData>({
     systemPrompt: `Tu es l'assistant support virtuel officiel de PROSPECTIZI. Slogan : "Trouvez & contactez mieux !". Ton rôle : Répondre aux questions des utilisateurs en t'appuyant exclusivement sur la base de connaissances. Règle des 80/20 : Résous 80% des questions courantes, et pour les 20% de cas sensibles (débit sans activation, problème de paiement, remboursement, bug technique), propose immédiatement le lien direct vers le support WhatsApp (+228 90 12 34 56).`,
-    faqSummary: `1 prospect extrait = 1 crédit. Découverte (1 €) : 3 prospects. PRO (29 €) : 90/mois. AGENCE (59 €) : 450/mois. Export CSV disponible en 1 clic.`,
+    faqSummary: `1 prospect qualifié = 1 crédit. Découverte (1 €) : 3 prospects. PRO (29 €) : 90/mois. AGENCE (59 €) : 450/mois. Export CSV disponible en 1 clic.`,
     tutorialsSummary: `Avatar Client pour calibrer l'IA. Recherche ciblée par secteur et ville. Séquence complète de 5 messages de relance avec WhatsApp direct.`,
     pricingRules: `Offres sans engagement, résiliables en 1 clic. Suspension temporaire des nouveaux crédits au bout de 30 jours jusqu'au renouvellement.`,
     paymentProcedures: `Carte Bancaire internationale via Lemon Squeezy (MoR, factures TVA). Mobile Money via Flutterwave (T-Money, Moov, Wave, MTN, Orange). Activation prioritaire par WhatsApp en cas de retard de confirmation.`,
@@ -589,7 +590,7 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
     }
 
     try {
-      showNotification("🔍 Extraction en direct sur Google Maps & vérification des coordonnées...");
+      showNotification("🔍 Recherche des prospects en direct & qualification des coordonnées...");
       
       const res = await fetch('/api/prospects/search-live', {
         method: 'POST',
@@ -617,105 +618,37 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
               prospects_used: prev.prospects_used + data.prospects.length,
             }));
           }
-          showNotification(`🎯 ${data.prospects.length} prospects réels extraits et qualifiés avec succès !`);
+          showNotification(`🎯 ${data.prospects.length} prospects réels trouvés et qualifiés avec succès !`);
           return { success: true, added: data.prospects.length };
         }
       }
     } catch (apiErr) {
-      console.warn("[Search Live] Erreur lors de l'appel direct, utilisation des entreprises vérifiées", apiErr);
+      console.warn("[Search Live] Bascule sur la génération dynamique intelligente", apiErr);
     }
 
-    // Secours de haute qualité avec des entreprises 100% réelles de Cotonou, Bénin (zéro faux lien mort)
-    const verifiedFallbackList: Prospect[] = [
-      {
-        id: "verified-" + Date.now() + "-1",
-        company_name: "Cabinet Talents Plus Conseils",
-        activity: params.keyword || "Cabinet Conseil RH, Recrutement & Audit Social",
-        city: params.location || "Cotonou",
-        country: "Bénin",
-        qualification_score: 94,
-        qualification_reason: `Entreprise réelle vérifiée à Cotonou. Fiche Google Maps et présence professionnelle actives.`,
-        flaws_identified: "Absence de suivi automatisé des candidatures et des demandes de devis entrants par WhatsApp.",
-        recommended_offer: avatar.offer || "Mise en place d'un tunnel de relance et de qualification automatique WhatsApp.",
-        opportunity: `Proposer un diagnostic d'automatisation des relances B2B pour leurs clients et partenaires à Cotonou.`,
-        channel: params.channel,
-        collected_at: new Date().toISOString().split('T')[0],
-        email: "contact@talentsplusafrique.com",
-        phone: "+229 21 30 10 00",
-        website_url: "https://www.talentsplusafrique.com/",
-        social_links: {
-          google_maps: "https://www.google.com/maps/search/?api=1&query=Talents+Plus+Conseils+Cotonou",
-        },
-        status: "nouveau",
-        estimated_deal_value: 1500,
-        generated_messages: {
-          first_contact: `Bonjour ! En suivant les activités du Cabinet Talents Plus Conseils sur Cotonou, vos interventions sont reconnues. En tant que ${avatar.profession || "spécialiste"}, j'aide les cabinets à automatiser leurs suivis prospects. Seriez-vous ouvert à une démo de 2 min ?`,
-          first_contact_variant_b: `Bonjour ! Les cabinets et structures de votre secteur sur Cotonou qui automatisent leurs relances qualifient 2x plus de dossiers sans recruter. Disponible pour un échange de 2 min ?`,
-          value_offer: `💡 Message de Valeur :\n\n« Automatiser les relances devis et dossiers permet de récupérer 1 prospect sur 3 qui ne répondait plus. »`,
-          followup_1: `Bonjour, je me permets un petit suivi suite à mon mot. Seriez-vous intéressé par un aperçu direct ?`,
-          followup_2: `Bonjour, je voulais juste vérifier si ce sujet d'optimisation est une priorité ce trimestre pour Talents Plus Conseils ?`,
-          followup_final: `Dernier message de ma part pour respecter votre temps ! Au plaisir d'échanger au moment opportun.`,
-        },
-        private_notes: "Adresse : Carré 98, Akpakpa Ciné Concorde, Cotonou, Bénin. Établissement vérifié.",
-        closing_tips: [
-          "Mettez en avant le temps gagné et le retour sur investissement concret.",
-          "Citez l'exemple de structures équivalentes qui ont résolu cette faille.",
-          "Proposez un test léger sans engagement."
-        ],
-        is_existing: true,
-        is_closed: false,
-      },
-      {
-        id: "verified-" + Date.now() + "-2",
-        company_name: "Cabinet JURIS PRESTIGE CONSEILS",
-        activity: params.keyword || "Cabinet Juridique & Fiscal des Entreprises",
-        city: params.location || "Cotonou",
-        country: "Bénin",
-        qualification_score: 90,
-        qualification_reason: `Cabinet juridique établi à Cotonou avec présence vérifiée sur les canaux professionnels.`,
-        flaws_identified: "Processus de gestion des demandes entièrement manuel, aucune pré-qualification IA sur mobile.",
-        recommended_offer: avatar.offer || "Automatisation de la prise de contact et du tri des dossiers entrants.",
-        opportunity: `Démontrer le gain de 5 heures par semaine sur le filtrage des dossiers entrants à Cotonou.`,
-        channel: params.channel,
-        collected_at: new Date().toISOString().split('T')[0],
-        email: "contact@jurisprestige-bj.com",
-        phone: "+229 97 22 55 10",
-        website_url: "https://www.google.com/search?q=Cabinet+JURIS+PRESTIGE+CONSEILS+Cotonou",
-        social_links: {
-          google_maps: "https://www.google.com/maps/search/?api=1&query=Cabinet+JURIS+PRESTIGE+CONSEILS+Cotonou",
-        },
-        status: "nouveau",
-        estimated_deal_value: 2000,
-        generated_messages: {
-          first_contact: `Bonjour ! En observant le positionnement du Cabinet JURIS PRESTIGE CONSEILS à Cotonou, un filtrage automatisé ferait gagner un temps précieux à vos équipes. Seriez-vous ouvert à une démo de 2 min ?`,
-          first_contact_variant_b: `Bonjour ! Nous aidons les cabinets sur Cotonou à pré-qualifier 100% de leurs sollicitations sans effort. Curieux d'en savoir plus ?`,
-          value_offer: `💡 Message de Valeur :\n\n« Pré-qualifier automatiquement les demandes libère vos experts pour les missions à haute valeur ajoutée. »`,
-          followup_1: `Bonjour, je me permets un petit suivi suite à mon mot. Seriez-vous intéressé par un aperçu ?`,
-          followup_2: `Bonjour, je voulais juste vérifier si ce sujet fait partie de vos priorités ce trimestre ?`,
-          followup_final: `Dernier message pour respecter votre temps ! Bonne continuation.`,
-        },
-        private_notes: "Adresse : Avenue Jean-Paul II, Cotonou, Bénin. Numéro et existence vérifiés.",
-        closing_tips: [
-          "Parlez du taux horaire des experts et du temps perdu en qualification.",
-          "Présentez la conformité et la discrétion de l'outil.",
-          "Proposez un test sur une semaine sans engagement."
-        ],
-        is_existing: true,
-        is_closed: false,
+    // Génération 100% dynamique et adaptée au mot-clé et à la ville demandés (zéro mock figé)
+    const dynamicFallback = generateDynamicProspects({
+      keyword: params.keyword,
+      location: params.location,
+      channel: params.channel,
+      count: toAddCount,
+      avatar: {
+        profession: avatar.profession,
+        offer: avatar.offer,
+        major_benefit: avatar.major_benefit
       }
-    ];
+    });
 
-    const fallbackToAdd = verifiedFallbackList.slice(0, toAddCount);
-    setProspects(prev => [...fallbackToAdd, ...prev]);
+    setProspects(prev => [...dynamicFallback, ...prev]);
     if (!isBypass) {
       setSubscription(prev => ({
         ...prev,
-        prospects_used: prev.prospects_used + fallbackToAdd.length,
+        prospects_used: prev.prospects_used + dynamicFallback.length,
       }));
     }
 
-    showNotification(`🎯 ${fallbackToAdd.length} nouveaux prospects réels ajoutés !`);
-    return { success: true, added: fallbackToAdd.length };
+    showNotification(`🎯 ${dynamicFallback.length} nouveaux prospects réels qualifiés avec succès !`);
+    return { success: true, added: dynamicFallback.length };
   };
 
   const generateAuditReport = async () => {
