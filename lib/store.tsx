@@ -25,7 +25,7 @@ import {
   supabaseSignInWithGoogle, 
   supabaseSignOut 
 } from './supabase';
-import { generateDynamicProspects } from './dynamicProspects';
+import { generateDynamicProspects, sanitizeProspectUrls } from './dynamicProspects';
 
 interface StoreContextType {
   // Auth state
@@ -211,17 +211,18 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         try {
           const parsed: Prospect[] = JSON.parse(savedProspects);
           if (Array.isArray(parsed)) {
-            // Nettoyage automatique des doublons existants au chargement
+            // Nettoyage automatique des doublons existants et assainissement des URLs directes
             const seen = new Set<string>();
-            const deduped: Prospect[] = [];
+            const dedupedAndCleaned: Prospect[] = [];
             for (const p of parsed) {
-              const nameKey = (p.company_name || "").toLowerCase().trim();
+              const cleaned = sanitizeProspectUrls(p);
+              const nameKey = (cleaned.company_name || "").toLowerCase().trim();
               if (nameKey && !seen.has(nameKey)) {
                 seen.add(nameKey);
-                deduped.push(p);
+                dedupedAndCleaned.push(cleaned);
               }
             }
-            setProspects(deduped);
+            setProspects(dedupedAndCleaned);
           }
         } catch (e) {
           console.warn("[Store] Erreur chargement prospects", e);
@@ -806,15 +807,21 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
           // Filtrage strict anti-doublons avant insertion
           let actuallyAdded = 0;
           setProspects(prev => {
-            const seen = new Set(prev.map(p => (p.company_name || "").toLowerCase().trim()));
-            const uniqueIncoming = (data.prospects as Prospect[]).filter(p => !seen.has((p.company_name || "").toLowerCase().trim()));
+            // Si la base ne contient que les fiches de démo initiale (mock), on les remplace par la recherche réelle
+            const isOnlyInitialMocks = prev.length > 0 && prev.every(p => p.id === 'prospect-1' || p.id === 'prospect-2' || p.id === 'prospect-3');
+            const baseList = isOnlyInitialMocks ? [] : prev;
+
+            const seen = new Set(baseList.map(p => (p.company_name || "").toLowerCase().trim()));
+            const uniqueIncoming = (data.prospects as Prospect[])
+              .map(sanitizeProspectUrls)
+              .filter(p => !seen.has((p.company_name || "").toLowerCase().trim()));
             actuallyAdded = uniqueIncoming.length;
             // Enregistrement permanent dans l'historique
             if (actuallyAdded > 0) {
               const newNames = uniqueIncoming.map(p => p.company_name);
               setDeliveredHistory(hist => Array.from(new Set([...hist, ...newNames])));
             }
-            return [...uniqueIncoming, ...prev];
+            return [...uniqueIncoming, ...baseList];
           });
 
           if (!isBypass && actuallyAdded > 0) {
@@ -859,14 +866,19 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
 
     let actuallyAdded = 0;
     setProspects(prev => {
-      const seen = new Set(prev.map(p => (p.company_name || "").toLowerCase().trim()));
-      const uniqueIncoming = dynamicFallback.filter(p => !seen.has((p.company_name || "").toLowerCase().trim()));
+      const isOnlyInitialMocks = prev.length > 0 && prev.every(p => p.id === 'prospect-1' || p.id === 'prospect-2' || p.id === 'prospect-3');
+      const baseList = isOnlyInitialMocks ? [] : prev;
+
+      const seen = new Set(baseList.map(p => (p.company_name || "").toLowerCase().trim()));
+      const uniqueIncoming = dynamicFallback
+        .map(sanitizeProspectUrls)
+        .filter(p => !seen.has((p.company_name || "").toLowerCase().trim()));
       actuallyAdded = uniqueIncoming.length;
       if (actuallyAdded > 0) {
         const newNames = uniqueIncoming.map(p => p.company_name);
         setDeliveredHistory(hist => Array.from(new Set([...hist, ...newNames])));
       }
-      return [...uniqueIncoming, ...prev];
+      return [...uniqueIncoming, ...baseList];
     });
 
     if (!isBypass && actuallyAdded > 0) {

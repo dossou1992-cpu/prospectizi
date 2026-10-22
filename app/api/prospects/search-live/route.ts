@@ -170,17 +170,29 @@ export async function POST(request: Request) {
               if (!cleanTitle || cleanTitle.length < 3) continue;
 
               let socialMapsUrl = "";
+              const compSlug = cleanTitle.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
+              const compKebab = cleanTitle.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
               if (channel === 'google_maps') {
-                socialMapsUrl = item.url && item.url.includes('google.com/maps')
-                  ? item.url
-                  : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${cleanTitle} ${cleanLocation}`)}`;
+                if (item.url && item.url.includes('google.com/maps/place/')) {
+                  socialMapsUrl = item.url;
+                } else if (item.placeUrl) {
+                  socialMapsUrl = item.placeUrl;
+                } else {
+                  const placeQuery = `${encodeURIComponent(cleanTitle.trim().replace(/\s+/g, '+'))},+${encodeURIComponent(cleanLocation.trim().replace(/\s+/g, '+'))}`;
+                  socialMapsUrl = `https://www.google.com/maps/place/${placeQuery}/`;
+                }
               } else if (channel === 'instagram') {
-                const igUser = item.username || cleanTitle.toLowerCase().replace(/[^a-z0-9._]/g, '');
-                socialMapsUrl = item.url || `https://www.instagram.com/${igUser}/`;
+                const igUser = item.username || item.handle || compSlug;
+                socialMapsUrl = (item.url && item.url.includes('instagram.com/') && !item.url.includes('/explore/')) ? item.url : `https://www.instagram.com/${igUser}/`;
               } else if (channel === 'linkedin') {
-                socialMapsUrl = item.linkedinUrl || item.url || `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(cleanTitle)}`;
+                socialMapsUrl = (item.linkedinUrl || item.companyUrl || (item.url && item.url.includes('linkedin.com/company/'))) 
+                  ? (item.linkedinUrl || item.companyUrl || item.url) 
+                  : `https://www.linkedin.com/company/${compKebab}/`;
               } else if (channel === 'facebook') {
-                socialMapsUrl = item.url || `https://www.facebook.com/search/top?q=${encodeURIComponent(cleanTitle)}`;
+                socialMapsUrl = (item.url && item.url.includes('facebook.com/') && !item.url.includes('/search/'))
+                  ? item.url
+                  : `https://www.facebook.com/${compSlug}/`;
               }
 
               extractedProspects.push({

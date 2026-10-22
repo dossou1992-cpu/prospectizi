@@ -57,6 +57,7 @@ export default function ProspectsPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterWebsitePresence, setFilterWebsitePresence] = useState<string>('all');
   const [onlyHot, setOnlyHot] = useState<boolean>(false);
+  const [crmSearch, setCrmSearch] = useState<string>('');
 
   // Faulty modal
   const [faultyProspect, setFaultyProspect] = useState<Prospect | null>(null);
@@ -168,6 +169,13 @@ export default function ProspectsPage() {
 
   // Filtered prospects
   const filteredProspects = prospects.filter(p => {
+    if (crmSearch.trim() !== '') {
+      const q = crmSearch.toLowerCase();
+      const matchName = (p.company_name || '').toLowerCase().includes(q);
+      const matchCity = (p.city || '').toLowerCase().includes(q);
+      const matchAct = (p.activity || '').toLowerCase().includes(q);
+      if (!matchName && !matchCity && !matchAct) return false;
+    }
     if (filterChannel !== 'all' && p.channel !== filterChannel) return false;
     if (filterStatus !== 'all' && p.status !== filterStatus) return false;
     if (onlyHot && p.qualification_score < 80) return false;
@@ -396,6 +404,18 @@ export default function ProspectsPage() {
           <div className="flex items-center gap-1.5 text-slate-400 mr-2">
             <Filter className="w-3.5 h-3.5 text-cyan" />
             <span className="font-semibold">Filtres vue :</span>
+          </div>
+
+          {/* Recherche rapide dans le CRM */}
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={crmSearch}
+              onChange={(e) => setCrmSearch(e.target.value)}
+              placeholder="Filtrer nom ou ville..."
+              className="bg-dark-800 border border-dark-600 focus:border-cyan text-xs text-white pl-8 pr-3 py-1.5 rounded-lg focus:outline-none w-40"
+            />
           </div>
 
           {/* Filtre Canal */}

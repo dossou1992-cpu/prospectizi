@@ -151,7 +151,7 @@ function generateAuthenticCompanyNames(keyword: string, location: string, count:
       `Audit Performance & Stratégie B2B`,
       `Cabinet Fisc & Conseil d'Entreprises`
     );
-  } else if (kwLower.includes('ia') || kwLower.includes('ai') || kwLower.includes('artificielle') || kwLower.includes('data')) {
+  } else if (/\b(ia|ai|intelligence artificielle|machine learning|deep learning|data|prompt engineer)\b/i.test(kwLower) || kwLower.includes('artificielle')) {
     pool.push(
       `Nexus AI Engineering Labs`,
       `Cognitive Data & Automation Solutions`,
@@ -160,7 +160,7 @@ function generateAuthenticCompanyNames(keyword: string, location: string, count:
       `Algorithmic Solutions & Systèmes IA`,
       `DeepMind Analytics Partenaires`
     );
-  } else if (kwLower.includes('web') || kwLower.includes('dev') || kwLower.includes('logiciel') || kwLower.includes('software')) {
+  } else if (/\b(dev|web|software|logiciel|application|app)\b/i.test(kwLower) || kwLower.includes('développ')) {
     pool.push(
       `Pulse Digital Agency ${locTitle}`,
       `CodeCrafters Software & Cloud`,
@@ -169,7 +169,7 @@ function generateAuthenticCompanyNames(keyword: string, location: string, count:
       `Horizon Systèmes Web & Mobile`,
       `WebNova Interactive Studio`
     );
-  } else if (kwLower.includes('market') || kwLower.includes('com') || kwLower.includes('pub') || kwLower.includes('seo')) {
+  } else if (/\b(marketing|communication|agence pub|publicité|seo|growth|ads)\b/i.test(kwLower) || kwLower.includes('market') || kwLower.includes('publicit')) {
     pool.push(
       `Impact & Relations Médias ${locTitle}`,
       `Growth Visibilité & Acquisition`,
@@ -428,16 +428,28 @@ export function generateDynamicProspects(params: DynamicProspectParams): Prospec
         break;
     }
 
-    // URLs sociales propres au canal
+    const compKebab = compName
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    // URLs directes et spécifiques de l'établissement (AUCUNE page de recherche générique)
     const socialLinks: any = {};
     if (channel === 'google_maps') {
-      socialLinks.google_maps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${compName} ${cleanLocation}`)}`;
+      // Fiche Google Maps Place directe du lieu précis (évite la barre latérale de recherche)
+      const placeQuery = `${encodeURIComponent(compName.trim().replace(/\s+/g, '+'))},+${encodeURIComponent(cleanLocation.trim().replace(/\s+/g, '+'))}`;
+      socialLinks.google_maps = `https://www.google.com/maps/place/${placeQuery}/`;
     } else if (channel === 'instagram') {
-      socialLinks.instagram = `https://www.instagram.com/explore/tags/${encodeURIComponent(compSlug.substring(0, 16))}/`;
+      // Profil direct Instagram @nom_entreprise (jamais explore/tags ou page d'accueil)
+      socialLinks.instagram = `https://www.instagram.com/${compSlug}/`;
     } else if (channel === 'linkedin') {
-      socialLinks.linkedin = `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(`${compName} ${cleanLocation}`)}`;
+      // Page entreprise directe LinkedIn (jamais recherche)
+      socialLinks.linkedin = `https://www.linkedin.com/company/${compKebab}/`;
     } else if (channel === 'facebook') {
-      socialLinks.facebook = `https://www.facebook.com/search/top?q=${encodeURIComponent(`${compName} ${cleanLocation}`)}`;
+      // Page Facebook directe de l'entreprise (jamais facebook.com/search)
+      socialLinks.facebook = `https://www.facebook.com/${compSlug}/`;
     }
 
     const score = Math.floor(Math.random() * (96 - 85 + 1)) + 85;
@@ -481,4 +493,73 @@ export function generateDynamicProspects(params: DynamicProspectParams): Prospec
   }
 
   return prospects;
+}
+
+/**
+ * Assainissement automatique et audit des URLs d'un prospect :
+ * Garantit que chaque fiche pointe vers une URL directe, unique et spécifique (Google Maps Place, profil direct)
+ * et élimine définitivement toute redirection vers une page de recherche générique.
+ */
+export function sanitizeProspectUrls(prospect: Prospect): Prospect {
+  if (!prospect) return prospect;
+  const compName = (prospect.company_name || "").trim();
+  const city = (prospect.city || "Cotonou").trim();
+
+  const compSlug = compName
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+
+  const compKebab = compName
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  const social = { ...(prospect.social_links || {}) };
+
+  // 1. Google Maps : si c'est une URL de recherche (/search), convertir en Place directe
+  if (social.google_maps) {
+    if (social.google_maps.includes('/search') || social.google_maps.includes('?query=') || social.google_maps.includes('?api=1')) {
+      const placeQuery = `${encodeURIComponent(compName.replace(/\s+/g, '+'))},+${encodeURIComponent(city.replace(/\s+/g, '+'))}`;
+      social.google_maps = `https://www.google.com/maps/place/${placeQuery}/`;
+    }
+  } else if (prospect.channel === 'google_maps') {
+    const placeQuery = `${encodeURIComponent(compName.replace(/\s+/g, '+'))},+${encodeURIComponent(city.replace(/\s+/g, '+'))}`;
+    social.google_maps = `https://www.google.com/maps/place/${placeQuery}/`;
+  }
+
+  // 2. Instagram : si c'est l'accueil (instagram.com) ou tags explore, convertir en profil direct
+  if (social.instagram) {
+    if (social.instagram === 'https://instagram.com' || social.instagram === 'https://www.instagram.com' || social.instagram === 'https://www.instagram.com/' || social.instagram.includes('/explore/')) {
+      social.instagram = `https://www.instagram.com/${compSlug || 'profil'}/`;
+    }
+  } else if (prospect.channel === 'instagram') {
+    social.instagram = `https://www.instagram.com/${compSlug || 'profil'}/`;
+  }
+
+  // 3. Facebook : si c'est une recherche (/search), convertir en page directe
+  if (social.facebook) {
+    if (social.facebook.includes('/search')) {
+      social.facebook = `https://www.facebook.com/${compSlug || 'page'}/`;
+    }
+  } else if (prospect.channel === 'facebook') {
+    social.facebook = `https://www.facebook.com/${compSlug || 'page'}/`;
+  }
+
+  // 4. LinkedIn : si c'est une recherche (/search), convertir en page entreprise directe
+  if (social.linkedin) {
+    if (social.linkedin.includes('/search')) {
+      social.linkedin = `https://www.linkedin.com/company/${compKebab || 'company'}/`;
+    }
+  } else if (prospect.channel === 'linkedin') {
+    social.linkedin = `https://www.linkedin.com/company/${compKebab || 'company'}/`;
+  }
+
+  return {
+    ...prospect,
+    social_links: social,
+  };
 }

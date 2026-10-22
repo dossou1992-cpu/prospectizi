@@ -41,7 +41,9 @@ export const initialProspects: Prospect[] = [
     phone: "+229 97 64 03 93",
     website_url: "http://www.talents-plus.com/",
     social_links: {
-      google_maps: "https://www.google.com/maps/search/?api=1&query=Cabinet+Talents+Plus+Conseils+Cotonou&query_place_id=ChIJQRofLwpVIxARYzIwdYW2RYw",
+      google_maps: "https://www.google.com/maps/place/Cabinet+Talents+Plus+Conseils,+Cotonou/",
+      linkedin: "https://www.linkedin.com/company/talents-plus-conseils/",
+      facebook: "https://www.facebook.com/talentsplusconseils/",
     },
     status: "en_discussion",
     estimated_deal_value: 1800,
@@ -81,7 +83,8 @@ export const initialProspects: Prospect[] = [
     phone: "+229 96 06 28 19",
     website_url: "",
     social_links: {
-      google_maps: "https://www.google.com/maps/search/?api=1&query=Cabinet+JURIS+PRESTIGE+CONSEILS+Cotonou&query_place_id=ChIJM-3nU3xXIxAR8lfphxt2suI",
+      google_maps: "https://www.google.com/maps/place/Cabinet+JURIS+PRESTIGE+CONSEILS,+Cotonou/",
+      linkedin: "https://www.linkedin.com/company/juris-prestige-conseils/",
     },
     status: "non_contacte",
     estimated_deal_value: 2200,
@@ -120,7 +123,8 @@ export const initialProspects: Prospect[] = [
     phone: "+229 97 12 34 56",
     website_url: "",
     social_links: {
-      instagram: "https://instagram.com",
+      instagram: "https://www.instagram.com/khellybiocosmetiques/",
+      facebook: "https://www.facebook.com/khellybiocosmetiques/",
     },
     status: "nouveau",
     estimated_deal_value: 950,

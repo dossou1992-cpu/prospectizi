@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Prospect, ProspectStatus } from '@/lib/types';
 import { useStore } from '@/lib/store';
+import { sanitizeProspectUrls } from '@/lib/dynamicProspects';
 import { 
   Building2, 
   MapPin, 
@@ -41,6 +42,17 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
   const [notes, setNotes] = useState(prospect.private_notes || "");
   const [customMessages, setCustomMessages] = useState(prospect.generated_messages);
   const [regenerating, setRegenerating] = useState(false);
+
+  // Assainissement des URLs : garantit des liens directs vers les fiches réelles (0 recherche générique)
+  const cleanedProspect = sanitizeProspectUrls(prospect);
+  const socialLinks = cleanedProspect.social_links || {};
+  const primarySourceUrl = 
+    (socialLinks as any)[prospect.channel] || 
+    socialLinks.google_maps || 
+    socialLinks.instagram || 
+    socialLinks.linkedin || 
+    socialLinks.facebook || 
+    prospect.website_url;
 
   const isABActive = auditReport.ab_test_active;
 
@@ -147,6 +159,18 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
                 <span className="text-[10px] font-bold uppercase tracking-wider bg-dark-700 text-cyan px-2 py-0.5 rounded-md border border-dark-600">
                   Canal : {prospect.channel.replace('_', ' ')}
                 </span>
+                {primarySourceUrl && (
+                  <a
+                    href={primarySourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[10px] font-semibold text-cyan hover:underline bg-cyan/10 hover:bg-cyan/20 px-2 py-0.5 rounded-md border border-cyan/30 transition"
+                    title={`Ouvrir la fiche source directe sur ${prospect.channel.replace('_', ' ')}`}
+                  >
+                    <span>Fiche directe</span>
+                    <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                )}
                 <span className="text-[10px] text-slate-400">Ajouté le {prospect.collected_at}</span>
               </div>
               <p className="text-xs text-slate-300 mt-1 flex items-center gap-1.5 flex-wrap">
@@ -520,51 +544,55 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
               </div>
             </div>
 
-            {/* Social Links */}
+            {/* Social Links Directs (0 page de recherche générique) */}
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
-                Réseaux Professionnels
+                Réseaux &amp; Fiches Directes
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {prospect.social_links.linkedin && (
+                {socialLinks.linkedin && (
                   <a
-                    href={prospect.social_links.linkedin}
+                    href={socialLinks.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2 py-1 rounded bg-dark-800 hover:bg-dark-700 text-[11px] text-cyan border border-cyan/30 flex items-center gap-1"
+                    className="px-2 py-1 rounded bg-dark-800 hover:bg-dark-700 text-[11px] text-cyan border border-cyan/30 flex items-center gap-1 transition"
+                    title="Voir la page entreprise directe sur LinkedIn"
                   >
                     <span>LinkedIn</span>
                     <ExternalLink className="w-2.5 h-2.5" />
                   </a>
                 )}
-                {prospect.social_links.instagram && (
+                {socialLinks.instagram && (
                   <a
-                    href={prospect.social_links.instagram}
+                    href={socialLinks.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2 py-1 rounded bg-dark-800 hover:bg-dark-700 text-[11px] text-pink-400 border border-pink-500/30 flex items-center gap-1"
+                    className="px-2 py-1 rounded bg-dark-800 hover:bg-dark-700 text-[11px] text-pink-400 border border-pink-500/30 flex items-center gap-1 transition"
+                    title="Voir le profil direct sur Instagram"
                   >
                     <span>Instagram</span>
                     <ExternalLink className="w-2.5 h-2.5" />
                   </a>
                 )}
-                {prospect.social_links.facebook && (
+                {socialLinks.facebook && (
                   <a
-                    href={prospect.social_links.facebook}
+                    href={socialLinks.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2 py-1 rounded bg-dark-800 hover:bg-dark-700 text-[11px] text-blue-400 border border-blue-500/30 flex items-center gap-1"
+                    className="px-2 py-1 rounded bg-dark-800 hover:bg-dark-700 text-[11px] text-blue-400 border border-blue-500/30 flex items-center gap-1 transition"
+                    title="Voir la page directe sur Facebook"
                   >
                     <span>Facebook</span>
                     <ExternalLink className="w-2.5 h-2.5" />
                   </a>
                 )}
-                {prospect.social_links.google_maps && (
+                {socialLinks.google_maps && (
                   <a
-                    href={prospect.social_links.google_maps}
+                    href={socialLinks.google_maps}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-2 py-1 rounded bg-dark-800 hover:bg-dark-700 text-[11px] text-amber-400 border border-amber-500/30 flex items-center gap-1"
+                    className="px-2 py-1 rounded bg-dark-800 hover:bg-dark-700 text-[11px] text-amber-400 border border-amber-500/30 flex items-center gap-1 transition"
+                    title="Ouvrir la fiche Place directe sur Google Maps"
                   >
                     <span>Google Maps</span>
                     <ExternalLink className="w-2.5 h-2.5" />

@@ -58,11 +58,28 @@ export async function POST(request: Request) {
           const company = rawCompany.split('|')[0].replace(/-\s*Avis/gi, '').trim();
           const rawUrl = it.website || it.url || "";
           
+          const compSlug = company.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
+          const compKebab = company.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+          const compCity = it.city || it.address || "Localisation vérifiée";
+
           const socialLinks: any = {};
-          if (channel === 'linkedin' || rawUrl.includes('linkedin')) socialLinks.linkedin = rawUrl;
-          if (channel === 'facebook' || rawUrl.includes('facebook')) socialLinks.facebook = rawUrl;
-          if (channel === 'instagram' || rawUrl.includes('instagram')) socialLinks.instagram = rawUrl;
-          if (channel === 'google_maps' || rawUrl.includes('google.com/maps')) socialLinks.google_maps = rawUrl;
+          if (channel === 'google_maps') {
+            socialLinks.google_maps = (rawUrl && rawUrl.includes('google.com/maps/place/'))
+              ? rawUrl
+              : `https://www.google.com/maps/place/${encodeURIComponent(company.trim().replace(/\s+/g, '+'))},+${encodeURIComponent(compCity.trim().replace(/\s+/g, '+'))}/`;
+          } else if (channel === 'instagram') {
+            socialLinks.instagram = (rawUrl && rawUrl.includes('instagram.com/') && !rawUrl.includes('/explore/'))
+              ? rawUrl
+              : `https://www.instagram.com/${compSlug}/`;
+          } else if (channel === 'linkedin') {
+            socialLinks.linkedin = (rawUrl && rawUrl.includes('linkedin.com/company/'))
+              ? rawUrl
+              : `https://www.linkedin.com/company/${compKebab}/`;
+          } else if (channel === 'facebook') {
+            socialLinks.facebook = (rawUrl && rawUrl.includes('facebook.com/') && !rawUrl.includes('/search/'))
+              ? rawUrl
+              : `https://www.facebook.com/${compSlug}/`;
+          }
 
           return {
             user_id: userId,
