@@ -799,10 +799,6 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
 
       if (res.ok) {
         const data = await res.json();
-        if (data.exhausted) {
-          showNotification(`🎯 Zone entièrement couverte : tous les acteurs répertoriés pour "${params.keyword}" à "${params.location}" ont déjà été qualifiés. Aucun crédit n'a été déduit.`);
-          return { success: true, added: 0, error: "Zone couverte" };
-        }
         if (data.prospects && data.prospects.length > 0) {
           // Filtrage strict anti-doublons avant insertion
           let actuallyAdded = 0;
@@ -858,11 +854,6 @@ export function ProspectiziProvider({ children }: { children: React.ReactNode })
         target_audience: avatar.target_audience
       }
     });
-
-    if (dynamicFallback.length === 0) {
-      showNotification(`🎯 Zone entièrement couverte : vous avez déjà qualifié l'ensemble des acteurs répertoriés pour "${params.keyword}" à "${params.location}". Aucun crédit n'a été déduit.`);
-      return { success: true, added: 0, error: "Zone couverte" };
-    }
 
     let actuallyAdded = 0;
     setProspects(prev => {

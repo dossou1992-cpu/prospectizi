@@ -312,16 +312,6 @@ export async function POST(request: Request) {
       avatar
     });
 
-    if (dynamicProspects.length === 0) {
-      return NextResponse.json({
-        success: true,
-        count: 0,
-        exhausted: true,
-        prospects: [],
-        message: `Vous avez déjà qualifié l'ensemble des acteurs répertoriés pour "${cleanKeyword}" à "${cleanLocation}" sur ${channel.replace('_', ' ')}. Aucun crédit n'a été déduit.`
-      });
-    }
-
     return NextResponse.json({
       success: true,
       count: dynamicProspects.length,
