@@ -42,8 +42,6 @@ export const initialProspects: Prospect[] = [
     website_url: "http://www.talents-plus.com/",
     social_links: {
       google_maps: "https://www.google.com/maps/place/Cabinet+Talents+Plus+Conseils,+Cotonou/",
-      linkedin: "https://www.linkedin.com/company/talents-plus-conseils/",
-      facebook: "https://www.facebook.com/talentsplusconseils/",
     },
     status: "en_discussion",
     estimated_deal_value: 1800,
@@ -84,7 +82,6 @@ export const initialProspects: Prospect[] = [
     website_url: "",
     social_links: {
       google_maps: "https://www.google.com/maps/place/Cabinet+JURIS+PRESTIGE+CONSEILS,+Cotonou/",
-      linkedin: "https://www.linkedin.com/company/juris-prestige-conseils/",
     },
     status: "non_contacte",
     estimated_deal_value: 2200,
@@ -123,8 +120,7 @@ export const initialProspects: Prospect[] = [
     phone: "+229 97 12 34 56",
     website_url: "",
     social_links: {
-      instagram: "https://www.instagram.com/khellybiocosmetiques/",
-      facebook: "https://www.facebook.com/khellybiocosmetiques/",
+      google_maps: "https://www.google.com/maps/place/Khelly+Bio+Cosm%C3%A9tiques,+Cotonou/",
     },
     status: "nouveau",
     estimated_deal_value: 950,

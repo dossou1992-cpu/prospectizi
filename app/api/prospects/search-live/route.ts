@@ -184,16 +184,40 @@ export async function POST(request: Request) {
                   socialMapsUrl = `https://www.google.com/maps/place/${placeQuery}/`;
                 }
               } else if (channel === 'instagram') {
-                const igUser = item.username || item.handle || compSlug;
-                socialMapsUrl = (item.url && item.url.includes('instagram.com/') && !item.url.includes('/explore/')) ? item.url : `https://www.instagram.com/${igUser}/`;
+                // Ne conserver que les profils Instagram réellement scrapés
+                if (item.username && !item.username.includes(' ') && !item.username.includes('/')) {
+                  socialMapsUrl = `https://www.instagram.com/${item.username}/`;
+                } else if (item.url && item.url.includes('instagram.com/') && !item.url.includes('/explore/')) {
+                  socialMapsUrl = item.url;
+                } else {
+                  socialMapsUrl = ""; // ZÉRO FAUX USERNAME INVENTÉ
+                }
+                // Rejet de la fiche fantôme si l'utilisateur a filtré sur Instagram et qu'aucun profil n'existe
+                if (!socialMapsUrl) continue;
               } else if (channel === 'linkedin') {
-                socialMapsUrl = (item.linkedinUrl || item.companyUrl || (item.url && item.url.includes('linkedin.com/company/'))) 
-                  ? (item.linkedinUrl || item.companyUrl || item.url) 
-                  : `https://www.linkedin.com/company/${compKebab}/`;
+                // Ne conserver que les pages entreprises LinkedIn réellement scrapées
+                if (item.linkedinUrl && item.linkedinUrl.includes('linkedin.com/company/')) {
+                  socialMapsUrl = item.linkedinUrl;
+                } else if (item.companyUrl && item.companyUrl.includes('linkedin.com/company/')) {
+                  socialMapsUrl = item.companyUrl;
+                } else if (item.url && item.url.includes('linkedin.com/company/')) {
+                  socialMapsUrl = item.url;
+                } else {
+                  socialMapsUrl = ""; // ZÉRO FAUX SLUG INVENTÉ
+                }
+                // Rejet de la fiche fantôme si l'utilisateur a filtré sur LinkedIn et qu'aucune page n'existe
+                if (!socialMapsUrl) continue;
               } else if (channel === 'facebook') {
-                socialMapsUrl = (item.url && item.url.includes('facebook.com/') && !item.url.includes('/search/'))
-                  ? item.url
-                  : `https://www.facebook.com/${compSlug}/`;
+                // Ne conserver que les pages Facebook réelles issues du scraping
+                if (item.url && item.url.includes('facebook.com/') && !item.url.includes('/search/')) {
+                  socialMapsUrl = item.url;
+                } else if (item.facebookUrl && item.facebookUrl.includes('facebook.com/')) {
+                  socialMapsUrl = item.facebookUrl;
+                } else {
+                  socialMapsUrl = ""; // ZÉRO FAUX SLUG INVENTÉ
+                }
+                // Rejet de la fiche fantôme si l'utilisateur a filtré sur Facebook et qu'aucune page n'existe
+                if (!socialMapsUrl) continue;
               }
 
               const geo = getGeoConfig(cleanLocation);
@@ -251,10 +275,10 @@ export async function POST(request: Request) {
         const score = Math.floor(Math.random() * (96 - 83 + 1)) + 83;
 
         const socialLinks: any = {};
-        if (channel === 'google_maps') socialLinks.google_maps = item.social_url;
-        if (channel === 'instagram') socialLinks.instagram = item.social_url;
-        if (channel === 'linkedin') socialLinks.linkedin = item.social_url;
-        if (channel === 'facebook') socialLinks.facebook = item.social_url;
+        if (channel === 'google_maps' && item.social_url) socialLinks.google_maps = item.social_url;
+        if (channel === 'instagram' && item.social_url) socialLinks.instagram = item.social_url;
+        if (channel === 'linkedin' && item.social_url) socialLinks.linkedin = item.social_url;
+        if (channel === 'facebook' && item.social_url) socialLinks.facebook = item.social_url;
 
         return {
           id: `live-${Date.now()}-${i}-${Math.random().toString(36).substring(7)}`,

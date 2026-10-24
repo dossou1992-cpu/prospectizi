@@ -168,10 +168,69 @@ test.describe("🤖 ROBOT DE TEST E2E EXHAUSTIF - MODULE DE PROSPECTION PROSPECT
 
     // Recharger la page (F5)
     await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1000);
 
     // Contrôler que l'état LocalStorage a bien restauré les valeurs sans réinitialisation
     await expect(keywordInput).toHaveValue("Cabinets d'avocats internationaux");
     await expect(locationInput).toHaveValue("Abidjan");
+  });
+
+  test("Sécurité Anti-Fausse Fiche : Vérification de l'assainissement et zéro faux slug Facebook/Instagram", async ({ page }) => {
+    await page.goto('/prospects', { waitUntil: 'domcontentloaded' });
+
+    // Injecter une ancienne fiche corrompue dans le localStorage pour tester la purge automatique
+    await page.evaluate(() => {
+      const corruptProspect = {
+        id: "test-ghost-card-1",
+        company_name: "Maison Salons de massage & Partenaires Abidjan",
+        activity: "Salons de massage",
+        city: "Abidjan",
+        country: "Côte d'Ivoire",
+        qualification_score: 88,
+        qualification_reason: "Fiche de test",
+        flaws_identified: "Aucun site",
+        recommended_offer: "Offre test",
+        opportunity: "Opportunité test",
+        channel: "facebook",
+        collected_at: "2026-10-24",
+        email: "test@example.com",
+        phone: "+225 07 00 00 00",
+        website_url: "",
+        social_links: {
+          facebook: "https://www.facebook.com/maisonsalonsdemassagepartenairesabidjan/",
+          google_maps: "https://www.google.com/maps/place/Maison+Salons,+Abidjan/"
+        },
+        status: "nouveau",
+        estimated_deal_value: 1200,
+        generated_messages: {
+          first_contact: "Test",
+          first_contact_variant_b: "Test",
+          value_offer: "Test",
+          followup_1: "Test",
+          followup_2: "Test",
+          followup_final: "Test"
+        },
+        private_notes: "",
+        closing_tips: [],
+        is_existing: true,
+        is_closed: false
+      };
+
+      const existing = JSON.parse(localStorage.getItem('prospectizi_prospects') || '[]');
+      localStorage.setItem('prospectizi_prospects', JSON.stringify([corruptProspect, ...existing]));
+    });
+
+    // Recharger la page pour que l'assainisseur dynamique s'exécute
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(1000);
+
+    // Vérifier que la fiche corrompue n'affiche plus le lien mort vers facebook.com/maisonsalons...
+    const deadFacebookLink = page.locator('a[href*="maisonsalonsdemassagepartenairesabidjan"]');
+    await expect(deadFacebookLink).toHaveCount(0);
+
+    // Vérifier que le badge "FACEBOOK : Non disponible" est bien affiché
+    const unavailableBadge = page.locator('text=FACEBOOK : Non disponible').first();
+    await expect(unavailableBadge).toBeVisible();
   });
 
 });

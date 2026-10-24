@@ -69,17 +69,17 @@ export async function POST(request: Request) {
               ? rawUrl
               : `https://www.google.com/maps/place/${encodeURIComponent(company.trim().replace(/\s+/g, '+'))},+${encodeURIComponent(compCity.trim().replace(/\s+/g, '+'))}/`;
           } else if (channel === 'instagram') {
-            socialLinks.instagram = (rawUrl && rawUrl.includes('instagram.com/') && !rawUrl.includes('/explore/'))
-              ? rawUrl
-              : `https://www.instagram.com/${compSlug}/`;
+            if (rawUrl && rawUrl.includes('instagram.com/') && !rawUrl.includes('/explore/')) {
+              socialLinks.instagram = rawUrl;
+            }
           } else if (channel === 'linkedin') {
-            socialLinks.linkedin = (rawUrl && rawUrl.includes('linkedin.com/company/'))
-              ? rawUrl
-              : `https://www.linkedin.com/company/${compKebab}/`;
+            if (rawUrl && rawUrl.includes('linkedin.com/company/')) {
+              socialLinks.linkedin = rawUrl;
+            }
           } else if (channel === 'facebook') {
-            socialLinks.facebook = (rawUrl && rawUrl.includes('facebook.com/') && !rawUrl.includes('/search/'))
-              ? rawUrl
-              : `https://www.facebook.com/${compSlug}/`;
+            if (rawUrl && rawUrl.includes('facebook.com/') && !rawUrl.includes('/search/')) {
+              socialLinks.facebook = rawUrl;
+            }
           }
 
           return {

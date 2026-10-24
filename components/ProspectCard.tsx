@@ -14,7 +14,8 @@ import {
   Copy, 
   Check, 
   Sparkles, 
-  AlertTriangle, 
+  AlertTriangle,
+  AlertCircle, 
   Lightbulb, 
   CheckCircle2, 
   Send,
@@ -43,16 +44,11 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
   const [customMessages, setCustomMessages] = useState(prospect.generated_messages);
   const [regenerating, setRegenerating] = useState(false);
 
-  // Assainissement des URLs : garantit des liens directs vers les fiches réelles (0 recherche générique)
+  // Assainissement des URLs : garantit des liens directs vers les fiches réelles (0 recherche générique, 0 fausse fiche)
   const cleanedProspect = sanitizeProspectUrls(prospect);
   const socialLinks = cleanedProspect.social_links || {};
-  const primarySourceUrl = 
-    (socialLinks as any)[prospect.channel] || 
-    socialLinks.google_maps || 
-    socialLinks.instagram || 
-    socialLinks.linkedin || 
-    socialLinks.facebook || 
-    prospect.website_url;
+  // Fiche source réelle sur le canal demandé (strictement sans faux slug ni lien fantôme)
+  const primarySourceUrl = (socialLinks as any)[prospect.channel] || null;
 
   const isABActive = auditReport.ab_test_active;
 
@@ -159,7 +155,7 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
                 <span className="text-[10px] font-bold uppercase tracking-wider bg-dark-700 text-cyan px-2 py-0.5 rounded-md border border-dark-600">
                   Canal : {prospect.channel.replace('_', ' ')}
                 </span>
-                {primarySourceUrl && (
+                {primarySourceUrl ? (
                   <a
                     href={primarySourceUrl}
                     target="_blank"
@@ -167,9 +163,17 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
                     className="inline-flex items-center gap-1 text-[10px] font-semibold text-cyan hover:underline bg-cyan/10 hover:bg-cyan/20 px-2 py-0.5 rounded-md border border-cyan/30 transition"
                     title={`Ouvrir la fiche source directe sur ${prospect.channel.replace('_', ' ')}`}
                   >
-                    <span>Fiche directe</span>
+                    <span>Fiche directe vérifiée</span>
                     <ExternalLink className="w-2.5 h-2.5" />
                   </a>
+                ) : (
+                  <span
+                    className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20"
+                    title={`Le canal source ${prospect.channel.replace('_', ' ')} n'a pas de lien direct vérifié pour cet établissement`}
+                  >
+                    <AlertCircle className="w-2.5 h-2.5" />
+                    <span>{prospect.channel.toUpperCase()} : Non disponible</span>
+                  </span>
                 )}
                 <span className="text-[10px] text-slate-400">Ajouté le {prospect.collected_at}</span>
               </div>
@@ -544,12 +548,24 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
               </div>
             </div>
 
-            {/* Social Links Directs (0 page de recherche générique) */}
+            {/* Réseaux & Fiches Directes (100% vérifiés, 0 fausse fiche, 0 page 404) */}
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
                 Réseaux &amp; Fiches Directes
               </span>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5 items-center">
+                {socialLinks.google_maps && (
+                  <a
+                    href={socialLinks.google_maps}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2 py-1 rounded bg-dark-800 hover:bg-dark-700 text-[11px] text-amber-400 border border-amber-500/30 flex items-center gap-1 transition"
+                    title="Ouvrir la fiche Place directe sur Google Maps"
+                  >
+                    <span>Google Maps</span>
+                    <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
+                )}
                 {socialLinks.linkedin && (
                   <a
                     href={socialLinks.linkedin}
@@ -586,17 +602,11 @@ export default function ProspectCard({ prospect, onReportFaulty }: ProspectCardP
                     <ExternalLink className="w-2.5 h-2.5" />
                   </a>
                 )}
-                {socialLinks.google_maps && (
-                  <a
-                    href={socialLinks.google_maps}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-2 py-1 rounded bg-dark-800 hover:bg-dark-700 text-[11px] text-amber-400 border border-amber-500/30 flex items-center gap-1 transition"
-                    title="Ouvrir la fiche Place directe sur Google Maps"
-                  >
-                    <span>Google Maps</span>
-                    <ExternalLink className="w-2.5 h-2.5" />
-                  </a>
+                {prospect.channel !== 'google_maps' && !(socialLinks as any)[prospect.channel] && (
+                  <span className="px-2 py-1 rounded bg-dark-900 text-[10px] text-slate-400 border border-dark-700 flex items-center gap-1">
+                    <AlertCircle className="w-2.5 h-2.5 text-amber-400" />
+                    <span>{prospect.channel.toUpperCase()} : Non disponible</span>
+                  </span>
                 )}
               </div>
             </div>
