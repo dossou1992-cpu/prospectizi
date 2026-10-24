@@ -12,7 +12,17 @@ export const isSupabaseConfigured = Boolean(
 
 // Client Supabase officiel pour le navigateur (clé publique)
 export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: typeof window !== 'undefined',
+      },
+      ...(typeof window === 'undefined' ? {
+        realtime: {
+          // @ts-ignore
+          transport: typeof WebSocket !== 'undefined' ? WebSocket : require('ws')
+        }
+      } : {})
+    })
   : null;
 
 // Client Supabase avec droits d'administration (pour les webhooks et actions serveur)

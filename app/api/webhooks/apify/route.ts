@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import * as Sentry from "@sentry/nextjs";
 
 // Filtre strict anti-bruit SERP
 function isSerpNoise(title: string, url: string): boolean {
@@ -119,6 +120,7 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     console.error("[Apify Webhook Error]", error);
+    Sentry.captureException(error, { extra: { context: "apify-webhook" } });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

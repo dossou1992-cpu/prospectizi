@@ -23,7 +23,7 @@ interface GeoConfig {
 }
 
 // Détection géographique fine des villes et pays avec indicatifs et quartiers réels
-function getGeoConfig(location: string): GeoConfig {
+export function getGeoConfig(location: string): GeoConfig {
   const loc = (location || "").toLowerCase().trim();
 
   if (loc.includes('abidjan') || loc.includes('ivoir') || loc.includes('bouak') || loc.includes('yamoussoukro')) {

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { generateDynamicProspects } from '@/lib/dynamicProspects';
+import { generateDynamicProspects, getGeoConfig } from '@/lib/dynamicProspects';
+import * as Sentry from "@sentry/nextjs";
 
 export const maxDuration = 60;
 
@@ -195,6 +196,7 @@ export async function POST(request: Request) {
                   : `https://www.facebook.com/${compSlug}/`;
               }
 
+              const geo = getGeoConfig(cleanLocation);
               extractedProspects.push({
                 title: cleanTitle,
                 website: rawUrl && rawUrl.startsWith('http') && !rawUrl.includes('google.com') && !rawUrl.includes('instagram.com') && !rawUrl.includes('facebook.com') && !rawUrl.includes('linkedin.com') ? rawUrl : "",
@@ -204,7 +206,7 @@ export async function POST(request: Request) {
                 social_url: socialMapsUrl,
                 rating: rating,
                 city: cleanLocation,
-                country: cleanLocation.toLowerCase().includes('cotonou') || cleanLocation.toLowerCase().includes('bénin') ? 'Bénin' : 'International'
+                country: geo.country
               });
             }
           }
@@ -320,6 +322,11 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     console.error("[Search Live Error]", error);
+    Sentry.captureException(error, {
+      extra: {
+        context: "search-live API handler"
+      }
+    });
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
